@@ -23,7 +23,7 @@ STEPS = [["step1_build_model.py"], ["step2_studies.py"], ["step3_design_and_eval
          ["step4_apply_settings.py", "dsdr"],
          ["loadflow_all_buses.py"], ["database_study.py"],
          ["make_loadflow_comparison_pdf.py"], ["make_paper_vs_database_pdf.py"],
-         ["make_comparison_pdf.py"], ["make_operating_time_pdf.py"], ["make_coordination_diagrams.py"], ["build_report_pdf.py"], ["make_figure_guide.py"]]
+         ["make_comparison_pdf.py"], ["make_operating_time_pdf.py"], ["make_coordination_diagrams.py"], ["build_report_pdf.py"], ["make_figure_guide.py"], ["make_report_word.py"]]
 
 for step in STEPS:
     print("\n" + "=" * 90 + "\n" + " ".join(step) + "\n" + "=" * 90, flush=True)
