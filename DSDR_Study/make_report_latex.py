@@ -287,6 +287,8 @@ for k, val in T.items():
     template = template.replace("<<%s>>" % k, val)
 left = re.findall(r"<<[A-Z0-9_]+>>", template)
 assert not left, left
+from table_style import excel_tables             # spreadsheet-style tables (all cells framed)
+template = excel_tables(template)
 with open(os.path.join(OUT, "main.tex"), "w", encoding="utf-8") as fh:
     fh.write(template)
 print("written", os.path.join(OUT, "main.tex"), "(%d lines)" % template.count("\n"))
