@@ -110,9 +110,7 @@ handles = [plt.Line2D([], [], marker="s", ls="", color=c, label="%d %%" % p) for
 handles += [plt.Line2D([], [], marker="s", ls="", color=INK2, label="fuse operating point"),
             plt.Line2D([], [], marker="o", ls="", color=INK2, label="recloser operating point")]
 fig.legend(handles=handles, title="DG penetration", loc="center right", frameon=False, fontsize=8.5)
-fig.suptitle("TCC with increasing DG penetration (conventional settings): the recloser point stays, the fuse point moves "
-             "right and down", fontsize=10, x=0.01, ha="left")
-fig.tight_layout(rect=(0, 0, 0.88, 0.95))
+fig.tight_layout(rect=(0, 0, 0.88, 1))
 fig.savefig(os.path.join(RES, "TCC_penetration_overview.png"), dpi=160)
 plt.close(fig)
 
@@ -131,9 +129,7 @@ for node in ("633", "671"):
         ax.set_xlabel("Current (A)")
     for ax in axes[:, 0]:
         ax.set_ylabel("Time (s)")
-    fig.suptitle("TCC - %s, conventional settings, at each DG penetration level (square: fuse, circle: recloser)"
-                 % CASES[node]["title"], fontsize=10.5, x=0.01, ha="left")
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.tight_layout()
     fig.savefig(os.path.join(RES, "TCC_penetration_%s.png" % node), dpi=140)
     plt.close(fig)
 print("written: TCC_penetration_overview.png, TCC_penetration_633.png, TCC_penetration_671.png")

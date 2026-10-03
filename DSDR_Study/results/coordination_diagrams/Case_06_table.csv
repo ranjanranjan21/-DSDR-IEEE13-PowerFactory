@@ -1,0 +1,12 @@
+Quantity,Single setting,Dual setting (DSDR)
+Fault,"LL fault at 646, LL, phases BC",same
+Fault impedance Zf,0 ohm (bolted),same
+Fault-path current (F646),3672 A,same
+"Current through R1, direction","2785 A, forward (RG60 -> 632), grid contribution",same
+"Current through R2, direction","1114 A, REVERSE (671 -> 632), DG contribution only",same
+R2 setting applied (fast / delayed),"FORWARD: plug 300/600 A, starts 600/1200 A, TMS 0.1/1.0","REVERSE: plug 150/300 A, starts 300/600 A, TMS 0.1/1.0"
+R1 fast / delayed,0.189 s / 3.770 s,0.189 s / 3.770 s
+R2 fast / delayed,0.278 s / no trip,0.086 s / 3.771 s
+Primary fuse melts / clears,F646 400E: 0.415 s / 0.684 s,F646 400E: 0.415 s / 0.684 s
+Backup fuse melts,F632 500E: 0.921 s,F632 500E: 0.921 s
+Fuse saving,HELD,HELD

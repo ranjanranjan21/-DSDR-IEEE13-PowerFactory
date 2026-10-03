@@ -84,14 +84,12 @@ def doughnut(panels, path, width):
     ax.set_title(title, fontsize=10.5)
   fig.legend(handles=[plt.Rectangle((0, 0), 1, 1, fc=c, ec="black", lw=0.8, label="%d %%" % p) for c, p in zip(cols, P)],
              title="DG penetration", loc="center right", frameon=False, fontsize=9)
-  fig.suptitle("Percentage variation of the CTI with DG penetration\n(each ring = 100 %; negative = fuse melts "
-               "before the recloser's fast trip)", fontsize=9.5, x=0.01, ha="left")
-  fig.tight_layout(rect=(0, 0, 0.82 if len(panels) == 1 else 0.9, 0.93))
+  fig.tight_layout(rect=(0, 0, 0.82 if len(panels) == 1 else 0.9, 1))
   fig.savefig(path, dpi=160)
   plt.close(fig)
 
 
-doughnut([(ring, "PowerFactory, conventional protection")], os.path.join(RES, "Fig07_penetration.png"), 7.0)
+doughnut([(ring, "")], os.path.join(RES, "Fig07_penetration.png"), 7.0)
 doughnut([(ring, "This study (PowerFactory)"), (PAPER, "Reference paper (values read from its Fig. 7)")],
          os.path.join(CMP, "Fig07_penetration_vs_paper.png"), 11.2)
 

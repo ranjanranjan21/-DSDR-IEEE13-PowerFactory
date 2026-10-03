@@ -964,7 +964,8 @@ In cases 5, 7 and 8 the dual setting restores the fuse saving: the reverse group
 the forward group does not see (case 7: 469\,A) or sees only slowly. Cases 3, 4 and 9 are lost with both
 settings; they are limits of the fuse revision and of the dial range, not of the direction. Cases 3 and 4 are
 faults through impedance: the larger fuses that are needed for the bolted faults are too slow for
-these lower currents.
+these lower currents. Cases 5 and 7 are shown in detail in Figures~\ref{fig:case5} and \ref{fig:case7};
+Tables~\ref{tab:case5} and \ref{tab:case7} list their currents, settings and operating times.
 
 \begin{figure}[H]
 \centering
@@ -973,12 +974,42 @@ these lower currents.
 \label{fig:case5}
 \end{figure}
 
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{p{4.4cm}LL}
+\toprule
+\textbf{Quantity} & \textbf{Single setting} & \textbf{Dual setting (DSDR)} \\
+\midrule
+<<CASE05_TABLE>>
+\bottomrule
+\end{tabularx}
+\caption{Three-phase fault at 10\,\% of line 632--633: currents, settings and operating times.}
+\label{tab:case5}
+\end{table}
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{case07.png}
 \caption{LG fault at 646: the single-setting R2 does not pick up the reverse current; the reverse group does.}
 \label{fig:case7}
 \end{figure}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{p{4.4cm}LL}
+\toprule
+\textbf{Quantity} & \textbf{Single setting} & \textbf{Dual setting (DSDR)} \\
+\midrule
+<<CASE07_TABLE>>
+\bottomrule
+\end{tabularx}
+\caption{LG fault at 646 (phase c): currents, settings and operating times.}
+\label{tab:case7}
+\end{table}
 
 \subsection{Time-Sequence Check}
 The classification above uses the strict rule that every recloser must trip before the fuse starts to melt.
@@ -992,7 +1023,8 @@ at 692 feeds the fault directly, with no recloser in its path, and the result is
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{cd_sequence.png}
-\caption{Time-sequence check of all <<N_CELLS>> cells, single against dual setting.}
+\caption{Time-sequence check of all <<N_CELLS>> cells: in each cell S is the single setting and D the dual
+setting on R2.}
 \label{fig:seq}
 \end{figure}
 
@@ -1076,8 +1108,7 @@ $CTI\,\% = 100 \times CTI / \sum |CTI|$ over the seven levels, so that each ring
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.62\textwidth]{pen_ring.png}
-\caption{Percentage variation of the CTI with DG penetration (each ring adds up to 100\,\%; outer ring 671, inner
-ring 633).}
+\caption{Percentage variation of the CTI with DG penetration (outer ring 671, inner ring 633).}
 \label{fig:penring}
 \end{figure}
 

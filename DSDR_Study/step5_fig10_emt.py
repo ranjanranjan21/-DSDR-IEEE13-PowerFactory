@@ -253,9 +253,7 @@ for ax, (tag, t, w, events, heat, t_melt) in zip(axes, cases):
                 color="#eb6834")
     ax.set_ylim(-1.15 * top, 1.15 * top)
     ax.set_ylabel("Current (A)")
-    ax.set_title("%s - F671-2 %s, heat after the fast shots: %.0f %% of melting" % (
-        tag, s["fuses"]["F671-2"].replace("A055C", ""), 100 * heat),
-                 fontsize=9, loc="left")
+    ax.set_title("%s (fuse F671-2 %s)" % ("With DG" if tag == "DG in" else "Without DG", s["fuses"]["F671-2"].replace("A055C", "")), fontsize=9, loc="left")
     ax.grid(True, color="#d9d8d4", lw=0.5)
     for sp in ("top", "right"):
         ax.spines[sp].set_visible(False)

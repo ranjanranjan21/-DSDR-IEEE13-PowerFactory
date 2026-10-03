@@ -1075,7 +1075,8 @@ In cases 5, 7 and 8 the dual setting restores the fuse saving: the reverse group
 the forward group does not see (case 7: 469\,A) or sees only slowly. Cases 3, 4 and 9 are lost with both
 settings; they are limits of the fuse revision and of the dial range, not of the direction. Cases 3 and 4 are
 faults through impedance: the larger fuses that are needed for the bolted faults are too slow for
-these lower currents.
+these lower currents. Cases 5 and 7 are shown in detail in Figures~\ref{fig:case5} and \ref{fig:case7};
+Tables~\ref{tab:case5} and \ref{tab:case7} list their currents, settings and operating times.
 
 \begin{figure}[H]
 \centering
@@ -1084,12 +1085,58 @@ these lower currents.
 \label{fig:case5}
 \end{figure}
 
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{|p{4.4cm}|L|L|}
+\hline
+\textbf{Quantity} & \textbf{Single setting} & \textbf{Dual setting (DSDR)} \\ \hline
+Fault & \multicolumn{2}{l|}{3-phase fault at 10 \% of 632-633, LLL, phases a-b-c} \\ \hline
+Fault impedance $Z_f$ & \multicolumn{2}{l|}{0\ohm{} (bolted)} \\ \hline
+Fault-path current (F633) & \multicolumn{2}{l|}{6398 A} \\ \hline
+Current through R1, direction & \multicolumn{2}{l|}{4645 A, forward (RG60 $\rightarrow$ 632), grid contribution} \\ \hline
+Current through R2, direction & \multicolumn{2}{l|}{1777 A, REVERSE (671 $\rightarrow$ 632), DG contribution only} \\ \hline
+R2 setting applied (fast / delayed) & FORWARD: plug 300/600 A, starts 600/1200 A, TMS 0.1/1.0 & REVERSE: plug 150/300 A, starts 300/600 A, TMS 0.1/1.0 \\ \hline
+R1 fast / delayed & 0.084 s / 1.672 s & 0.084 s / 1.672 s \\ \hline
+R2 fast / delayed & 0.121 s / 6.426 s & 0.052 s / 1.470 s \\ \hline
+Primary fuse melts / clears & F633 400E: 0.100 s / 0.163 s & F633 400E: 0.100 s / 0.163 s \\ \hline
+Backup fuse melts & - & - \\ \hline
+Fuse saving & LOST: F633 melts (0.100 s) before R2 fast (0.121 s) & HELD \\ \hline
+\end{tabularx}
+\caption{Three-phase fault at 10\,\% of line 632--633: currents, settings and operating times.}
+\label{tab:case5}
+\end{table}
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{case07.png}
 \caption{LG fault at 646: the single-setting R2 does not pick up the reverse current; the reverse group does.}
 \label{fig:case7}
 \end{figure}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{|p{4.4cm}|L|L|}
+\hline
+\textbf{Quantity} & \textbf{Single setting} & \textbf{Dual setting (DSDR)} \\ \hline
+Fault & \multicolumn{2}{l|}{LG fault at 646 (phase c), LG, phases C} \\ \hline
+Fault impedance $Z_f$ & \multicolumn{2}{l|}{0\ohm{} (bolted)} \\ \hline
+Fault-path current (F646) & \multicolumn{2}{l|}{2732 A} \\ \hline
+Current through R1, direction & \multicolumn{2}{l|}{2359 A, forward (RG60 $\rightarrow$ 632), grid contribution} \\ \hline
+Current through R2, direction & \multicolumn{2}{l|}{469 A, REVERSE (671 $\rightarrow$ 632), DG contribution only} \\ \hline
+R2 setting applied (fast / delayed) & FORWARD: plug 300/600 A, starts 600/1200 A, TMS 0.1/1.0 & REVERSE: plug 150/300 A, starts 300/600 A, TMS 0.1/1.0 \\ \hline
+R1 fast / delayed & 0.255 s / 5.105 s & 0.255 s / 5.105 s \\ \hline
+R2 fast / delayed & no trip / no trip & 0.396 s / no trip \\ \hline
+Primary fuse melts / clears & F646 400E: 1.057 s / 2.058 s & F646 400E: 1.057 s / 2.058 s \\ \hline
+Backup fuse melts & F632 500E: 2.913 s & F632 500E: 2.913 s \\ \hline
+Fuse saving & LOST: R2 does not pick up (469 A) & HELD \\ \hline
+\end{tabularx}
+\caption{LG fault at 646 (phase c): currents, settings and operating times.}
+\label{tab:case7}
+\end{table}
 
 \subsection{Time-Sequence Check}
 The classification above uses the strict rule that every recloser must trip before the fuse starts to melt.
@@ -1103,7 +1150,8 @@ at 692 feeds the fault directly, with no recloser in its path, and the result is
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{cd_sequence.png}
-\caption{Time-sequence check of all 39 cells, single against dual setting.}
+\caption{Time-sequence check of all 39 cells: in each cell S is the single setting and D the dual
+setting on R2.}
 \label{fig:seq}
 \end{figure}
 
@@ -1196,8 +1244,7 @@ $CTI\,\% = 100 \times CTI / \sum |CTI|$ over the seven levels, so that each ring
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.62\textwidth]{pen_ring.png}
-\caption{Percentage variation of the CTI with DG penetration (each ring adds up to 100\,\%; outer ring 671, inner
-ring 633).}
+\caption{Percentage variation of the CTI with DG penetration (outer ring 671, inner ring 633).}
 \label{fig:penring}
 \end{figure}
 

@@ -206,9 +206,10 @@ def fault_rows(rec, node, zf, paper):
 
 
 def case_figure(cid, title, rec, node, zf, paper):
-    fig = plt.figure(figsize=(11.4, 8.3))
-    gs = fig.add_gridspec(2, 2, height_ratios=[1.55, 1.0], hspace=0.2, wspace=0.12, left=0.06, right=0.985,
-                          top=0.9, bottom=0.03)
+    """Two TCC panels (single / dual setting).  The numbers of the case go to Case_NN_table.csv, which the
+    report prints as a table under the figure."""
+    fig = plt.figure(figsize=(11.4, 5.4))
+    gs = fig.add_gridspec(1, 2, wspace=0.12, left=0.06, right=0.985, top=0.94, bottom=0.1)
     ax1, ax2 = fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1])
     e1 = draw_panel(ax1, rec, node, S_SINGLE, False, "Single setting: R2 non-directional, forward setting only")
     e2 = draw_panel(ax2, rec, node, S_DUAL, True, "Dual setting: R2 as DSDR")
@@ -222,41 +223,16 @@ def case_figure(cid, title, rec, node, zf, paper):
             f, S_DUAL["fuses"][f].replace("A055C", ""))))
     handles.append(Line2D([], [], color=INK2, lw=0.9, label="vertical lines: current through each device"))
     ax1.legend(handles=handles, loc="lower left", fontsize=7.2, frameon=True, framealpha=0.92)
-    zf_txt = "Zf = %.1f ohm" % zf if zf else "Zf = 0 ohm (bolted)"
-    fig.suptitle("Case %s - %s, %s, DG 4.05 MVA connected at 692" % (cid, title, zf_txt),
-                 fontsize=11.5, x=0.06, ha="left", y=0.965)
 
     rows, labels, both = fault_rows(rec, node, zf, paper)
-    axt = fig.add_subplot(gs[1, :])
-    axt.axis("off")
-    cell = [["%s" % title if a.startswith("Fault (") else a, "" if b is None else b, ""] for a, b in rows]
-    cell[0][1] = "%s, phases %s" % (rec["type"], rec["phases"] or "a-b-c")
+    cell = [[title if a.startswith("Fault") and b is None else a, "" if b is None else b, "same"] for a, b in rows]
+    cell[0] = ["Fault", "%s, %s, phases %s" % (title, rec["type"], rec["phases"] or "a-b-c"), "same"]
     for k, lab in enumerate(labels):
         cell.append([lab, both[0][0][k], both[1][0][k]])
-    tb = axt.table(cellText=cell, colLabels=["Quantity", "Single setting", "Dual setting (DSDR)"],
-                   colWidths=[0.24, 0.38, 0.38], loc="center", cellLoc="left")
-    tb.auto_set_font_size(False)
-    tb.set_fontsize(7.6)
-    tb.scale(1, 1.32)
-    n_common = len(rows)
-    for (r, c), cl in tb.get_celld().items():
-        cl.set_edgecolor("#b9b8b3")
-        cl.set_linewidth(0.5)
-        if r == 0:
-            cl.set_facecolor("#1b4f93")
-            cl.get_text().set_color("white")
-            cl.get_text().set_fontweight("bold")
-        elif r <= n_common:
-            cl.set_facecolor("#f4f4f2")
-            if c == 2:
-                cl.get_text().set_text("(same fault and currents)")
-                cl.get_text().set_color(INK2)
-        if r == len(cell) and c in (1, 2):
-            held = both[c - 1][1]["held"]
-            cl.set_facecolor("#dff3df" if held else "#fbe0e0")
-            cl.get_text().set_fontweight("bold")
-        if r == n_common + 1 and c == 2 and both[0][0][0] != both[1][0][0]:
-            cl.set_facecolor("#fde3d6")
+    with open_csv(os.path.join(OUT, "Case_%s_table.csv" % cid)) as f:
+        w = csv.writer(f)
+        w.writerow(["Quantity", "Single setting", "Dual setting (DSDR)"])
+        w.writerows(cell)
     path_png = os.path.join(OUT, "Case_%s_%s.png" % (cid, title.replace(" ", "_").replace("%", "pct").replace("(", "").replace(")", "")))
     path_png = save_fig(fig, path_png, 150)
     plt.close(fig)

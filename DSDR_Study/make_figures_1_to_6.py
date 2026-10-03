@@ -437,8 +437,6 @@ def fig6():
                        Line2D([], [], color=INK, lw=1.4, ls="-.", label="single-phase line"),
                        Line2D([], [], marker="s", ms=6, color=RED, ls="", label="recloser / fuse (size of the final design)")],
               loc="lower right", fontsize=7.4, frameon=False)
-    ax.set_title("IEEE 13-node test feeder with the protective devices of this study", fontsize=9.5,
-                 loc="left")
     fig.tight_layout()
     save(fig, "Fig06_IEEE13_with_devices.png")
 

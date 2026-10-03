@@ -1,0 +1,12 @@
+Quantity,Single setting,Dual setting (DSDR)
+Fault,"3-phase fault at 10 % of 632-633, LLL, phases a-b-c",same
+Fault impedance Zf,0 ohm (bolted),same
+Fault-path current (F633),6398 A,same
+"Current through R1, direction","4645 A, forward (RG60 -> 632), grid contribution",same
+"Current through R2, direction","1777 A, REVERSE (671 -> 632), DG contribution only",same
+R2 setting applied (fast / delayed),"FORWARD: plug 300/600 A, starts 600/1200 A, TMS 0.1/1.0","REVERSE: plug 150/300 A, starts 300/600 A, TMS 0.1/1.0"
+R1 fast / delayed,0.084 s / 1.672 s,0.084 s / 1.672 s
+R2 fast / delayed,0.121 s / 6.426 s,0.052 s / 1.470 s
+Primary fuse melts / clears,F633 400E: 0.100 s / 0.163 s,F633 400E: 0.100 s / 0.163 s
+Backup fuse melts,-,-
+Fuse saving,LOST: F633 melts (0.100 s) before R2 fast (0.121 s),HELD

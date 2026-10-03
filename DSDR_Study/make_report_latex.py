@@ -169,6 +169,22 @@ for r in ft:
                "%s: %s" % (fuse, first(times)), r["Fuse saving, single setting"].lower(), r["Fuse saving, dual setting"].lower()])
 T["TABLE_CASES"] = rows(ca)
 
+
+def case_rows(cid):
+    """quantity / single setting / dual setting of one case, for the table under its TCC figure"""
+    out = []
+    for r in read(os.path.join(RES, "coordination_diagrams", "Case_%s_table.csv" % cid)):
+        cells = [tex(r[k]).replace("->", r"$\rightarrow$").replace(" ohm", r"\ohm{}").replace("Zf", "$Z_f$")
+                 for k in ("Quantity", "Single setting", "Dual setting (DSDR)")]
+        if cells[2] == "same":
+            cells = [cells[0], r"\multicolumn{2}{l}{%s}" % cells[1]]
+        out.append(cells)
+    return rows(out)
+
+
+T["CASE05_TABLE"] = case_rows("05")
+T["CASE07_TABLE"] = case_rows("07")
+
 # ---- Fig. 10 ----------------------------------------------------------------------------------
 f10 = json.load(open(os.path.join(RES, "Fig10_summary.json")))
 ev = lambda tag, k: "%.3f" % f10[tag]["events"][k][0]

@@ -1,0 +1,12 @@
+Quantity,Single setting,Dual setting (DSDR)
+Fault,"LG fault at 692 (phase a), LG, phases A",same
+Fault impedance Zf,0 ohm (bolted),same
+Fault-path current (F671-1),2100 A,same
+"Current through R1, direction","2197 A, forward (RG60 -> 632), grid contribution",same
+"Current through R2, direction","2182 A, forward (632 -> 671), grid contribution",same
+R2 setting applied (fast / delayed),"FORWARD: plug 300/600 A, starts 600/1200 A, TMS 0.1/1.0","FORWARD: plug 300/600 A, starts 600/1200 A, TMS 0.1/1.0"
+R1 fast / delayed,0.293 s / 5.856 s,0.293 s / 5.856 s
+R2 fast / delayed,0.089 s / 3.958 s,0.089 s / 3.958 s
+Primary fuse melts / clears,F671-1 400E: 2.842 s / 7.580 s,F671-1 400E: 2.842 s / 7.580 s
+Backup fuse melts,-,-
+Fuse saving,LOST: R2 delayed (3.958 s) before F671-1 clears (7.580 s),LOST: R2 delayed (3.958 s) before F671-1 clears (7.580 s)
