@@ -19,6 +19,7 @@ import tempfile
 import pypandoc
 from docx import Document
 from docx.enum.section import WD_SECTION
+from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -227,9 +228,9 @@ def borders(table):
     pr.append(jc)
 
 
-def toc_field(paragraph):
+def toc_field(paragraph, instr=None):
     run = paragraph.add_run()
-    for kind, text in (("begin", None), (None, 'TOC \\o "1-3" \\h \\z \\u'), ("separate", None), (None, None), ("end", None)):
+    for kind, text in (("begin", None), (None, instr or 'TOC \\o "1-3" \\h \\z \\u'), ("separate", None), (None, None), ("end", None)):
         if kind:
             f = OxmlElement("w:fldChar")
             f.set(qn("w:fldCharType"), kind)
@@ -348,6 +349,11 @@ def polish(path, tex):
             p.text = ""
             h = p.insert_paragraph_before("TABLE OF CONTENTS", style="Heading 1")
             toc_field(p)
+            # lists of figures and tables: Word tables of contents built from the caption styles
+            nxt = next(q for q in doc.paragraphs if q.style.name == "Heading 1" and q.text.startswith("LIST OF ABBREVIATIONS"))
+            for title, style in (("LIST OF FIGURES", "Image Caption"), ("LIST OF TABLES", "Table Caption")):
+                nxt.insert_paragraph_before(title, style="Heading 1")
+                toc_field(nxt.insert_paragraph_before(), 'TOC '+chr(92)+'h '+chr(92)+'z '+chr(92)+'t "%s,1"' % style)
         if any(r._r.find(qn("w:drawing")) is not None for r in p.runs):
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     # ---- three sections: title page (no number), front matter (i, ii, ...), chapters (1, 2, ...)
@@ -389,7 +395,16 @@ def main():
 def update_in_word(path):
     """fill the table of contents with Word itself (if Word is installed); otherwise Word asks on opening"""
     ps = ("$w = New-Object -ComObject Word.Application; $w.Visible = $false; $w.DisplayAlerts = 0; "
-          "try { $d = $w.Documents.Open('%s', $false, $false); foreach ($t in $d.TablesOfContents) { $t.Update() }; "
+          "try { $d = $w.Documents.Open('%s', $false, $false); "
+          # compact entries in the contents and the lists of figures and tables (Word's built-in styles
+          # toc 1-3 = -20..-22, table of figures = -36; 5 = multiple line spacing, 13.8 pt = 1.15 lines)
+          "foreach ($k in -20,-21,-22,-36) { $f = $d.Styles.Item($k).ParagraphFormat; $f.LineSpacingRule = 5; "
+          "$f.LineSpacing = 13.8; $f.SpaceAfter = 4; $f.SpaceBefore = 0; $f.Alignment = 0 }; "
+          "foreach ($t in $d.TablesOfContents) { $t.Update() }; "
+          # the empty paragraph that ends each list is made 1 pt high, so that it never spills onto a page
+          # of its own when a list fills its last page exactly
+          "foreach ($t in $d.TablesOfContents) { $e = $t.Range.End; $q = $d.Range($e, $e).Paragraphs.Item(1); "
+          "$q.Range.Font.Size = 1; $q.SpaceAfter = 0; $q.SpaceBefore = 0; $q.LineSpacingRule = 4; $q.LineSpacing = 1 }; "
           "$d.Save(); $d.Close() } finally { $w.Quit() }" % path.replace("'", "''"))
     r = subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True, text=True)
     if r.returncode:
