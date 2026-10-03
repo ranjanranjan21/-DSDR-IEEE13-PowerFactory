@@ -66,5 +66,5 @@ Lowest current through each recloser for an LG fault through 3 ohm anywhere in i
 | 75 % | 689 | 680 | **does not operate** | 483 | 675 | **does not operate** |
 | 100 % | 577 | 675 | **does not operate** | 368 | 675 | **does not operate** |
 
-R1's IAC curve starts at 1.5 x pickup = 1080 A, so R1 already misses the 3-ohm LG fault at 680 by 6 A without DG (1074 A); the margin then grows to 503 A short at 100 %. R2 still sees its zone's minimum fault up to 50 % and loses it from about 55 %.
+R1's IAC curve starts at 1.5 x pickup = 1080 A, so R1 already misses the 3-ohm LG fault at 680 by 6 A without DG (1074 A); the margin then grows to 503 A short at 100 %. R2 still sees its zone's minimum fault up to 50 % (606 A against 600 A) and loses it just above 50 %.
 

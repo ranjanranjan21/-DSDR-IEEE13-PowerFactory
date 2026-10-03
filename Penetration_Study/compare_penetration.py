@@ -128,7 +128,7 @@ if os.path.isfile(path):
                                                                  m2["I_R2"], m2["node"], "operates" if ok2 else "**does not operate**"))
         L.append("\nR1's IAC curve starts at 1.5 x pickup = 1080 A, so R1 already misses the 3-ohm LG fault at 680 by 6 A "
                  "without DG (1074 A); the margin then grows to 503 A short at 100 %. R2 still sees its zone's minimum fault "
-                 "up to 50 % and loses it from about 55 %.\n")
+                 "up to 50 % (606 A against 600 A) and loses it just above 50 %.\n")
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
     ax = axes[0]
