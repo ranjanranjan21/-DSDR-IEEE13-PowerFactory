@@ -297,7 +297,7 @@ story = [Spacer(1, 0.8 * cm),
          Spacer(1, 0.2 * cm),
          Paragraph("<b>Base case:</b> DG disconnected. <b>Compared case:</b> 4.05 MVA synchronous DG connected at "
                    "node 692 through its 0.69/4.16 kV transformer, dispatched at %.0f kW. Both are AC unbalanced "
-                   "three-phase load flows in PowerFactory (project <i>IEEE13 Yousaf2022 Replication</i>, study case "
+                   "three-phase load flows in PowerFactory (project <i>IEEE13 DSDR Fuse Coordination</i>, study case "
                    "<i>Study with Substation Transformer</i>, regulator taps fixed). No relay, fuse or network "
                    "setting differs between the two cases." % d["dg_p"], BODY),
          Spacer(1, 0.25 * cm),

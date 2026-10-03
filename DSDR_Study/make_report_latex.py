@@ -172,7 +172,7 @@ T["TABLE_CASES"] = rows(ca)
 # ---- Fig. 10 ----------------------------------------------------------------------------------
 f10 = json.load(open(os.path.join(RES, "Fig10_summary.json")))
 ev = lambda tag, k: "%.3f" % f10[tag]["events"][k][0]
-T["TABLE_EMT"] = rows([
+emt_rows = [
     ["Fault initiated", "0.30", "%.2f" % f10["DG out"]["t_fault"], "%.2f" % f10["DG in"]["t_fault"]],
     ["R2 fast trip 1", r"$\approx$0.46", ev("DG out", 0), ev("DG in", 0)],
     ["R2 reclose 1", r"$\approx$0.65", ev("DG out", 1), ev("DG in", 1)],
@@ -182,7 +182,8 @@ T["TABLE_EMT"] = rows([
     ["Fuse operation / clears", "1.21", "%.3f" % f10["DG out"]["t_clear"], "%.3f" % f10["DG in"]["t_clear"]],
     ["Fuse heat after the fast shots", "--", r"%.0f\,\%%" % (100 * f10["DG out"]["heat_after_fast_shots"]),
      r"%.0f\,\%%" % (100 * f10["DG in"]["heat_after_fast_shots"])],
-])
+]
+T["TABLE_EMT"] = rows(emt_rows)
 n = f10["DG out"]["node632"]
 T["EMT_PRE"] = "%.0f / %.0f" % (n["prefault_rms_a"], n["prefault_rms_c"])
 T["EMT_RMS"] = "%.0f / %.0f" % (n["fault_rms_a"], n["fault_rms_c"])
@@ -192,6 +193,22 @@ T["EMT_PEAK"] = "%.0f / %.0f" % (n["steady_peak_a"], n["steady_peak_c"])
 pf = read(os.path.join(RES, "PF_vs_Python_times_conventional.csv")) + read(os.path.join(RES, "PF_vs_Python_times_dsdr.csv"))
 d = [abs(float(r["deviation %"])) for r in pf if r["deviation %"] != "-"]
 T["PF_N"], T["PF_MAX"] = str(len(d)), "%.2f" % max(d)
+
+# ---- the study's own tables (chapters 4 and 5); the *_vs_paper versions above are for Appendix E -------------
+t1o = read(os.path.join(DB, "Table_I_DG_parameters.csv"))
+T["TABLE_I_OWN"] = rows([[tex(r["Parameter"]), sym.get(r["Symbol"], tex(r["Symbol"])), tex(r["Value"]), tex(r["Unit"]) or "--"]
+                         for r in t1o if r["Symbol"]])
+T["TABLE_II_OWN"] = rows([["%s--%s" % (r["From"], r["To"]) if r["To"] != "side" else tex(r["From"] + " side"),
+                           r["Inom (A)"], r["If,min (kA)"], r["If,max (kA)"]] for r in read(os.path.join(RES, "Table_II.csv"))])
+T["TABLE_III_OWN"] = rows([[r["Fuse"], r["If (A)"], r["i/z"], "%.3f" % float(r["t_fast (s)"]), "%.3f" % float(r["t_delayed (s)"]),
+                            "%.3f" % float(r["t_fuse eq.(9) (s)"]), "%.2f" % float(r["b_i (eq. 9, i=1 closest to fault)"]),
+                            size(r["installed fuse"]), r["t_MMT of installed fuse at If (s)"]]
+                           for r in read(os.path.join(RES, "Table_III.csv"))])
+T["TABLE_IVA_OWN"] = rows([[r["node"], r["fault"], r["I R1 (A)"], r["R1 fast (s)"], r["R1 delayed (s)"], r["I R2 (A)"], r["R2 unit"],
+                            r["R2 fast (s)"], r["R2 delayed (s)"]] for r in t4])
+T["TABLE_IVB_OWN"] = rows([row[:6] + row[7:] for row in ivb])
+T["GRID14_OWN"] = grid([("", "Fig14 model")])
+T["TABLE_EMT_OWN"] = rows([[r[0]] + r[2:] for r in emt_rows])
 
 # ---- figures ----------------------------------------------------------------------------------
 F = os.path.join(RES, "figures")

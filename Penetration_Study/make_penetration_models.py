@@ -2,7 +2,7 @@
 DG penetration study (Fig. 7 of Yousaf et al. 2022) in separate PowerFactory models.
 
 For every penetration level p (0, 10, 25, 37, 50, 75, 100 % of the 4.05 MVA DG):
-  * the replication project "IEEE13 Yousaf2022 Replication" is COPIED to a new project
+  * the main project "IEEE13 DSDR Fuse Coordination" is COPIED to a new project
     "IEEE13 DG penetration <p> %"; the original project is only read, never changed;
   * in the copy the DG at 692 is set to p x 4.05 MVA (machine, its 0.69/4.16 kV transformer and its
     active / reactive power scaled together; per-unit impedances unchanged; p = 0: DG out of service);
@@ -27,7 +27,7 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REPL = os.path.join(os.path.dirname(HERE), "Replication")
+REPL = os.path.join(os.path.dirname(HERE), "DSDR_Study")
 sys.path.insert(0, REPL)
 from pf_setup import get_app, attr, PROJECT, STUDY_CASE, BUILD_CASE   # noqa: E402
 

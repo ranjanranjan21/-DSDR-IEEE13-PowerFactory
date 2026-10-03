@@ -37,7 +37,7 @@ import subprocess
 import sys
 import traceback
 
-DIR = r"C:\Users\Rabin\Desktop\Digsilent_project - TWIST AND TURN\Replication"
+DIR = r"C:\Users\Rabin\Desktop\Digsilent_project - TWIST AND TURN\DSDR_Study"
 if not os.path.isdir(DIR):
     DIR = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(DIR, "results")

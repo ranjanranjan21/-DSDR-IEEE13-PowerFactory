@@ -14,7 +14,7 @@ In each project: study case *Study with Substation Transformer*, event list with
 file *Fig10 EMT* (LOHL650-632, phase currents a and c at the 632 end) and the plot page *Curve plot*.
 Open the project, run Initial Conditions and Start Simulation (2 s), and the plot fills.
 
-Switching times: from R2's fast curve and the fuse heating of the simulated current (`Replication/step5_fig10_emt.py`).
+Switching times: from R2's fast curve and the fuse heating of the simulated current (`DSDR_Study/step5_fig10_emt.py`).
 
 `make_fig10_projects.py` rebuilds both projects from the user's set-up in the main project and
 then restores the main project (PowerFactory closed). `results/` holds the waveforms and

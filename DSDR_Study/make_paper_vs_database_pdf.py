@@ -262,7 +262,7 @@ story = [Spacer(1, 0.6 * cm),
          Paragraph("<b>Reference paper:</b> M. Yousaf, A. Jalilian, K. M. Muttaqi, D. Sutanto, \"An Adaptive Overcurrent "
                    "Protection Scheme for Dual-Setting Directional Recloser and Fuse Coordination in Unbalanced "
                    "Distribution Networks With Distributed Generation,\" <i>IEEE Trans. Ind. Appl.</i>, 58(2), 2022.", BODY),
-         Paragraph("<b>Our results:</b> PowerFactory 2021 SP2, project <i>IEEE13 Yousaf2022 Replication</i>, study case "
+         Paragraph("<b>Our results:</b> PowerFactory 2021 SP2, project <i>IEEE13 DSDR Fuse Coordination</i>, study case "
                    "<i>Study with Substation Transformer</i>; unbalanced load flow and complete-method short circuits, "
                    "DG disconnected and connected (database run, 17 of 18 internal checks passed).", BODY),
          Spacer(1, 0.2 * cm)]
@@ -271,7 +271,7 @@ workflow(wf)
 story += [image(wf, 17.6 * cm),
           Paragraph("The comparison follows the order in which the results were produced. Step 7 (relay coordination: "
                     "pickups, time dials, Figs. 8-17, Tables III and IV) is compared in "
-                    "Comparison_Paper_vs_Replication.pdf.", SMALL),
+                    "Comparison_with_Reference_Paper.pdf.", SMALL),
           Paragraph("Scorecard", H2)]
 score = [["Step", "Quantity", "Paper", "Our result", "Agreement"],
          ["1", "DG data (Table I)", "8 reactances / resistances", "identical in the model", "exact"],
@@ -512,7 +512,7 @@ story += [Paragraph("Summary of the comparison", H1),
                     "motivates the dual-setting recloser. The paper's Table II fault currents cannot be reproduced as a "
                     "set, because they are not mutually consistent.", BODY),
           Paragraph("<b>Next step.</b> Relay coordination (Tables III and IV, Figs. 8-17), built on this database, is "
-                    "compared with the paper in Comparison_Paper_vs_Replication.pdf.", BODY),
+                    "compared with the paper in Comparison_with_Reference_Paper.pdf.", BODY),
           Spacer(1, 0.3 * cm), Paragraph("Table II as printed in the paper", H2), image(t2_png, 8.2 * cm)]
 
 

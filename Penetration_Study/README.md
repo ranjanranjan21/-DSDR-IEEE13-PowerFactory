@@ -1,6 +1,6 @@
 # DG penetration study (Fig. 7 of Yousaf et al. 2022)
 
-Separate from the replication: the project "IEEE13 Yousaf2022 Replication" and the `Replication/` folder are not changed.
+Separate from the main study: the project "IEEE13 DSDR Fuse Coordination" and the `DSDR_Study/` folder are not changed.
 
 | File | Content |
 |---|---|

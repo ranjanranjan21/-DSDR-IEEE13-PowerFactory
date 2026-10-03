@@ -2,7 +2,7 @@
 ======================================================================================================================
 LOAD FLOW ON ALL BUSES AND BRANCHES
 ======================================================================================================================
-Project: IEEE13 Yousaf2022 Replication   Study case: Study with Substation Transformer
+Project: IEEE13 DSDR Fuse Coordination   Study case: Study with Substation Transformer
 AC load flow, unbalanced 3-phase (ABC).  Grid at bus SubstationHV.  22 buses, 23 branch elements.
 
 ======================================================================================================================

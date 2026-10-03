@@ -7,7 +7,7 @@ Time-current characteristics (TCC) of the two Fig. 7 cases at every DG penetrati
 The curves are the same at every level (the settings are not changed); what moves are the operating
 points: the fuse at its own current (grid + DG), the recloser at its current (grid only).
 Currents from results/penetration_results.json (PowerFactory); curves identical to PowerFactory's
-library types (Replication/curves.py, checked against c:Ttrip within 1.2 %).
+library types (DSDR_Study/curves.py, checked against c:Ttrip within 1.2 %).
 
 Writes results/TCC_penetration_overview.png, results/TCC_penetration_633.png, results/TCC_penetration_671.png.
 """
@@ -21,13 +21,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(HERE), "Replication"))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "DSDR_Study"))
 import step3_design_and_evaluate as S3          # noqa: E402  (curves only; main() is not run)
 
 RES = os.path.join(HERE, "results")
 D = {int(k): v for k, v in json.load(open(os.path.join(RES, "penetration_results.json"))).items()}
 P = sorted(D)
-CONV = json.load(open(os.path.join(os.path.dirname(HERE), "Replication", "results", "settings.json")))["conventional"]
+CONV = json.load(open(os.path.join(os.path.dirname(HERE), "DSDR_Study", "results", "settings.json")))["conventional"]
 INF = float("inf")
 INK2, GRID, BLUE, FUSEC = "#55534e", "#d9d8d4", "#2a78d6", "#1baf7a"
 LEVEL_COL = ["#0b3c5d", "#1f6f9f", "#3f9fc4", "#f2b134", "#ef7d22", "#d94a1e", "#9e1b12"]

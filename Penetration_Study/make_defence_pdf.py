@@ -20,7 +20,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image, KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REPL = os.path.join(os.path.dirname(HERE), "Replication")
+REPL = os.path.join(os.path.dirname(HERE), "DSDR_Study")
 sys.path.insert(0, REPL)
 import step3_design_and_evaluate as S3          # noqa: E402  (curves only)
 
@@ -97,7 +97,7 @@ def sc_best(pp, node, case="max"):
 
 
 story = [p("DG penetration and recloser–fuse coordination", TITLE),
-         p("Replication of Fig. 7 of Yousaf et al. (2022) in DIgSILENT PowerFactory, IEEE 13-node feeder — "
+         p("DG penetration study (Fig. 7) in DIgSILENT PowerFactory, IEEE 13-node feeder — "
            "results, how they match the paper, and prepared answers to the panel's questions", SUB)]
 
 # ---- 1 claim -------------------------------------------------------------------------------------

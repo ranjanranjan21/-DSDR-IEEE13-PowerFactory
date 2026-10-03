@@ -1,4 +1,4 @@
-A. Projects: IEEE 13 Node Feeder, IEEE 13 Node Feeder(1), IEEE13 DG penetration 000 %, IEEE13 DG penetration 010 %, IEEE13 DG penetration 025 %, IEEE13 DG penetration 037 %, IEEE13 DG penetration 050 %, IEEE13 DG penetration 075 %, IEEE13 DG penetration 100 %, IEEE13 Fig10 EMT - DG in, IEEE13 Fig10 EMT - DG out, IEEE13 Yousaf2022 Replication
+A. Projects: IEEE 13 Node Feeder, IEEE 13 Node Feeder(1), IEEE13 DG penetration 000 %, IEEE13 DG penetration 010 %, IEEE13 DG penetration 025 %, IEEE13 DG penetration 037 %, IEEE13 DG penetration 050 %, IEEE13 DG penetration 075 %, IEEE13 DG penetration 100 %, IEEE13 DSDR Fuse Coordination, IEEE13 Fig10 EMT - DG in, IEEE13 Fig10 EMT - DG out
 B. Variation stage 'Substation Transformer': 13 objects
 C. Events in 'Study with Substation Transformer': none
 C. Events in 'Study Detailed Network Model': none (plus 1 without target, from the original .pfd)

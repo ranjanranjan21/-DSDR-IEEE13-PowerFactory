@@ -1,4 +1,4 @@
-# Replication – Yousaf et al. (2022), DSDR recloser–fuse coordination, IEEE 13-node feeder
+# Dual-Setting Directional Recloser and Fuse Coordination in Unbalanced Distribution Networks With Distributed Generation
 
 > M. Yousaf, A. Jalilian, K. M. Muttaqi, D. Sutanto, "An Adaptive Overcurrent Protection Scheme for
 > Dual-Setting Directional Recloser and Fuse Coordination in Unbalanced Distribution Networks With
@@ -16,7 +16,7 @@ python run_all.py          # ~5 min, plain Python 3.9, PowerFactory closed; need
 
 | Step | Script | What it does |
 |---|---|---|
-| 1 | `step1_build_model.py` | Imports `IEEE 13 Node Feeder.pfd` as project *IEEE13 Yousaf2022 Replication* (first run only), removes all old protection, adds the DL lateral, sets the DG to Table I, places 15 fuses, R1 and R2 |
+| 1 | `step1_build_model.py` | Imports `IEEE 13 Node Feeder.pfd` as project *IEEE13 DSDR Fuse Coordination* (first run only), removes all old protection, adds the DL lateral, sets the DG to Table I, places 15 fuses, R1 and R2 |
 | 2 | `step2_studies.py` | Load flows and 273 short circuits (all nodes × LG/LL/LLG/LLL × phases, DG out/in, 3 Ω minimum faults, DG penetration sweep, the figures' faults) → `results/studies.json` |
 | 3 | `step3_design_and_evaluate.py` | The paper's method (Fig. 5, eqs. 1–12), coordination classification, Tables II–IV, Figs. 8, 9, 11–17 (pure Python, same curves as PowerFactory) |
 | 4 | `step4_apply_settings.py [conventional\|dsdr]` | Writes the settings into PowerFactory and checks PowerFactory's own trip times (`c:Ttrip`) against step 3 |
@@ -133,7 +133,7 @@ times, maximum deviation 1.22 %** (`results/PF_vs_Python_times_*.csv`).
 | `make_loadflow_comparison_pdf.py` | Load flow with DG against the base case (DG out) | `results/LoadFlow_Comparison_Base_vs_DG.pdf` |
 | `make_paper_vs_database_pdf.py` | Database against the paper: Table I, Table II, figure fault currents, direction at R2 | `results/Paper_vs_Our_Results.pdf` |
 | `make_comparison_pdf.py` | Coordination against the paper: Tables III-IV, Figs. 8-17; appendix with the inventory of all tables and figures, Table I and Figs. 1-6 |
-| `make_operating_time_pdf.py` | Hand calculation of Table IV: R1 (IAC equation), R2 (CDG table), fuse t_MMT / t_TCT (A055C curves), five worked examples | `results/Operating_Time_Calculation.pdf` | `results/Comparison_Paper_vs_Replication.pdf` |
+| `make_operating_time_pdf.py` | Hand calculation of Table IV: R1 (IAC equation), R2 (CDG table), fuse t_MMT / t_TCT (A055C curves), five worked examples | `results/Operating_Time_Calculation.pdf` | `results/Comparison_with_Reference_Paper.pdf` |
 | `make_report_latex.py` | Project report as LaTeX (layout of `DSDR_Final_Project_Progress_Report`); tables filled from the results; text in `report_template.tex.in` (a template with placeholders: it does not compile on its own) | `report/main.tex`, `report/figures/` (compile with pdfLaTeX, e.g. upload the folder to Overleaf) |
 | `make_coordination_diagrams.py` | Coordination diagrams, single setting vs dual setting on R2, same fuses in both; fault table with Zf, R1 / R2 current and direction | `results/coordination_diagrams/` (9 case PNGs, summary, `Fault_table.csv`, `Coordination_Diagrams.pdf`) |
 

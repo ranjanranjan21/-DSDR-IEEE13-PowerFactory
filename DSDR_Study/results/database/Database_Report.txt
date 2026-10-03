@@ -2,7 +2,7 @@
 ==============================================================================================================
 0. MODEL, REFERENCE DIRECTIONS AND OPEN POINTS (before any calculation)
 ==============================================================================================================
-Project: IEEE13 Yousaf2022 Replication   Study case: Study with Substation Transformer
+Project: IEEE13 DSDR Fuse Coordination   Study case: Study with Substation Transformer
 Load flow: AC unbalanced, 3-phase (ABC).  Short circuit: complete method (pre-fault load flow), initial symmetrical current Ikss.
 
 Reference direction of the reclosers (+ = forward = away from the grid):
@@ -614,4 +614,4 @@ VALIDATION BEFORE RELAY COORDINATION
   [PASS ] relay pickups, time dials, curves and fuse types are unchanged by this study
 
 20 of 22 checks passed. Items marked CHECK must be looked at before relay coordination.
-Files: C:\Users\Rabin\Desktop\Digsilent_project - TWIST AND TURN\Replication\results\database
+Files: C:\Users\Rabin\Desktop\Digsilent_project - TWIST AND TURN\DSDR_Study\results\database

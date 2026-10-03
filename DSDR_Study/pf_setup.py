@@ -12,7 +12,7 @@ import os
 import sys
 
 PF_DIR = r"C:\Program Files\DIgSILENT\PowerFactory 2021 SP2"
-PROJECT = "IEEE13 Yousaf2022 Replication"
+PROJECT = "IEEE13 DSDR Fuse Coordination"
 PFD_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                         "IEEE 13 Node Feeder.pfd")
 # The IEEE short-circuit benchmark (Kersting & Shirek 2012, used in ref. [8]) includes the

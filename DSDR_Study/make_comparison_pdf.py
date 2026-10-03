@@ -1,5 +1,5 @@
 """
-Builds results/Comparison_Paper_vs_Replication.pdf: the paper's results next to the replication's,
+Builds results/Comparison_with_Reference_Paper.pdf: the paper's results next to the replication's,
 in the order of the workflow (network -> load flow -> faults -> settings -> fuses -> conventional
 scheme -> DG impact -> DSDR -> time domain -> verification).
 
@@ -34,7 +34,7 @@ FIG = os.path.join(RES, "figures")
 TMP = os.path.join(RES, "_pdf_tmp")
 os.makedirs(TMP, exist_ok=True)
 PAPER = os.path.join(os.path.dirname(HERE), "An Adaptive Overcurrent Protection Scheme for by mohommad yousuf .pdf")
-OUT = os.path.join(RES, "comparison", "Comparison_Paper_vs_Replication.pdf")
+OUT = os.path.join(RES, "comparison", "Comparison_with_Reference_Paper.pdf")
 
 SET = json.load(open(os.path.join(RES, "settings.json")))
 CONV, DSDR = SET["conventional"], SET["dsdr"]
@@ -266,15 +266,15 @@ story = []
 
 # ---- title and scorecard ------------------------------------------------------------------
 story += [Spacer(1, 1.2 * cm),
-          Paragraph("Paper vs Replication", ParagraphStyle("T", parent=H1, fontSize=22, leading=26)),
+          Paragraph("Comparison with the reference paper", ParagraphStyle("T", parent=H1, fontSize=22, leading=26)),
           Paragraph("Comparison of results in serial workflow order", ParagraphStyle("st", parent=H2, fontSize=13)),
           Spacer(1, 0.3 * cm),
           Paragraph("<b>Paper:</b> M. Yousaf, A. Jalilian, K. M. Muttaqi, D. Sutanto, \"An Adaptive Overcurrent "
                     "Protection Scheme for Dual-Setting Directional Recloser and Fuse Coordination in Unbalanced "
                     "Distribution Networks With Distributed Generation,\" <i>IEEE Trans. Ind. Appl.</i>, 58(2), "
                     "1831-1842, 2022 - IEEE 13-node part.", BODY),
-          Paragraph("<b>Replication:</b> DIgSILENT PowerFactory 2021 SP2, project <i>IEEE13 Yousaf2022 Replication</i>, "
-                    "scripts in <i>Replication/</i> (run_all.py). Paper figures are reproduced from the article for "
+          Paragraph("<b>This study:</b> DIgSILENT PowerFactory 2021 SP2, project <i>IEEE13 DSDR Fuse Coordination</i>, "
+                    "scripts in <i>DSDR_Study/</i> (run_all.py). Paper figures are reproduced from the article for "
                     "side-by-side comparison only.", BODY),
           Spacer(1, 0.4 * cm), Paragraph("Scorecard", H2)]
 
@@ -290,7 +290,7 @@ bench_dev = max(abs(node_max(n) / v - 1) for n, v in BENCH.items() if n != "RG60
 t3 = rows("comparison/Table_III_vs_paper.csv")
 r1zone = [r for r in t3 if r["Fuse"] in ("F632", "F645", "F646", "F-DL", "F634")]
 rev_match = max(abs(float(r["b_i (i counted from source)"]) - float(r["paper b_i"])) for r in r1zone)
-score = [["Item", "Paper", "Replication", "Agreement"],
+score = [["Item", "Paper", "This study", "Agreement"],
          ["Rated branch currents (Table II)", "Table II", "max deviation %.1f %%" % (100 * inom_dev), "very good"],
          ["Fault levels vs IEEE benchmark [8]", "-", "within %.1f %% (nodes)" % (100 * bench_dev), "very good"],
          ["Fault levels vs paper Table II", "If,max 1.9-7.8 kA", "IEEE-benchmark levels", "lower (paper inconsistent)"],
@@ -320,10 +320,10 @@ story += [Paragraph("Serial workflow", H1),
 story += step_header("1", "Network model and source",
                      "<b>Paper:</b> IEEE 13-node feeder [33], 4.05 MVA / 0.69 kV synchronous DG at 692 via a "
                      "0.69/4.16 kV, 0.15 pu transformer (Table I). The source model is not stated.<br/>"
-                     "<b>Replication:</b> DIgSILENT IEEE 13-node example with the 115/4.16 kV 5 MVA substation "
+                     "<b>This study:</b> DIgSILENT IEEE 13-node example with the 115/4.16 kV 5 MVA substation "
                      "transformer; DG set to Table I. The source is validated against the IEEE short-circuit "
                      "benchmark (Kersting &amp; Shirek, quoted by the same authors in [8]).")
-data = [["Node", "IEEE benchmark [8] (kA)", "Replication (kA)", "Difference"]]
+data = [["Node", "IEEE benchmark [8] (kA)", "This study (kA)", "Difference"]]
 for n, v in BENCH.items():
     if n == "RG60":
         continue
@@ -334,7 +334,7 @@ story += [table(data, [3 * cm, 4.5 * cm, 4.5 * cm, 3.5 * cm]),
                     "unbalanced fault). The stiff-grid study case used by the earlier attempt gives 20-65 % higher "
                     "values, e.g. 7.91 kA at 632.", SMALL),
           Spacer(1, 0.3 * cm)]
-tbl1 = [["Table I parameter", "Paper", "Replication"],
+tbl1 = [["Table I parameter", "Paper", "This study"],
         ["Xl / Ra", "0.05 / 0.0014 pu", "0.05 / 0.0014 pu"],
         ["Xd / Xd' / Xd''", "1.4 / 0.231 / 0.118 pu", "1.4 / 0.231 / 0.118 pu"],
         ["Xq / Xq' / Xq''", "1.372 / 0.8 / 0.118 pu", "1.372 / 0.8 / 0.118 pu"],
@@ -347,7 +347,7 @@ story += [table(tbl1, [5 * cm, 5.5 * cm, 7 * cm]), PageBreak()]
 story += step_header("2 and 3", "Load flow and fault study (Table II)",
                      "<b>Paper:</b> Inom from the unbalanced load flow; If,max from a bolted fault below the device; "
                      "If,min from an LG fault through 3 ohm at the farthest node; DG out.<br/>"
-                     "<b>Replication:</b> the same definitions (complete short-circuit method, all phase combinations).")
+                     "<b>This study:</b> the same definitions (complete short-circuit method, all phase combinations).")
 data = [["From", "To", "Inom paper (A)", "Inom ours (A)", "diff", "If,min paper (kA)", "If,min ours (kA)",
          "If,max paper (kA)", "If,max ours (kA)"]]
 colr = []
@@ -372,9 +372,9 @@ fw, rv = DSDR["R2fw"], DSDR["R2rv"]
 story += step_header("4", "Protective devices and pickup settings (Fig. 6, eq. 3)",
                      "<b>Paper:</b> R1 GE IAC77B801A extremely inverse, TDS 0.5 / 10, OLF 1.25; R2 GE/Alstom CDG34 "
                      "extremely inverse (settings not given); 15 fuses, a = -1.8, b from Table III.<br/>"
-                     "<b>Replication:</b> PowerFactory library relays and fuses; fuse sizes from the fuse bands of the "
+                     "<b>This study:</b> PowerFactory library relays and fuses; fuse sizes from the fuse bands of the "
                      "paper's figures where shown, otherwise from [8] Table V.")
-data = [["Device", "Paper", "Replication"],
+data = [["Device", "Paper", "This study"],
         ["R1 relay / curve", "GE IAC77B801A, extremely inverse", "same (library type)"],
         ["R1 pickup", "OLF x Inom = 1.25 x 587.1 = 734 A", "CT 900/5, tap 4 A = %.0f A (eq. 3: %.1f A)" % (CONV["R1"]["ip"], CONV["R1"]["ip_eq3"])],
         ["R1 TDS fast / delayed", "0.5 / 10", "0.5 / 10"],
@@ -413,7 +413,7 @@ story += [Spacer(1, 0.3 * cm), Paragraph("Fuse sizes", H2),
 # ---- Step 5: Table III ---------------------------------------------------------------------------
 story += step_header("5", "Fuse coefficients b<sub>i</sub> (Table III, eqs. 6-9)",
                      "<b>Paper:</b> b<sub>i</sub> from eq. (9), a<sub>i</sub> = -1.8; worked example F645: 4219 A, "
-                     "t<sub>F</sub> 0.097 s, t<sub>D</sub> 1.932 s, b = 6.65.<br/><b>Replication:</b> eq. (9) at the "
+                     "t<sub>F</sub> 0.097 s, t<sub>D</sub> 1.932 s, b = 6.65.<br/><b>This study:</b> eq. (9) at the "
                      "maximum fault current below each fuse, once with i = 1 for the fuse closest to the fault (the "
                      "definition of the cited ref. [25]) and once with i counted from the source.")
 data = [["Fuse", "If (A)", "i / z", "b<sub>i</sub> paper", "b<sub>i</sub> ours, i from fault [25]", "b<sub>i</sub> ours, i from source", "b of installed fuse"]]
@@ -437,7 +437,7 @@ story += [table(data, [1.8 * cm, 1.7 * cm, 1.3 * cm, 2.1 * cm, 3.6 * cm, 3.4 * c
 summ = open(os.path.join(RES, "summary.txt"), encoding="utf-8").read()
 story += step_header("6", "Conventional scheme without DG (Fig. 5 steps 7-10)",
                      "<b>Paper:</b> the preset recloser-fuse scheme is stated to be coordinated before DG is added "
-                     "(no figure).<br/><b>Replication:</b> 39 node/fault-type cells (13 nodes x LG/LL/LLG/LLL where the "
+                     "(no figure).<br/><b>This study:</b> 39 node/fault-type cells (13 nodes x LG/LL/LLG/LLL where the "
                      "phases exist), every phase combination, bolted faults.")
 a0 = found(r"published fuse sizes, no DG: (\d+) of (\d+)")
 a1 = found(r"after steps 8-10, no DG: (\d+) of (\d+)")
@@ -451,7 +451,7 @@ story += [table(data, [5 * cm, 12.5 * cm]), Spacer(1, 0.3 * cm)]
 # ---- Step 7: DG impact -----------------------------------------------------------------------------
 story += step_header("7", "DG added, conventional R2 (Figs. 14 and 8-13)",
                      "<b>Paper:</b> Fig. 14 marks 9 cells lost (633 LLG/LLL, 645 LG/LL/LLG, 646 LL/LLG, 675 LLG/LLL).<br/>"
-                     "<b>Replication:</b> same settings with the 4.05 MVA DG in service.")
+                     "<b>This study:</b> same settings with the 4.05 MVA DG in service.")
 story += stacked(PFIG["14"], os.path.join(FIG, "Fig14_without_DSDR.png"), "Paper Fig. 14",
                  "This study (model)", width=13.5 * cm)
 data = [["Node"] + FAULT_TYPES + ["Node"] + FAULT_TYPES]
@@ -509,7 +509,7 @@ FIGCMP = [
 def fig_compare(num, case, relay, unit, fuses, s, title, paper_vals, png, verdict):
     rec = fig_case(case)
     d = dev_times(rec, s, relay, unit, fuses)
-    data = [["Quantity", "Paper Fig. %s" % num, "Replication"]]
+    data = [["Quantity", "Paper Fig. %s" % num, "This study"]]
     data.append(["Current", paper_vals["I"], "%.0f A (%s)" % (d["I_rec"], relay) + "".join(
         ", %.0f A (%s)" % (d[f][0], f) for f in fuses)])
     data.append(["%s fast (s)" % relay, paper_vals["%s fast" % relay], t(d["fast"])])
@@ -518,7 +518,7 @@ def fig_compare(num, case, relay, unit, fuses, s, title, paper_vals, png, verdic
         data.append(["%s melt / clear (s)" % f, paper_vals.get(f, "-"),
                      "%s / %s (%s)" % (t(d[f][1]), t(d[f][2]), s["fuses"][f].replace("A055C", ""))])
     return [Paragraph("Fig. %s - %s" % (num, title), H2),
-            side_by_side(PFIG[num], os.path.join(FIG, png), "Paper Fig. %s" % num, "Replication", h=5.4 * cm),
+            side_by_side(PFIG[num], os.path.join(FIG, png), "Paper Fig. %s" % num, "This study", h=5.4 * cm),
             table(data, [4 * cm, 5.5 * cm, 8 * cm]), Paragraph(verdict, BODY)]
 
 
@@ -553,11 +553,11 @@ for num, case, relay, unit, fuses, s, title, pv, png in FIGCMP:
 story += step_header("8", "R2 as dual-setting directional recloser (Fig. 17, Figs. 15-16, Table IV)",
                      "<b>Paper:</b> reverse pickup by eq. (12), TDS revised by If,Rec/If,Fuse (step 8), fuse revision if a "
                      "dial limit is reached (step 9); with the DSDR every cell of Fig. 17 is held.<br/>"
-                     "<b>Replication:</b> Ip,rv = 1.25 x %.1f A = %.0f A; step 8 found every remaining loss at a dial limit "
+                     "<b>This study:</b> Ip,rv = 1.25 x %.1f A = %.0f A; step 8 found every remaining loss at a dial limit "
                      "(R1 TDS 0.5/10, CDG TMS 0.1/1.0), so step 9 revised: %s."
                      % (rv["i_nom_rv"], rv["ip_eq12"], changed(CONV["fuses"], DSDR["fuses"])))
 story += stacked(PFIG["17"], os.path.join(FIG, "Fig17_with_DSDR.png"), "Paper Fig. 17 - all held",
-                 "Replication - %d / %d held" % (held17, len(comp)))
+                 "This study - %d / %d held" % (held17, len(comp)))
 story += [
           Paragraph("<b>Result:</b> with the DSDR %d of %d cells are held; lost: %s. %s The same fuses with a "
                     "conventional R2 give %s of %s cells. Without DG the final fuses hold %s of %s cells; prioritising "
@@ -571,7 +571,7 @@ story += [
 rec = fig_case("Fig15")
 d15 = dev_times(rec, DSDR, "R2", "R2rv", ["F646", "F632"])
 d16 = dev_times(rec, DSDR, "R1", None, ["F646", "F632"])
-data = [["Quantity", "Paper Figs. 15 / 16", "Replication"],
+data = [["Quantity", "Paper Figs. 15 / 16", "This study"],
         ["Fuse current", "3.64 kA", "%.2f kA" % (d15["F646"][0] / 1000)],
         ["R2 reverse current", "1.54 kA", "%.2f kA" % (d15["I_rec"] / 1000)],
         ["R2 reverse fast / delayed (s)", "0.103 / 2.046", "%s / %s" % (t(d15["fast"]), t(d15["delayed"]))],
@@ -580,8 +580,8 @@ data = [["Quantity", "Paper Figs. 15 / 16", "Replication"],
         ["F646 melt (s)", "0.181 (300E)", "%s (%s)" % (t(d15["F646"][1]), DSDR["fuses"]["F646"].replace("A055C", ""))],
         ["F632 melt (s)", "0.411 (400E)", "%s (%s)" % (t(d15["F632"][1]), DSDR["fuses"]["F632"].replace("A055C", ""))]]
 story += [Paragraph("Figs. 15 and 16 - solid LL fault at 646", H2),
-          side_by_side(PFIG["15"], os.path.join(FIG, "Fig15_LL_646_DSDR.png"), "Paper Fig. 15", "Replication", h=5.0 * cm),
-          side_by_side(PFIG["16"], os.path.join(FIG, "Fig16_LL_646_R1.png"), "Paper Fig. 16", "Replication", h=5.0 * cm),
+          side_by_side(PFIG["15"], os.path.join(FIG, "Fig15_LL_646_DSDR.png"), "Paper Fig. 15", "This study", h=5.0 * cm),
+          side_by_side(PFIG["16"], os.path.join(FIG, "Fig16_LL_646_R1.png"), "Paper Fig. 16", "This study", h=5.0 * cm),
           table(data, [5 * cm, 5 * cm, 7.5 * cm]),
           Paragraph("<b>Agreement:</b> fuse current within 1 %%; R2 reverse trips first on its fast curve and its delayed "
                     "curve waits for the fuses. <b>Difference:</b> the replication's DG contributes less current through "
@@ -609,7 +609,7 @@ story += [Paragraph("Table IV - operating times with the DSDR (s)", H2),
 # ---- Step 9: Fig. 10 ---------------------------------------------------------------------------
 story += step_header("9", "Time-domain reclosing sequence (Fig. 10)",
                      "<b>Paper:</b> LL (a-c) fault at 684 through 0.2 ohm; two fast recloser operations, then the fuse "
-                     "clears at t = 1.21 s.<br/><b>Replication:</b> PowerFactory EMT; switching times from the relay "
+                     "clears at t = 1.21 s.<br/><b>This study:</b> PowerFactory EMT; switching times from the relay "
                      "and fuse curves, fuse heating accumulated from the simulated current. Fault at 0.30 s and dead time 0.2 s as read "
                      "from the paper's figure; the plotted current is the feeder current arriving at node 632.")
 F10 = json.load(open(os.path.join(RES, "Fig10_summary.json")))
@@ -623,8 +623,8 @@ def f10(tag, key, fmt_="%.2f s"):
 fo, fi_ = F10["DG out"], F10["DG in"]
 saved = {tag: F10[tag]["t_melt"] is None or F10[tag]["fast_shots_before_melt"] >= 2 for tag in F10}
 story += [side_by_side(PFIG["10"], os.path.join(FIG, "Fig10_EMT_LL_684.png"), "Paper Fig. 10",
-                       "Replication (top: DG out, bottom: DG in)", h=7.0 * cm),
-          table([["Quantity", "Paper", "Replication DG out", "Replication DG in"],
+                       "This study (top: DG out, bottom: DG in)", h=7.0 * cm),
+          table([["Quantity", "Paper", "This study DG out", "This study DG in"],
                  ["F671-2", "(300E in Fig. 8)", sz(fo["fuse"]), sz(fi_["fuse"])],
                  ["R2 fast shot incl. breaker", "-", f10("DG out", "t_fast", "%.3f s"), f10("DG in", "t_fast", "%.3f s")],
                  ["Fuse heat after the fast shots", "-", "%.0f %% of melting" % (100 * fo["heat_after_fast_shots"]),
@@ -674,7 +674,7 @@ for c in concl:
 story += [PageBreak(), Paragraph("Appendix A - every table and figure of the paper up to Fig. 17", H1),
           Paragraph("Where each item of the paper is in the replication. Tables are in <i>results/database/</i> "
                     "(Table_I ... Table_IV csv and Tables_I_to_IV.txt), figures in <i>results/figures/</i>.", BODY)]
-inv = [["Paper", "Content", "Replication", "Kind"],
+inv = [["Paper", "Content", "This study", "Kind"],
        ["Table I", "Short-circuit parameters of the DG", "Table_I_DG_parameters.csv", "model read-back"],
        ["Table II", "Inom, If,min, If,max of the branches", "Table_II_branch_currents.csv", "calculated"],
        ["Table III", "Fuse coefficients b_i", "Table_III_fuse_coefficients.csv", "calculated"],
@@ -729,8 +729,8 @@ def on_page(canvas, doc):
 
 
 pdf = SimpleDocTemplate(OUT, pagesize=A4, leftMargin=1.5 * cm, rightMargin=1.5 * cm, topMargin=1.5 * cm,
-                        bottomMargin=1.6 * cm, title="Paper vs Replication - Yousaf et al. 2022",
-                        author="Replication, IEEE 13-node feeder")
+                        bottomMargin=1.6 * cm, title="Comparison with the reference paper",
+                        author="DSDR study, IEEE 13-node feeder")
 pdf.build(story, onFirstPage=on_page, onLaterPages=on_page)
 for f in os.listdir(TMP):
     os.remove(os.path.join(TMP, f))

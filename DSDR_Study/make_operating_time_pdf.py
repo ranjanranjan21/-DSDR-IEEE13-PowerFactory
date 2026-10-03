@@ -212,8 +212,8 @@ def implied_current(t_delayed):
 # ---------------------------------------------------------------------------------------------
 story = []
 story.append(p("How the recloser operating times and the fuse melting times are calculated", TITLE))
-story.append(p("Replication of Yousaf et al. (2022), IEEE 13-node feeder, Table IV. All numbers are taken from the "
-               "PowerFactory replication in <i>Replication/results</i> (studies.json, settings.json, Table_IV.csv).", SUB))
+story.append(p("DSDR study, IEEE 13-node feeder, Table IV, checked against the reference paper. All numbers are taken from the "
+               "PowerFactory study in <i>DSDR_Study/results</i> (studies.json, settings.json, Table_IV.csv).", SUB))
 
 # ---- 1 summary -------------------------------------------------------------------------------
 ex_chk, _, _ = None, None, None

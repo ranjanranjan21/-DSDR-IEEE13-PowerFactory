@@ -15,7 +15,7 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(HERE), "Replication"))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "DSDR_Study"))
 from pf_setup import get_app, attr, STUDY_CASE           # noqa: E402
 from protection_data import NODES, NODE_ORDER, PF_FAULT   # noqa: E402
 

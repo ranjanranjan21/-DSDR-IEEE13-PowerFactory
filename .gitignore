@@ -3,22 +3,22 @@
 !/.gitignore
 !/README.md
 !/IEEE 13 Node Feeder.pfd
-!/Replication/
+!/DSDR_Study/
 !/Penetration_Study/
 !/Fig10_EMT_Study/
 
 # not in the repository
 __pycache__/
 *.pyc
-Replication/error/
-Replication/report_overleaf.zip
-Replication/report/main_preview.pdf
-Replication/results/_pdf_tmp/
+DSDR_Study/error/
+DSDR_Study/report_overleaf.zip
+DSDR_Study/report/main_preview.pdf
+DSDR_Study/results/_pdf_tmp/
 *_new.csv
 *_new.png
 # contains figures reproduced from the IEEE paper (copyright) - regenerate with make_comparison_pdf.py
-Replication/results/Comparison_Paper_vs_Replication.pdf
-Replication/results/Paper_vs_Our_Results.pdf
+DSDR_Study/results/Comparison_with_Reference_Paper.pdf
+DSDR_Study/results/Paper_vs_Our_Results.pdf
 # comparison PDFs that contain figures reproduced from the IEEE paper (copyright)
-Replication/results/comparison/Comparison_Paper_vs_Replication.pdf
-Replication/results/comparison/Paper_vs_Our_Results.pdf
+DSDR_Study/results/comparison/Comparison_with_Reference_Paper.pdf
+DSDR_Study/results/comparison/Paper_vs_Our_Results.pdf

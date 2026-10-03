@@ -93,9 +93,9 @@
 {\bfseries PROJECT REPORT\par}
 {\itshape on\par}
 \vspace{0.4cm}
-{\large\bfseries An Adaptive Overcurrent Protection Scheme for\\
-Dual-Setting Directional Recloser and Fuse Coordination\\
-in Unbalanced Distribution Networks With Distributed Generation\par}
+{\large\bfseries Dual-Setting Directional Recloser and Fuse Coordination\\
+in Unbalanced Distribution Networks\\
+With Distributed Generation\par}
 \vspace{1.0cm}
 {\bfseries Submitted by\par}
 {\bfseries Jhala Nath Kafle\par}
@@ -128,25 +128,23 @@ MATLAB/Simulink; the complete study has now been rebuilt in \textbf{DIgSILENT \P
 scripts, so that every table and figure is regenerated from the model by one command.
 
 The model uses the feeder of the DIgSILENT example library with the 115/4.16\,kV substation transformer, a
-4.05\,MVA synchronous DG at node 692 with the full machine data of the reference paper, the manufacturer
+4.05\,MVA synchronous DG at node 692 with its full machine data, the manufacturer
 curves of the two reclosers (GE IAC77B801A and GE/Alstom CDG34) and library fuse curves (Gould-Shawmut
 A055C). Unbalanced load flow, short-circuit calculation for all fault types and phase combinations, and an
 electromagnetic-transient (EMT) simulation of the reclosing sequence were carried out.
 
-The rated branch currents agree with the reference paper within 2\,\%. The fault levels follow the IEEE
-short-circuit benchmark and are lower than the values printed in the paper, by 4 to 60\,\% on the feeder
-branches. Without DG the
+The fault levels of the model agree with the IEEE 13-node short-circuit benchmark within about 2\,\%.
+Without DG the
 scheme is coordinated in all <<N_CELLS>> node/fault-type cells. With the DG and a conventional single-setting
-recloser R2, coordination is held in only <<N14_HELD>> of <<N_CELLS>> cells; <<N14_AGREE>> cells agree with
-the paper's Fig.~14. With R2 as a DSDR and the fuse revision of the method, coordination is held in
+recloser R2, coordination is held in only <<N14_HELD>> of <<N_CELLS>> cells. With R2 as a DSDR and the fuse revision of the method, coordination is held in
 <<N17_HELD>> of <<N_CELLS>> cells. With the same fuses and a single-setting R2 only <<N17_SINGLE>> cells are
 held, so the dual setting itself restores seven cells. One cell (line-to-ground fault at 692) cannot be
 restored with the available dial range, and faults downstream of R2 remain fed directly by the DG.
 \PF's own relay and fuse models confirm the calculated operating times within <<PF_MAX>>\,\% over
 <<PF_N>> operating times.
 
-The report documents the model, the settings, the results, the differences from the reference paper and
-their causes, and the work that remains: the extension to the IEEE 34-node feeder.
+The report documents the model, the settings, the results and the work that remains: the extension to the
+IEEE 34-node feeder. The comparison with the reference paper is given separately in Appendix~E.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
 coordination, IEEE 13-node feeder, DIgSILENT \PF.
@@ -245,63 +243,60 @@ Yousaf \textit{et al.}~\cite{yousaf2022} on the IEEE 13-node feeder in DIgSILENT
 The problem addressed is the loss of recloser--fuse coordination caused by the change of fault-current
 magnitude and direction when a DG is connected. A conventional scheme that is coordinated without DG may lose
 the fuse-saving property in the zone between the grid and the DG. The project investigates whether the DSDR
-method restores the coordination when it is reproduced with an independently built model and with the real
-characteristics of the devices named in the paper.
+method restores the coordination in an independently built model that uses the real characteristics of
+the protection devices.
 
 \subsection{Objectives}
 \subsubsection{General Objective}
 To build and validate a DIgSILENT \PF{} implementation of the DSDR protection-coordination method on the IEEE
-13-node test feeder, with and without distributed generation, and to compare the results with the reference
-paper.
+13-node test feeder, with and without distributed generation.
 
 \subsubsection{Specific Objectives}
 \begin{enumerate}
-\item Build and verify the IEEE 13-node feeder with the protection devices of the reference paper and compare
-      the branch currents with its Table~II.
+\item Build and verify the IEEE 13-node feeder with its recloser and fuse protection.
 \item Perform unbalanced load-flow and short-circuit studies for all fault types and phase combinations.
-\item Calculate the recloser pickup currents, time dials and the fuse coefficients with the paper's equations.
+\item Calculate the recloser pickup currents, time dials and the fuse coefficients with the method's equations.
 \item Establish the conventional recloser--fuse coordination without DG.
 \item Connect the 4.05\,MVA synchronous DG at node 692 and quantify the change of the fault currents and of
       their direction at the reclosers.
-\item Classify the coordination with DG for a conventional recloser R2 (Fig.~14 of the paper).
+\item Classify the coordination with DG for a conventional recloser R2.
 \item Design the forward and reverse settings of R2 as a DSDR and classify the coordination again
-      (Fig.~17 and Table~IV of the paper).
-\item Verify the reclosing sequence in the time domain (Fig.~10 of the paper).
-\item Identify and explain every difference from the reference paper.
+      and determine the operating times.
+\item Verify the reclosing sequence in the time domain.
+\item Compare the results with the reference paper and explain the differences (Appendix~E).
 \end{enumerate}
 
 \subsection{Scope of the Study}
 The study covers the IEEE 13-node feeder: unbalanced load flow, LG, LL, LLG and LLL faults at twelve fault
 locations, pickup and time-dial calculation, fuse coordination, the DSDR forward and reverse settings, the
-coordination classification with and without the DSDR, and one EMT simulation. The IEEE 34-node part of
-the paper is outside the completed work.
+coordination classification with and without the DSDR, and one EMT simulation. The IEEE 34-node feeder
+is outside the completed work.
 
 \subsection{Significance of the Study}
 The study gives a reproducible implementation of a protection-coordination method for feeders with DG in a
 tool that utilities use. It shows what the method achieves when the real relay dials and fuse sizes are
-respected, and it separates the contribution of the dual setting from the contribution of the fuse revision,
-which the paper does not do.
+respected, and it separates the contribution of the dual setting from the contribution of the fuse revision.
 
 \subsection{Limitations of the Study}
 \begin{itemize}
-\item The paper does not print the settings of R2, the fuse sizes behind its Table~IV, the source impedance,
-      or the fault type of each row of Table~IV. These had to be chosen; every choice and its basis is listed
-      in Section~\ref{sec:assumptions}.
+\item The method leaves the settings of R2, the fuse sizes, the source impedance and the fault type of each
+      operating-time case open. These were chosen; every choice and its basis is listed in
+      Section~\ref{sec:assumptions}.
 \item The library model of the CDG34 relay is not directional. The two setting groups are modelled as
       separate relay units and the direction is assigned from the fault location.
 \item Coordination is judged with a zero-margin criterion (the fuse must not start to melt before the fast
       trip). Section~\ref{sec:margin} shows how the result changes with a breaker time and a fuse margin.
-\item Fig.~7 of the paper (CTI against DG penetration) is not reproduced, because the paper does not define
-      the quantity it plots.
+\item The effect of the DG penetration level (CTI against penetration) is studied separately, in seven
+      dedicated \PF{} models, and is not part of this report.
 \item The IEEE 34-node feeder has not been modelled.
 \end{itemize}
 
 \subsection{Organization of the Report}
 Chapter One introduces the problem and the objectives. Chapter Two reviews the protection concepts and the
-reference paper. Chapter Three gives the method and its equations. Chapter Four describes the \PF{} model,
+reference method. Chapter Three gives the method and its equations. Chapter Four describes the \PF{} model,
 the DG, the protection devices and the simulation cases. Chapter Five presents the results. Chapter Six
-compares them with the reference paper. Chapter Seven discusses the findings and their limits. Chapter Eight
-gives the conclusions and the remaining work.
+discusses the findings and their limits. Chapter Seven gives the conclusions and the remaining work. The
+comparison with the reference paper is in Appendix~E.
 
 % =====================================================================================================
 \chapterhead{TWO}{LITERATURE REVIEW AND REFERENCE PAPER}
@@ -367,7 +362,7 @@ Protection Scheme for Dual-Setting Directional Recloser and Fuse Coordination in
 Networks With Distributed Generation,'' \textit{IEEE Transactions on Industry Applications}, vol.~58, no.~2,
 pp.~1831--1842, 2022~\cite{yousaf2022}. The project uses its equations for the forward and reverse operating
 times, the pickup currents, the fuse characteristic and coefficients, the series-fuse rule and the setting
-constraints, and its flowchart (Fig.~5 of the paper) for the design sequence.
+constraints, and its flowchart for the design sequence.
 
 \subsection{Research Gap}
 The paper reports that the DSDR restores coordination in every case, but it does not publish the settings of
@@ -531,9 +526,8 @@ t = TDS\left[0.004+\frac{0.6379}{M-0.62}+\frac{1.7872}{(M-0.62)^2}+\frac{0.2461}
 \qquad M=\frac{I_f}{I_p},
 \label{eq:iac}
 \end{equation}
-valid from $M=1.5$ to $M=40$. This equation, and not eq.~\eqref{eq:tf} with standard IEEE constants,
-reproduces the only worked example of the paper: for 4219\,A it gives 0.096\,s and 1.926\,s against the
-paper's 0.097\,s and 1.932\,s.
+valid from $M=1.5$ to $M=40$. For 4219\,A, for example, it gives 0.096\,s (fast, TDS 0.5) and 1.926\,s
+(delayed, TDS 10).
 
 \subsubsection{R2: GE/Alstom CDG34}
 The CDG extremely inverse characteristic is a manufacturer's table of time against $M=I_f/I_s$ for time
@@ -548,7 +542,7 @@ The table is not defined below a multiplier of 0.1, so 0.1 is the fastest settin
 The fuses are Gould-Shawmut A055C (5.5\,kV, E-rated) with their minimum-melting and total-clearing curves.
 The fuse times are read from these curves at the current through the fuse with the same interpolation as
 eq.~\eqref{eq:cdg}. The straight line of eq.~\eqref{eq:fuse} is used only to compute the coefficients of
-Table~III; it was found that the paper's own figures also use A055C curves and not eq.~\eqref{eq:fuse}.
+Table~III.
 
 \subsection{Coordination Criteria}
 A fault cell is classified as \emph{coordination exists} when all of the following hold:
@@ -585,7 +579,7 @@ The steps of Figure~\ref{fig:flow} are applied as follows.
 \chapterhead{FOUR}{SYSTEM MODELING AND SIMULATION SETUP}
 
 \subsection{DIgSILENT \PF{} Environment}
-The model is the project \emph{IEEE13 Yousaf2022 Replication} in \PF{} 2021~SP2. Load flows use the
+The model is the project \emph{IEEE13 DSDR Fuse Coordination} in \PF{} 2021~SP2. Load flows use the
 unbalanced AC method, short circuits the complete method, and the time-domain study the EMT simulation with a
 step of 0.1\,ms. The studies are run from Python~3.9 in engine mode; the same sequence can be started inside
 \PF{} from one script object, which prints the report in the output window.
@@ -612,20 +606,19 @@ fault levels by 20 to 65\,\% and is not used. The regulator taps are fixed at +1
 \subsection{Distributed Generation Model}
 The DG is a 4.05\,MVA, 0.69\,kV synchronous machine connected to node 692 through a 0.69/4.16\,kV
 transformer with a leakage reactance of 0.15\,p.u. It is modelled with the standard synchronous-machine
-model of \PF, round rotor, and the full data of Table~I of the paper. Table~\ref{tab:dg} compares the
-paper's values with the values read back from the model. In the load flow the machine delivers 3.24\,MW and
-controls its terminal voltage to 1.0\,p.u.; the paper does not give the operating point.
+model of \PF, round rotor, with the short-circuit data of Table~\ref{tab:dg} (values read back from the
+model). In the load flow the machine delivers 3.24\,MW and controls its terminal voltage to 1.0\,p.u.
 
 \begin{table}[H]
 \centering\small
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
-\hd\textbf{Parameter} & \textbf{Symbol} & \textbf{Paper} & \textbf{Model} & \textbf{Unit} \\
+\hd\textbf{Parameter} & \textbf{Symbol} & \textbf{Value} & \textbf{Unit} \\
 \midrule
-<<TABLE_I>>
+<<TABLE_I_OWN>>
 \bottomrule
 \end{tabular}
-\caption{Parameters of the synchronous DG: reference paper against the \PF{} model.}
+\caption{Parameters of the synchronous DG in the \PF{} model.}
 \label{tab:dg}
 \end{table}
 
@@ -750,24 +743,22 @@ eq.~\eqref{eq:iprv}.
 \end{table}
 
 \subsection{Branch Currents and Fault Levels (Table II)}
-Table~\ref{tab:t2} reproduces Table~II of the paper. The rated currents agree within 2\,\% on every branch.
-The minimum fault currents are of the same size as the paper's. The maximum fault currents are lower, by 4 to 60\,\% on the feeder branches: the
-model follows the IEEE benchmark, while several of the paper's values exceed its own value at the feeder
-head (5.41\,kA), which is not possible on a radial feeder without DG.
+Table~\ref{tab:t2} gives the rated current of every protected branch from the unbalanced load flow, the
+minimum fault current (LG through 3\ohm{} at the farthest node of the branch's section) and the maximum
+fault current (bolted, nearest node). The largest fault current at the feeder head is 4.73\,kA; the fault
+levels agree with the IEEE 13-node short-circuit benchmark within about 2\,\%.
 
 \begin{table}[H]
 \centering\footnotesize
-\begin{tabular}{@{}lcccccccc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
-\hd & \multicolumn{3}{c}{\textbf{$I_{nom}$ (A)}} & \multicolumn{2}{c}{\textbf{$I_{f,min}$ (kA)}} & \multicolumn{3}{c}{\textbf{$I_{f,max}$ (kA)}} \\
-\hd\textbf{Branch} & \textbf{model} & \textbf{paper} & \textbf{dev.\,\%} & \textbf{model} & \textbf{paper} & \textbf{model} & \textbf{paper} & \textbf{dev.\,\%} \\
+\hd\textbf{Branch} & \textbf{$I_{nom}$ (A)} & \textbf{$I_{f,min}$ (kA)} & \textbf{$I_{f,max}$ (kA)} \\
 \midrule
-<<TABLE_II>>
+<<TABLE_II_OWN>>
 \bottomrule
 \end{tabular}
-\caption{Rated, minimum and maximum fault current of the protected branches without DG (Table~II of the paper).
-XFM1 HV side: the model values are the 4.16\,kV currents for a fault on the 0.48\,kV side, so this row is not
-comparable with the paper's.}
+\caption{Rated, minimum and maximum fault current of the protected branches without DG. XFM1 HV side: 4.16\,kV
+currents for a fault on the 0.48\,kV side.}
 \label{tab:t2}
 \end{table}
 
@@ -797,26 +788,22 @@ to 2.0\,kA, in the reverse direction, while R1 still carries the grid contributi
 \end{table}
 
 \subsection{Fuse Coefficients (Table III)}
-Table~\ref{tab:t3} gives the fuse coefficients of eq.~\eqref{eq:biseries}. With $i$ counted from the fault,
-as the paper defines it, the values differ from the paper's Table~III. With $i$ counted from the source they
-agree within 0.05 for the series fuses of R1's zone; in R2's zone the agreement is weaker (within 0.25),
-because the settings of R2 are not published. The paper's table therefore applies the equation with the index
-reversed, which would make the upstream fuse faster than the downstream one. The last two columns give the
-installed fuse and its melting time at the same current; it is much shorter than the time the equation asks
-for, because real fuse curves are steeper than the slope $-1.8$.
+Table~\ref{tab:t3} gives the fuse coefficients of eq.~\eqref{eq:biseries}, with $i = 1$ for the fuse closest
+to the fault. The last columns give the installed fuse and its melting time at the same current; it is much
+shorter than the time the equation asks for, because real fuse curves are steeper than the slope $-1.8$.
 
 \begin{table}[H]
 \centering\footnotesize
-\begin{tabular}{@{}lcccccccccc@{}}
+\begin{tabular}{@{}lcccccccc@{}}
 \toprule
 \hd\textbf{Fuse} & \textbf{$I_f$ (A)} & \textbf{$i/z$} & \textbf{$t_F$ (s)} & \textbf{$t_D$ (s)} & \textbf{$t_{fuse}$ (s)} &
-\textbf{$b_i$} & \textbf{$b_i$ rev.} & \textbf{paper} & \textbf{Size} & \textbf{$t_{MMT}$ (s)} \\
+\textbf{$b_i$} & \textbf{Size} & \textbf{$t_{MMT}$ (s)} \\
 \midrule
-<<TABLE_III>>
+<<TABLE_III_OWN>>
 \bottomrule
 \end{tabular}
-\caption{Fuse coefficients, eq.~(9), $a_i=-1.8$ (Table~III of the paper). ``$b_i$ rev.'': index $i$ counted
-from the source. Size and $t_{MMT}$: fuse of the design without DG at the same current.}
+\caption{Fuse coefficients, eq.~(9), $a_i=-1.8$. Size and $t_{MMT}$: fuse of the design without DG at the same
+current.}
 \label{tab:t3}
 \end{table}
 
@@ -824,20 +811,20 @@ from the source. Size and $t_{MMT}$: fuse of the design without DG at the same c
 With the starting fuse sizes 35 of the <<N_CELLS>> cells are coordinated. The four lost cells are the faults
 at 675, where the series pair F692-R (250E) and F671-1 (300E) breaks the 75\,\% rule. The fuse revision of
 the method changes F692-R to 200E, after which all <<N_CELLS>> cells are coordinated. Figures~\ref{fig:f8}
-and \ref{fig:f9} show two of the paper's cases: R2's fast curve lies below the fuses and its delayed curve
+and \ref{fig:f9} show two cases: R2's fast curve lies below the fuses and its delayed curve
 above them.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig08.png}
-\caption{LG fault at 611 (Fig.~8 of the paper): R2 forward, fuses F684 and F671-2.}
+\caption{LG fault at 611: R2 forward, fuses F684 and F671-2.}
 \label{fig:f8}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig09.png}
-\caption{LLG fault at the middle of 692--675 through 1\ohm{} (Fig.~9 of the paper).}
+\caption{LLG fault at the middle of 692--675 through 1\ohm{}.}
 \label{fig:f9}
 \end{figure}
 
@@ -845,10 +832,8 @@ above them.
 With the DG connected and the settings unchanged, coordination is held in <<N14_HELD>> of <<N_CELLS>> cells
 (Table~\ref{tab:g14}, Figure~\ref{fig:f14}). The lost cells are at 633, 645, 646, DL and 675: the fuse now
 carries the grid and the DG current and melts before the fast trip, and for some LG faults the single-setting
-R2 does not pick up the reverse DG current at all. <<N14_AGREE>> of the <<N_CELLS>> cells have the same status
-as in the paper's Fig.~14; the paper marks nine cells as lost, the model fifteen. The differences are mainly at
-633 and DL, which are lost in the model and held in the paper because the model's fuses there have almost no
-margin even without DG, and at 645, where the model holds two cells that the paper marks as lost.
+R2 does not pick up the reverse DG current at all. At 633 and DL the fuses have almost no margin even
+without DG, so every fault type is lost there.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -857,41 +842,41 @@ margin even without DG, and at 645, where the model holds two cells that the pap
 \toprule
 \hd\textbf{Fault} & <<GRID_HEAD>> \\
 \midrule
-<<GRID14>>
+<<GRID14_OWN>>
 \bottomrule
 \end{tabular}
-\caption{Coordination status with DG and a conventional R2 (Fig.~14 of the paper): model and paper.
-$\checkmark$ exists, $\times$ does not exist, -- not applicable.}
+\caption{Coordination status with DG and a conventional R2. $\checkmark$ exists, $\times$ does not exist,
+-- not applicable.}
 \label{tab:g14}
 \end{table}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{fig14.png}
-\caption{Coordination status with DG, without the DSDR (replication of Fig.~14).}
+\caption{Coordination status with DG, without the DSDR.}
 \label{fig:f14}
 \end{figure}
 
-Figures~\ref{fig:f11} to \ref{fig:f13} show the paper's three cases with the conventional R2.
+Figures~\ref{fig:f11} to \ref{fig:f13} show three cases with the conventional R2.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig11.png}
-\caption{LL fault at 646 through 1\ohm: R1 with F646 and F632 (Fig.~11 of the paper).}
+\caption{LL fault at 646 through 1\ohm: R1 with F646 and F632.}
 \label{fig:f11}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig12.png}
-\caption{LL fault at 645 through 1.5\ohm, conventional R2 (Fig.~12 of the paper).}
+\caption{LL fault at 645 through 1.5\ohm, conventional R2.}
 \label{fig:f12}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig13.png}
-\caption{Three-phase fault at 10\,\% of line 632--633, conventional R2 (Fig.~13 of the paper).}
+\caption{Three-phase fault at 10\,\% of line 632--633, conventional R2.}
 \label{fig:f13}
 \end{figure}
 
@@ -930,38 +915,36 @@ then clears after R2's delayed trip (7.6\,s against 4.0\,s), and R2's delayed di
 <<GRID17>>
 \bottomrule
 \end{tabular}
-\caption{Coordination status with DG and the revised fuses: single-setting R2 against dual-setting R2 (Fig.~17
-of the paper, in which every cell exists).}
+\caption{Coordination status with DG and the revised fuses: single-setting R2 against dual-setting R2.}
 \label{tab:g17}
 \end{table}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{fig17.png}
-\caption{Coordination status with DG and the DSDR (replication of Fig.~17).}
+\caption{Coordination status with DG and the DSDR.}
 \label{fig:f17}
 \end{figure}
 
-Figures~\ref{fig:f15} and \ref{fig:f16} show the paper's worked case, a bolted LL fault at 646. The fuses
-carry 3.67\,kA (paper: 3.64\,kA). R2 carries 1.11\,kA in reverse (paper: 1.54\,kA) and trips on its reverse
-fast curve in 0.086\,s (paper: 0.103\,s), before F646 melts.
+Figures~\ref{fig:f15} and \ref{fig:f16} show a bolted LL fault at 646. The fuses carry 3.67\,kA. R2 carries
+1.11\,kA in reverse and trips on its reverse fast curve in 0.086\,s, before F646 melts (0.415\,s).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig15.png}
-\caption{Bolted LL fault at 646: R2 reverse setting with F646 and F632 (Fig.~15 of the paper).}
+\caption{Bolted LL fault at 646: R2 reverse setting with F646 and F632.}
 \label{fig:f15}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig16.png}
-\caption{Bolted LL fault at 646: R1 with F646 and F632 (Fig.~16 of the paper).}
+\caption{Bolted LL fault at 646: R1 with F646 and F632.}
 \label{fig:f16}
 \end{figure}
 
 \subsection{Operating Times With the DSDR (Table IV)}
-Tables~\ref{tab:t4a} and \ref{tab:t4b} reproduce Table~IV of the paper. R1 operates forward for every node.
+Tables~\ref{tab:t4a} and \ref{tab:t4b} give the operating times with the DSDR. R1 operates forward for every node.
 R2 operates in reverse for the nodes upstream of it and forward for the nodes downstream. The fuse time is
 the minimum-melting time of the fuse nearest to the fault at the current through that fuse. In all nine
 rows with a fuse it is longer than the last fast trip; the smallest margins are 6\,ms at 675 and 15\,ms at DL
@@ -972,35 +955,35 @@ and 652.
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llccccccc@{}}
 \toprule
-\hd & & \textbf{$I_{R1}$} & \textbf{R1 fast (s)} & \textbf{R1 delayed (s)} & \textbf{$I_{R2}$} & & \textbf{R2 fast (s)} & \textbf{R2 delayed (s)} \\
-\hd\textbf{Node} & \textbf{Fault} & \textbf{(A)} & \textbf{model / paper} & \textbf{model / paper} & \textbf{(A)} & \textbf{Dir.} & \textbf{model / paper} & \textbf{model / paper} \\
+\hd & & \textbf{$I_{R1}$} & \textbf{R1 fast} & \textbf{R1 delayed} & \textbf{$I_{R2}$} & & \textbf{R2 fast} & \textbf{R2 delayed} \\
+\hd\textbf{Node} & \textbf{Fault} & \textbf{(A)} & \textbf{(s)} & \textbf{(s)} & \textbf{(A)} & \textbf{Dir.} & \textbf{(s)} & \textbf{(s)} \\
 \midrule
-<<TABLE_IVA>>
+<<TABLE_IVA_OWN>>
 \bottomrule
 \end{tabular}
-\caption{Recloser operating times with the DSDR, DG in service (Table~IV of the paper).}
+\caption{Recloser operating times with the DSDR, DG in service.}
 \label{tab:t4a}
 \end{table}
 
 \begin{table}[H]
 \centering\footnotesize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lllcccccccl@{}}
+\begin{tabular}{@{}lllccccccl@{}}
 \toprule
-\hd & & & & \textbf{$I_{fuse}$} & \multicolumn{2}{c}{\textbf{$t_{MMT}$ (s)}} & \textbf{$t_{TCT}$} & \textbf{Last fast} & \textbf{Margin} & \\
-\hd\textbf{Node} & \textbf{Fault} & \textbf{Fuse} & \textbf{Size} & \textbf{(A)} & \textbf{model} & \textbf{paper} & \textbf{(s)} & \textbf{trip (s)} & \textbf{(s)} & \textbf{Status} \\
+\hd & & & & \textbf{$I_{fuse}$} & \textbf{$t_{MMT}$} & \textbf{$t_{TCT}$} & \textbf{Last fast} & \textbf{Margin} & \\
+\hd\textbf{Node} & \textbf{Fault} & \textbf{Fuse} & \textbf{Size} & \textbf{(A)} & \textbf{(s)} & \textbf{(s)} & \textbf{trip (s)} & \textbf{(s)} & \textbf{Status} \\
 \midrule
-<<TABLE_IVB>>
+<<TABLE_IVB_OWN>>
 \bottomrule
 \end{tabular}
-\caption{Fuse times of Table~IV. Margin = $t_{MMT}$ minus the last fast trip (R2 for faults below R2; the later
+\caption{Fuse times with the DSDR, DG in service. Margin = $t_{MMT}$ minus the last fast trip (R2 for faults below R2; the later
 of R1 and R2 reverse above it). Nodes 632, 671 and 680 are on the main feeder and have no fuse.}
 \label{tab:t4b}
 \end{table}
 
 \subsection{Single Setting Against Dual Setting on Selected Faults}
 Table~\ref{tab:cases9} compares the two settings of R2 on nine faults with the same (revised) fuses: the six
-faults of the paper's figures and three cells of the classification. Figure~\ref{fig:cdsum} summarises it and
+faults of the figures above and three cells of the classification. Figure~\ref{fig:cdsum} summarises it and
 Figures~\ref{fig:case5} and \ref{fig:case7} show two of the diagrams.
 
 \begin{table}[H]
@@ -1008,8 +991,8 @@ Figures~\ref{fig:case5} and \ref{fig:case7} show two of the diagrams.
 \setlength{\tabcolsep}{3pt}
 \begin{tabularx}{\textwidth}{@{}clLcccccccll@{}}
 \toprule
-\hd & \textbf{Paper} & & \textbf{$Z_f$} & \textbf{$I_{R1}$} & \textbf{$I_{R2}$ (A),} & \textbf{R1 fast} & \multicolumn{2}{c}{\textbf{R2 fast (s)}} & \textbf{Fuse: melts} & \multicolumn{2}{c}{\textbf{Fuse saving}} \\
-\hd\textbf{\#} & \textbf{figure} & \textbf{Fault} & \textbf{($\Omega$)} & \textbf{(A)} & \textbf{direction} & \textbf{(s)} & \textbf{single} & \textbf{dual} & \textbf{(s)} & \textbf{single} & \textbf{dual} \\
+\hd & & & \textbf{$Z_f$} & \textbf{$I_{R1}$} & \textbf{$I_{R2}$ (A),} & \textbf{R1 fast} & \multicolumn{2}{c}{\textbf{R2 fast (s)}} & \textbf{Fuse: melts} & \multicolumn{2}{c}{\textbf{Fuse saving}} \\
+\hd\textbf{\#} & \textbf{Figure} & \textbf{Fault} & \textbf{($\Omega$)} & \textbf{(A)} & \textbf{direction} & \textbf{(s)} & \textbf{single} & \textbf{dual} & \textbf{(s)} & \textbf{single} & \textbf{dual} \\
 \midrule
 <<TABLE_CASES>>
 \bottomrule
@@ -1021,7 +1004,7 @@ Figures~\ref{fig:case5} and \ref{fig:case7} show two of the diagrams.
 In cases 5, 7 and 8 the dual setting restores the fuse saving: the reverse group picks up a DG current that
 the forward group does not see (case 7: 469\,A) or sees only slowly. Cases 3, 4 and 9 are lost with both
 settings; they are limits of the fuse revision and of the dial range, not of the direction. Cases 3 and 4 are
-the paper's faults through impedance: the larger fuses that are needed for the bolted faults are too slow for
+faults through impedance: the larger fuses that are needed for the bolted faults are too slow for
 these lower currents.
 
 \begin{figure}[H]
@@ -1068,27 +1051,26 @@ and the fuse F671-2 (300E) melts when the accumulated heating $\sum \Delta t / t
 Without DG the two fast shots use 45\,\% of the melting heat, the fuse survives both and then clears the
 permanent fault. With the DG the fuse melts at the end of the second fast shot, because the DG keeps feeding
 the fault while R2 is open (Table~\ref{tab:emt}). The feeder current at node 632 is <<EMT_PRE>>\,A RMS
-(phases a / c) before the fault and <<EMT_RMS>>\,A during it, with peaks of <<EMT_PEAK>>\,A; the paper's
-larger phase peaks at about 5000\,A.
+(phases a / c) before the fault and <<EMT_RMS>>\,A during it, with peaks of <<EMT_PEAK>>\,A.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.95\textwidth]{fig10.png}
-\caption{Time-domain current at node 632 for an LL (a--c) fault at 684 through 0.2\ohm{} (Fig.~10 of the paper):
+\caption{Time-domain current at node 632 for an LL (a--c) fault at 684 through 0.2\ohm{} :
 without DG (top) and with DG (bottom).}
 \label{fig:f10}
 \end{figure}
 
 \begin{table}[H]
 \centering\small
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lcc@{}}
 \toprule
-\hd\textbf{Event (time in s)} & \textbf{Paper (read off Fig.~10)} & \textbf{Model, DG out} & \textbf{Model, DG in} \\
+\hd\textbf{Event (time in s)} & \textbf{DG out} & \textbf{DG in} \\
 \midrule
-<<TABLE_EMT>>
+<<TABLE_EMT_OWN>>
 \bottomrule
 \end{tabular}
-\caption{Reclosing sequence of the EMT simulation against the paper.}
+\caption{Reclosing sequence of the EMT simulation.}
 \label{tab:emt}
 \end{table}
 
@@ -1104,7 +1086,7 @@ The <<N17_HELD>> held cells are obtained with a zero margin. If the breaker inte
 is added to the fast trip, 31 cells are held; if in addition the fuse may only be loaded to 75\,\% of its
 melting time, 26 cells are held. The pickups are a second limit: with the DG, the lowest LG fault current
 through 3\ohm{} is 577\,A at R1 and 368\,A at R2, below the pickups of 734.6\,A and 587.5\,A, because the DG
-supplies part of the fault. The paper examines neither point.
+supplies part of the fault.
 
 \subsection{Results Summary}
 \begin{table}[H]
@@ -1130,73 +1112,8 @@ The dual setting alone, with the fuses of the design without DG, restores one ce
 the fuse revision it restores fourteen (24 to <<N17_HELD>>), seven of which need the dual setting.
 
 % =====================================================================================================
-\chapterhead{SIX}{COMPARISON OF RESULTS WITH THE REFERENCE PAPER}
-
-\subsection{Basis of Comparison}
-The comparison uses only values that the paper prints or that can be read from its figures. The model was
-not tuned to match the paper; differences are stated and explained from the evidence in the model.
-
-\begin{table}[H]
-\centering\footnotesize
-\begin{tabularx}{\textwidth}{@{}LLLl@{}}
-\toprule
-\hd\textbf{Aspect} & \textbf{This project} & \textbf{Reference paper} & \textbf{Assessment} \\
-\midrule
-Rated branch currents & within 2\,\% & Table II & Very good \\
-Fault levels & IEEE benchmark, feeder head 4.73\,kA & 5.41\,kA, some branches higher & Lower \\
-R1 worked example (4219\,A) & 0.096 / 1.926\,s & 0.097 / 1.932\,s & Very good \\
-Recloser curves & IAC77B801A and CDG34 library curves & Same devices & Same \\
-Fuse coefficients, series fuses of R1's zone & within 0.05 with reversed index & Table III & Index reversed in the paper \\
-DG model & Dynamic synchronous machine, Table I data & Synchronous machine & Same \\
-Coordination with DG, conventional R2 & <<N14_HELD>> of <<N_CELLS>> held; <<N14_AGREE>> cells agree & 30 of 39 held (Fig.~14) & Good \\
-Coordination with the DSDR & <<N17_HELD>> of <<N_CELLS>> held & 39 of 39 held (Fig.~17) & Good; one cell at the dial limit \\
-Fuse current, LL at 646 & 3.67\,kA & 3.64\,kA (Fig.~15) & Very good \\
-R2 reverse current, LL at 646 & 1.11\,kA & 1.54\,kA & Lower \\
-Table IV, R1 times & 12 to 78\,\% slower (652: 34\,\% faster) & Table IV & Follows the fault levels \\
-Table IV, R2 and fuse times & assumed R2 settings, revised fuses & settings not published & Not comparable in detail \\
-EMT sequence, fuse operation & melts 1.25\,s, clears 1.61\,s & 1.21\,s (Fig.~10) & Close if 1.21\,s is melting \\
-IEEE 34-node feeder & not modelled & validated & Remaining work \\
-\bottomrule
-\end{tabularx}
-\caption{Comparison of the results with the reference paper.}
-\label{tab:compare}
-\end{table}
-
-\subsection{Base-Case Comparison}
-The rated currents test the feeder model independently of the protection and of the DG. Their agreement
-within 2\,\% (the MATLAB/Simulink model of the earlier phase reached 2 to 9\,\%) shows that the topology, the
-loads and the regulator are implemented as in the paper.
-
-\subsection{Fault-Current Magnitude Difference}
-The maximum fault currents of the feeder branches are 4 to 60\,\% below the paper's Table~II. The model was validated against the
-published IEEE short-circuit results instead, which it meets within about 2\,\%. The paper's values cannot
-all be correct: 6.73\,kA on 632--633 and 7.83\,kA on 692--675 exceed its own 5.41\,kA at the feeder head. The
-two worked cases of the paper illustrate the remaining difference: R2 carries 1718\,A for the LG fault at
-611 (paper: 1974\,A) and 1114\,A in reverse for the LL fault at 646 (paper: 1542\,A). In the earlier
-MATLAB/Simulink phase these currents were 702\,A and 838\,A, because the DG was a static Thevenin source.
-
-\subsection{Fuse and Coordination Comparison}
-The paper's Table~III could be reproduced only with the series index reversed. The fuse times in the paper's
-figures do not follow its fuse equation: for F646 at 3.6\,kA the figure shows about 0.18\,s, the equation
-with Table~III gives 1.85\,s. The figures match A055C library fuses, and the sizes change between figures
-(F646 is 200E in Fig.~12 and 300E in Figs.~11 and 16). The model therefore uses library fuse curves
-throughout.
-
-\subsection{Operating-Time Comparison (Table IV)}
-The R1 equation and settings reproduce the paper's worked example, so the difference of the R1 times comes
-from the fault currents. In every row of the paper the delayed time of R1 is 20 times the fast time, the
-ratio of the dials 10 and 0.5, which confirms the dials. For R2 the paper prints no settings and the ratio of
-its two times is not constant, so the R2 times and the fuse times of the model are the result of the stated
-method and cannot be matched to the paper row by row.
-
-\subsection{Central Finding Comparison}
-The central finding of the paper is reproduced: the DG makes a conventional scheme lose coordination in the
-zone between the grid and the DG, and a dual-setting directional R2 restores it there. The model adds two
-qualifications. The dual setting needs the fuse revision to be effective; and it does not help for faults
-downstream of R2, which the DG feeds directly.
-
 % =====================================================================================================
-\chapterhead{SEVEN}{DISCUSSION}
+\chapterhead{SIX}{DISCUSSION}
 
 \subsection{Effect of DG on Fault Current}
 The DG raises the fault current at every node, most near its connection point (671 and 692: from 3.39 to
@@ -1223,17 +1140,16 @@ R1's time. The
 DSDR is therefore necessary but not sufficient.
 
 \subsection{Limits Reached by the Devices}
-R1's dials in the paper are the two extremes of the IAC range, and the CDG table ends at 0.1 and 1.0. The
+R1's dials are the two extremes of the IAC range, and the CDG table ends at 0.1 and 1.0. The
 method's dial revision has no room. The fuse revision creates a conflict between the two states of the
 network: the larger fuses that are needed with the DG are too slow for two cells without it, and for the
-paper's impedance faults. Fuse sizes cannot adapt to the DG state. For faults downstream of R2 the fuse
-saving relies on the DG's own protection disconnecting it during the dead time, which the paper does not
-treat.
+faults through impedance. Fuse sizes cannot adapt to the DG state. For faults downstream of R2 the fuse
+saving relies on the DG's own protection disconnecting it during the dead time, which is not part of the method.
 
 \subsection{Change of the Simulation Tool}
 Rebuilding the study in \PF{} removed the main limitations of the earlier MATLAB\slash Simulink phase. The DG is a
-dynamic synchronous machine with the full data of the paper instead of a static source. The reclosers use
-the curves of the devices named in the paper instead of a substitute curve. All <<N_CELLS>> cells are
+dynamic synchronous machine with its full data instead of a static source. The reclosers use the curves of
+the actual devices instead of a substitute curve. All <<N_CELLS>> cells are
 resolved, including the three-phase faults and the single-phase nodes that could not be built before. The
 complete DSDR stage, which was pending, is finished. The earlier model remains useful as an independent
 cross-check of the load flow.
@@ -1245,42 +1161,38 @@ pickup against the reduced minimum fault current with DG, and provide for the DG
 recloser.
 
 % =====================================================================================================
-\chapterhead{EIGHT}{CONCLUSION AND FUTURE WORK}
+\chapterhead{SEVEN}{CONCLUSION AND FUTURE WORK}
 
 \subsection{Conclusion}
 The DSDR method of Yousaf \textit{et al.} was implemented on the IEEE 13-node feeder in DIgSILENT \PF{} with
-the real characteristics of the devices named in the paper. The feeder model agrees with the paper's rated
-currents within 2\,\% and with the IEEE short-circuit benchmark within about 2\,\%. Without DG the
+the real characteristics of the protection devices. The feeder model agrees with the IEEE short-circuit
+benchmark within about 2\,\%. Without DG the
 conventional scheme is coordinated in all <<N_CELLS>> cells. With the 4.05\,MVA DG at node 692 and a
 conventional R2, coordination is held in <<N14_HELD>> cells. With R2 as a DSDR and the fuse revision of the
-method it is held in <<N17_HELD>> cells; with the same fuses and a single setting in <<N17_SINGLE>>. The
-central finding of the paper is therefore confirmed, with the qualification that the result depends on the
-fuse revision and that one cell and the faults downstream of R2 remain open.
+method it is held in <<N17_HELD>> cells; with the same fuses and a single setting in <<N17_SINGLE>>. The dual-setting directional recloser therefore restores the coordination in the zone between the grid
+and the DG, with the qualification that the result depends on the fuse revision and that one cell and the
+faults downstream of R2 remain open.
 
 \subsection{Major Findings}
 \begin{enumerate}
-\item Rated currents within 2\,\% of the paper; fault levels at the IEEE benchmark, lower than the paper's.
-\item R1: pickup 720\,A, TDS 0.5 / 10; the IAC equation reproduces the paper's worked example within 1\,\%.
+\item Fault levels at the IEEE 13-node benchmark (feeder head 4.73\,kA).
+\item R1: pickup 720\,A, TDS 0.5 / 10, GE IAC extremely inverse curve.
 \item R2 forward: plugs 300 / 600\,A, TMS 0.1 / 1.0; R2 reverse: plugs 150 / 300\,A, TMS 0.1 / 1.0; reverse
       pickup by eq.~(12) 315.3\,A.
 \item With DG the load current at R2 reverses (252\,A) and R2 carries 1.1 to 2.0\,kA in reverse for upstream
       faults.
 \item Coordination: 39 cells without DG; <<N14_HELD>> with DG and a conventional R2; <<N17_HELD>> with the
-      DSDR; <<N14_AGREE>> cells agree with the paper's Fig.~14.
+      DSDR.
 \item The dual setting restores seven cells with the revised fuses and one cell without the revision.
 \item The LG fault at 692 cannot be coordinated within the dial range of R2.
 \item \PF's own relay and fuse models confirm the operating times within <<PF_MAX>>\,\%.
-\item In the EMT simulation the fuse survives the two fast shots without DG and melts at 1.25\,s (paper:
-      fuse operation at 1.21\,s); with DG it melts during the second fast shot.
+\item In the EMT simulation the fuse survives the two fast shots without DG and melts at 1.25\,s; with DG it melts during the second fast shot.
 \end{enumerate}
 
 \subsection{Contributions of the Present Work}
 \begin{itemize}
 \item A reproducible \PF{} implementation of the method: one command rebuilds the model and all results.
 \item Separation of the effect of the dual setting from the effect of the fuse revision.
-\item Identification of inconsistencies in the reference paper: the reversed index in Table~III, fuse curves
-      in the figures that differ from the fuse equation, fuse sizes that change between figures, and fault
-      levels above the feeder-head value.
 \item Identification of the limits of the method: dial range, DG-in against DG-out fuse sizes, DG infeed
       downstream of the recloser, and sensitivity of the pickups with DG.
 \item A time-domain verification and a verification with the relay models of the tool.
@@ -1288,7 +1200,7 @@ fuse revision and that one cell and the faults downstream of R2 remain open.
 
 \subsection{Remaining Work}
 \begin{enumerate}
-\item Extend the study to the IEEE 34-node feeder (Figs.~18 to 20 and Table~V of the paper).
+\item Extend the study to the IEEE 34-node feeder.
 \item Model the directional element of R2 explicitly instead of assigning the direction from the fault location.
 \item Repeat the classification with a practical margin (breaker time and 75\,\% of the fuse melting time).
 \end{enumerate}
@@ -1329,7 +1241,7 @@ PDF copy in accordance with the requirement of the department. It is not reprodu
 
 \appendixhead{B}{POWERFACTORY MODEL AND PARAMETER NOTES}
 \begin{itemize}
-\item Project: \emph{IEEE13 Yousaf2022 Replication}, imported from \texttt{IEEE 13 Node Feeder.pfd}; study
+\item Project: \emph{IEEE13 DSDR Fuse Coordination}, imported from \texttt{IEEE 13 Node Feeder.pfd}; study
       case \emph{Study with Substation Transformer}.
 \item Source: external grid 115\,kV, substation transformer 115/4.16\,kV, 5\,MVA, $u_k = 8.06\,\%$.
 \item Regulator taps fixed at +10 (a), +8 (b), +11 (c).
@@ -1377,17 +1289,185 @@ Unbalanced load flow & Completed & Tables~\ref{tab:volt} and \ref{tab:lf} \\
 Short-circuit analysis & Completed & All fault types and phase combinations, DG out and in \\
 DG connection (dynamic machine) & Completed & Table~\ref{tab:dg} \\
 Conventional coordination without DG & Completed & 39 of 39 cells \\
-Classification with DG (Fig.~14) & Completed & <<N14_HELD>> of <<N_CELLS>> cells held, <<N14_AGREE>> agree with the paper \\
+Classification with DG (Fig.~14) & Completed & <<N14_HELD>> of <<N_CELLS>> cells held \\
 DSDR forward and reverse settings & Completed & Table~\ref{tab:settings} \\
 DSDR coordination restoration (Fig.~17, Table~IV) & Completed & <<N17_HELD>> of <<N_CELLS>> cells \\
 Time-domain verification (Fig.~10) & Completed & Table~\ref{tab:emt} \\
 Verification with \PF{} relay models & Completed & <<PF_N>> operating times, max <<PF_MAX>>\,\% \\
-CTI against DG penetration (Fig.~7) & Not included & Quantity not defined in the paper \\
+CTI against DG penetration & Completed separately & Seven \PF{} models, 0--100\,\% of 4.05\,MVA \\
 IEEE 34-node extension & Pending & Not started \\
 \bottomrule
 \end{tabularx}
 \caption{Status of the work packages.}
 \label{tab:status}
+\end{table}
+
+\appendixhead{E}{COMPARISON WITH THE REFERENCE PAPER}
+This appendix compares the results of Chapter Five with the values printed in the reference
+paper~\cite{yousaf2022} or read from its figures.
+
+\subsection*{Basis of Comparison}
+The comparison uses only values that the paper prints or that can be read from its figures. The model was
+not tuned to match the paper; differences are stated and explained from the evidence in the model.
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}LLLl@{}}
+\toprule
+\hd\textbf{Aspect} & \textbf{This project} & \textbf{Reference paper} & \textbf{Assessment} \\
+\midrule
+Rated branch currents & within 2\,\% & Table II & Very good \\
+Fault levels & IEEE benchmark, feeder head 4.73\,kA & 5.41\,kA, some branches higher & Lower \\
+R1 worked example (4219\,A) & 0.096 / 1.926\,s & 0.097 / 1.932\,s & Very good \\
+Recloser curves & IAC77B801A and CDG34 library curves & Same devices & Same \\
+Fuse coefficients, series fuses of R1's zone & within 0.05 with reversed index & Table III & Index reversed in the paper \\
+DG model & Dynamic synchronous machine, Table I data & Synchronous machine & Same \\
+Coordination with DG, conventional R2 & <<N14_HELD>> of <<N_CELLS>> held; <<N14_AGREE>> cells agree & 30 of 39 held (Fig.~14) & Good \\
+Coordination with the DSDR & <<N17_HELD>> of <<N_CELLS>> held & 39 of 39 held (Fig.~17) & Good; one cell at the dial limit \\
+Fuse current, LL at 646 & 3.67\,kA & 3.64\,kA (Fig.~15) & Very good \\
+R2 reverse current, LL at 646 & 1.11\,kA & 1.54\,kA & Lower \\
+Table IV, R1 times & 12 to 78\,\% slower (652: 34\,\% faster) & Table IV & Follows the fault levels \\
+Table IV, R2 and fuse times & assumed R2 settings, revised fuses & settings not published & Not comparable in detail \\
+EMT sequence, fuse operation & melts 1.25\,s, clears 1.61\,s & 1.21\,s (Fig.~10) & Close if 1.21\,s is melting \\
+IEEE 34-node feeder & not modelled & validated & Remaining work \\
+\bottomrule
+\end{tabularx}
+\caption{Comparison of the results with the reference paper.}
+\label{tab:compare}
+\end{table}
+
+\subsection*{Base-Case Comparison}
+The rated currents test the feeder model independently of the protection and of the DG. Their agreement
+within 2\,\% (the MATLAB/Simulink model of the earlier phase reached 2 to 9\,\%) shows that the topology, the
+loads and the regulator are implemented as in the paper.
+
+\subsection*{Fault-Current Magnitude Difference}
+The maximum fault currents of the feeder branches are 4 to 60\,\% below the paper's Table~II. The model was validated against the
+published IEEE short-circuit results instead, which it meets within about 2\,\%. The paper's values cannot
+all be correct: 6.73\,kA on 632--633 and 7.83\,kA on 692--675 exceed its own 5.41\,kA at the feeder head. The
+two worked cases of the paper illustrate the remaining difference: R2 carries 1718\,A for the LG fault at
+611 (paper: 1974\,A) and 1114\,A in reverse for the LL fault at 646 (paper: 1542\,A). In the earlier
+MATLAB/Simulink phase these currents were 702\,A and 838\,A, because the DG was a static Thevenin source.
+
+\subsection*{Fuse and Coordination Comparison}
+The paper's Table~III could be reproduced only with the series index reversed. The fuse times in the paper's
+figures do not follow its fuse equation: for F646 at 3.6\,kA the figure shows about 0.18\,s, the equation
+with Table~III gives 1.85\,s. The figures match A055C library fuses, and the sizes change between figures
+(F646 is 200E in Fig.~12 and 300E in Figs.~11 and 16). The model therefore uses library fuse curves
+throughout.
+
+\subsection*{Operating-Time Comparison (Table IV)}
+The R1 equation and settings reproduce the paper's worked example, so the difference of the R1 times comes
+from the fault currents. In every row of the paper the delayed time of R1 is 20 times the fast time, the
+ratio of the dials 10 and 0.5, which confirms the dials. For R2 the paper prints no settings and the ratio of
+its two times is not constant, so the R2 times and the fuse times of the model are the result of the stated
+method and cannot be matched to the paper row by row.
+
+\subsection*{Central Finding Comparison}
+The central finding of the paper is reproduced: the DG makes a conventional scheme lose coordination in the
+zone between the grid and the DG, and a dual-setting directional R2 restores it there. The model adds two
+qualifications. The dual setting needs the fuse revision to be effective; and it does not help for faults
+downstream of R2, which the DG feeds directly.
+
+\subsection*{Tables of the comparison}
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\hd\textbf{Parameter} & \textbf{Symbol} & \textbf{Paper} & \textbf{Model} & \textbf{Unit} \\
+\midrule
+<<TABLE_I>>
+\bottomrule
+\end{tabular}
+\caption{DG parameters: reference paper (Table~I) against the \PF{} model.}
+\label{tab:e1}
+\end{table}
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+\hd & \multicolumn{3}{c}{\textbf{$I_{nom}$ (A)}} & \multicolumn{2}{c}{\textbf{$I_{f,min}$ (kA)}} & \multicolumn{3}{c}{\textbf{$I_{f,max}$ (kA)}} \\
+\hd\textbf{Branch} & \textbf{model} & \textbf{paper} & \textbf{dev.\,\%} & \textbf{model} & \textbf{paper} & \textbf{model} & \textbf{paper} & \textbf{dev.\,\%} \\
+\midrule
+<<TABLE_II>>
+\bottomrule
+\end{tabular}
+\caption{Branch currents: model against Table~II of the paper. XFM1 HV side: the model values are 4.16\,kV currents
+for a fault on the 0.48\,kV side, so this row is not comparable.}
+\label{tab:e2}
+\end{table}
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{@{}lcccccccccc@{}}
+\toprule
+\hd\textbf{Fuse} & \textbf{$I_f$ (A)} & \textbf{$i/z$} & \textbf{$t_F$ (s)} & \textbf{$t_D$ (s)} & \textbf{$t_{fuse}$ (s)} &
+\textbf{$b_i$} & \textbf{$b_i$ rev.} & \textbf{paper} & \textbf{Size} & \textbf{$t_{MMT}$ (s)} \\
+\midrule
+<<TABLE_III>>
+\bottomrule
+\end{tabular}
+\caption{Fuse coefficients against Table~III of the paper. ``$b_i$ rev.'': index $i$ counted from the source,
+which reproduces the paper's values in R1's zone.}
+\label{tab:e3}
+\end{table}
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llccccccc@{}}
+\toprule
+\hd & & \textbf{$I_{R1}$} & \textbf{R1 fast (s)} & \textbf{R1 delayed (s)} & \textbf{$I_{R2}$} & & \textbf{R2 fast (s)} & \textbf{R2 delayed (s)} \\
+\hd\textbf{Node} & \textbf{Fault} & \textbf{(A)} & \textbf{model / paper} & \textbf{model / paper} & \textbf{(A)} & \textbf{Dir.} & \textbf{model / paper} & \textbf{model / paper} \\
+\midrule
+<<TABLE_IVA>>
+\bottomrule
+\end{tabular}
+\caption{Recloser operating times against Table~IV of the paper.}
+\label{tab:e4a}
+\end{table}
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lllcccccccl@{}}
+\toprule
+\hd & & & & \textbf{$I_{fuse}$} & \multicolumn{2}{c}{\textbf{$t_{MMT}$ (s)}} & \textbf{$t_{TCT}$} & \textbf{Last fast} & \textbf{Margin} & \\
+\hd\textbf{Node} & \textbf{Fault} & \textbf{Fuse} & \textbf{Size} & \textbf{(A)} & \textbf{model} & \textbf{paper} & \textbf{(s)} & \textbf{trip (s)} & \textbf{(s)} & \textbf{Status} \\
+\midrule
+<<TABLE_IVB>>
+\bottomrule
+\end{tabular}
+\caption{Fuse times against Table~IV of the paper.}
+\label{tab:e4b}
+\end{table}
+
+\begin{table}[H]
+\centering\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}l*{12}{c}@{}}
+\toprule
+\hd\textbf{Fault} & <<GRID_HEAD>> \\
+\midrule
+<<GRID14>>
+\bottomrule
+\end{tabular}
+\caption{Coordination status with DG and a conventional R2: model against the paper's Fig.~14.}
+\label{tab:e5}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\hd\textbf{Event (time in s)} & \textbf{Paper (read off Fig.~10)} & \textbf{Model, DG out} & \textbf{Model, DG in} \\
+\midrule
+<<TABLE_EMT>>
+\bottomrule
+\end{tabular}
+\caption{Reclosing sequence of the EMT simulation against the paper's Fig.~10.}
+\label{tab:e6}
 \end{table}
 
 \end{document}

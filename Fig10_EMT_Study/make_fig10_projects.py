@@ -3,7 +3,7 @@ Fig. 10 (time-domain current at node 632, LL a-c fault at 684 through 0.2 ohm) i
 projects, so that the replication project is not affected by the EMT events and the out-of-service
 protection that this study needs.
 
-  1. The user's Fig. 10 set-up in "IEEE13 Yousaf2022 Replication" (study case "Study with Substation
+  1. The user's Fig. 10 set-up in "IEEE13 DSDR Fuse Coordination" (study case "Study with Substation
      Transformer": short-circuit event, R2 switch events, fuse event, plot page "Curve plot") is copied to
        "IEEE13 Fig10 EMT - DG out"   (DG out of service)
        "IEEE13 Fig10 EMT - DG in"    (DG in service, switching times recalculated for the higher currents)
@@ -25,7 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(os.path.dirname(HERE), "Replication"))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "DSDR_Study"))
 from pf_setup import get_app, attr, PROJECT, STUDY_CASE, clean_variation   # noqa: E402
 
 RES, PFD = os.path.join(HERE, "results"), os.path.join(HERE, "pfd")
