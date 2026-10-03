@@ -5,6 +5,8 @@ Separate from the replication: the project "IEEE13 Yousaf2022 Replication" and t
 | File | Content |
 |---|---|
 | `make_penetration_models.py` | Copies the replication project 7 times in PowerFactory (DG at 692 = 0, 10, 25, 37, 50, 75, 100 % of 4.05 MVA, conventional protection), runs load flow and faults, reads PowerFactory's relay/fuse times, exports each copy to `pfd/` (PowerFactory closed) |
+| `sc_levels_penetration.py` | Every fault type at every node (bolted and LG through 3 ohm) in the seven models; currents at the fault, through R1, R2 and from the DG (PowerFactory closed) |
+| `compare_penetration.py` | Pickups by eq. (3) per level, short-circuit levels, minimum fault against pickup -> `results/Comparison_summary.md`, `Fig_pickup_sc.png` |
 | `analyse_penetration.py` | CTI per level, ring % (each ring = 100 %), comparison with the paper, figures (Python only) |
 | `pfd/IEEE13_DG_penetration_XXX.pfd` | The seven PowerFactory models (import with File > Import > PFD) |
 | `results/` | `penetration_results.json`, `Penetration_CTI.csv`, `Penetration_loadflow.csv`, `Fig07_penetration.png`, `Fig07_penetration_currents.png`, `Penetration_summary.md` |

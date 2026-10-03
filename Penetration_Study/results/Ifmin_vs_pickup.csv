@@ -1,0 +1,8 @@
+DG penetration %,"lowest R1 current, LG 3 ohm (A)",at node,R1 pickup (A),R1 sees it?,"lowest R2 current in its zone, LG 3 ohm (A)",at node,R2 fast pickup (A),R2 sees it?
+0,1074.4,680,720.0,NO,878.5,680,600.0,yes
+10,1018.4,680,720.0,NO,821.0,680,600.0,yes
+25,937.2,680,720.0,NO,737.5,680,600.0,yes
+37,874.4,680,720.0,NO,673.0,680,600.0,yes
+50,808.7,680,720.0,NO,605.5,680,600.0,yes
+75,689.3,680,720.0,NO,483.2,675,600.0,NO
+100,576.6,675,720.0,NO,367.7,675,600.0,NO
