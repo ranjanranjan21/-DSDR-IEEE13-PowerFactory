@@ -57,6 +57,9 @@ for k, m in enumerate(marks):
     else:
         name = "references.tex"
     body = tex[start:stop].rstrip() + "\n"
+    arabic = "\\clearpage\n\\pagenumbering{arabic}"          # belongs in main.tex, before chapter one
+    if arabic in body:
+        body = body[:body.index(arabic)].rstrip().rstrip("%= \n") + "\n"
     open(os.path.join(OUT, name), "w", encoding="utf-8", newline="\n").write(body)
     parts.append((start, stop, name))
 
@@ -64,6 +67,8 @@ for k, m in enumerate(marks):
 main, pos = [], 0
 for start, stop, name in parts:
     main.append(tex[pos:start])
+    if name.startswith("chapters/ch1_"):
+        main.append("\\clearpage\n\\pagenumbering{arabic}                      % page 1 = Introduction\n")
     main.append("\\input{%s}\n\n" % name[:-4])
     pos = stop
 main.append(tex[pos:])
