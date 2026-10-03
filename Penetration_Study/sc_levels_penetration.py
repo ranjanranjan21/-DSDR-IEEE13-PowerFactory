@@ -3,7 +3,7 @@ Short-circuit levels at every node of the seven penetration models (made by make
 
 For each copy "IEEE13 DG penetration NNN %" (only calculations, the models are not changed):
   * maximum faults: LG, LL, LLG, LLL, bolted, every phase combination the node has;
-  * minimum faults: LG through 3 ohm (the paper's If,min);
+  * minimum faults: LG through 3 ohm (If,min);
   * for each fault: current at the fault, through R1, through R2 (with its direction) and from the DG.
 Direction at R2: + = towards 671 (forward), - = towards 632 (reverse), from the active power at R2's end.
 

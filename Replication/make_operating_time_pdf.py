@@ -30,7 +30,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(HERE, "results")
 TMP = os.path.join(RES, "_pdf_tmp")
 os.makedirs(TMP, exist_ok=True)
-OUT = os.path.join(RES, "Operating_Time_Calculation.pdf")
+OUT = os.path.join(RES, "comparison", "Operating_Time_Calculation_vs_paper.pdf")
 
 D = json.load(open(os.path.join(RES, "studies.json")))
 S = json.load(open(os.path.join(RES, "settings.json")))["dsdr"]

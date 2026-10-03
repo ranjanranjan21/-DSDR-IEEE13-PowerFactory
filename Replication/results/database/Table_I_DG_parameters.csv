@@ -1,20 +1,20 @@
-Parameter,Symbol,Paper,Model,Unit,Match
-Leakage reactance,Xl,0.05,0.05,pu,yes
-Stator resistance,Ra,0.0014,0.0014,pu,yes
-d-axis synchronous reactance,Xd,1.4,1.4,pu,yes
-d-axis transient reactance,X'd,0.231,0.231,pu,yes
-d-axis subtransient reactance,X''d,0.118,0.118,pu,yes
-d-axis transient open-circuit time constant,T'd0,5.5,5.5,s,yes
-d-axis subtransient open-circuit time constant,T''d0,0.05,0.05,s,yes
-q-axis synchronous reactance,Xq,1.372,1.372,pu,yes
-q-axis transient reactance,X'q,0.8,0.8,pu,yes
-q-axis subtransient reactance,X''q,0.118,0.118,pu,yes
-q-axis transient open-circuit time constant,T'q0,1.25,1.25,s,yes
-q-axis subtransient open-circuit time constant,T''q0,0.19,0.19,s,yes
-Mechanical starting time,M = 2H,1.5,1.5,s,yes
-DG rating,Sn,4.05,4.05,MVA,yes
-DG voltage,Un,0.69,0.69,kV,yes
-"Step-up transformer, HV side",U_HV,4.16,4.16,kV,yes
-Step-up transformer leakage reactance,x_T,0.15,0.15,pu,yes
-DG connected at node,,692,DG,,yes
-Rotor model in PowerFactory,,"X'q, T'q0 given",round rotor,,yes
+Parameter,Symbol,Value,Unit
+Leakage reactance,Xl,0.05,pu
+Stator resistance,Ra,0.0014,pu
+d-axis synchronous reactance,Xd,1.4,pu
+d-axis transient reactance,X'd,0.231,pu
+d-axis subtransient reactance,X''d,0.118,pu
+d-axis transient open-circuit time constant,T'd0,5.5,s
+d-axis subtransient open-circuit time constant,T''d0,0.05,s
+q-axis synchronous reactance,Xq,1.372,pu
+q-axis transient reactance,X'q,0.8,pu
+q-axis subtransient reactance,X''q,0.118,pu
+q-axis transient open-circuit time constant,T'q0,1.25,s
+q-axis subtransient open-circuit time constant,T''q0,0.19,s
+Mechanical starting time,M = 2H,1.5,s
+DG rating,Sn,4.05,MVA
+DG voltage,Un,0.69,kV
+"Step-up transformer, HV side",U_HV,4.16,kV
+Step-up transformer leakage reactance,x_T,0.15,pu
+DG connected at node,,692 (through the step-up transformer),
+Machine model,,round rotor,

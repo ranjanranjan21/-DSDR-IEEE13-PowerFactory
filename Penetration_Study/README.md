@@ -8,7 +8,7 @@ Separate from the replication: the project "IEEE13 Yousaf2022 Replication" and t
 | `sc_levels_penetration.py` | Every fault type at every node (bolted and LG through 3 ohm) in the seven models; currents at the fault, through R1, R2 and from the DG (PowerFactory closed) |
 | `tcc_penetration.py` | TCC of the two Fig. 7 cases at every level -> `results/TCC_penetration_overview.png`, `TCC_penetration_633.png`, `TCC_penetration_671.png` |
 | `compare_penetration.py` | Pickups by eq. (3) per level, short-circuit levels, minimum fault against pickup -> `results/Comparison_summary.md`, `Fig_pickup_sc.png` |
-| `analyse_penetration.py` | CTI per level, ring % (each ring = 100 %), comparison with the paper, figures (Python only) |
+| `analyse_penetration.py` | CTI per level, ring % (each ring = 100 %), figures (Python only); the paper's values go to `comparison/` |
 | `pfd/IEEE13_DG_penetration_XXX.pfd` | The seven PowerFactory models (import with File > Import > PFD) |
 | `results/` | `penetration_results.json`, `Penetration_CTI.csv`, `Penetration_loadflow.csv`, `Fig07_penetration.png`, `Fig07_penetration_currents.png`, `Penetration_summary.md` |
 

@@ -19,3 +19,6 @@ Replication/results/_pdf_tmp/
 # contains figures reproduced from the IEEE paper (copyright) - regenerate with make_comparison_pdf.py
 Replication/results/Comparison_Paper_vs_Replication.pdf
 Replication/results/Paper_vs_Our_Results.pdf
+# comparison PDFs that contain figures reproduced from the IEEE paper (copyright)
+Replication/results/comparison/Comparison_Paper_vs_Replication.pdf
+Replication/results/comparison/Paper_vs_Our_Results.pdf

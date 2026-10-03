@@ -34,7 +34,7 @@ FIG = os.path.join(RES, "figures")
 TMP = os.path.join(RES, "_pdf_tmp")
 os.makedirs(TMP, exist_ok=True)
 PAPER = os.path.join(os.path.dirname(HERE), "An Adaptive Overcurrent Protection Scheme for by mohommad yousuf .pdf")
-OUT = os.path.join(RES, "Comparison_Paper_vs_Replication.pdf")
+OUT = os.path.join(RES, "comparison", "Comparison_Paper_vs_Replication.pdf")
 
 SET = json.load(open(os.path.join(RES, "settings.json")))
 CONV, DSDR = SET["conventional"], SET["dsdr"]
@@ -278,16 +278,16 @@ story += [Spacer(1, 1.2 * cm),
                     "side-by-side comparison only.", BODY),
           Spacer(1, 0.4 * cm), Paragraph("Scorecard", H2)]
 
-t2 = rows("Table_II.csv")
+t2 = rows("comparison/Table_II_vs_paper.csv")
 inom_dev = max(abs(float(r["Inom (A)"]) / float(r["paper Inom (A)"]) - 1) for r in t2 if float(r["paper Inom (A)"]))
-cls = rows("Fig14_Fig17_classification.csv")
+cls = rows("comparison/Fig14_Fig17_vs_paper.csv")
 comp = [r for r in cls if r["Fig14 model"] != "n/a"]
 agree14 = sum(r["Fig14 model"] == r["Fig14 paper"] for r in comp)
 held17 = sum(r["Fig17 model"] == "held" for r in comp)
 pfv = rows("PF_vs_Python_times_dsdr.csv") + rows("PF_vs_Python_times_conventional.csv")
 pfmax = max(float(r["deviation %"]) for r in pfv if r["deviation %"] != "-")
 bench_dev = max(abs(node_max(n) / v - 1) for n, v in BENCH.items() if n != "RG60")
-t3 = rows("Table_III.csv")
+t3 = rows("comparison/Table_III_vs_paper.csv")
 r1zone = [r for r in t3 if r["Fuse"] in ("F632", "F645", "F646", "F-DL", "F634")]
 rev_match = max(abs(float(r["b_i (i counted from source)"]) - float(r["paper b_i"])) for r in r1zone)
 score = [["Item", "Paper", "Replication", "Agreement"],
@@ -453,7 +453,7 @@ story += step_header("7", "DG added, conventional R2 (Figs. 14 and 8-13)",
                      "<b>Paper:</b> Fig. 14 marks 9 cells lost (633 LLG/LLL, 645 LG/LL/LLG, 646 LL/LLG, 675 LLG/LLL).<br/>"
                      "<b>Replication:</b> same settings with the 4.05 MVA DG in service.")
 story += stacked(PFIG["14"], os.path.join(FIG, "Fig14_without_DSDR.png"), "Paper Fig. 14",
-                 "Replication (dotted box = differs from paper)", width=13.5 * cm)
+                 "This study (model)", width=13.5 * cm)
 data = [["Node"] + FAULT_TYPES + ["Node"] + FAULT_TYPES]
 cl = {(r["node"], r["fault"]): r for r in cls}
 colr = []
@@ -588,7 +588,7 @@ story += [Paragraph("Figs. 15 and 16 - solid LL fault at 646", H2),
                     "R2 (1.11 vs 1.54 kA). R1's fast trip (%s s) is slower than the paper's 0.128 s; it precedes "
                     "F646 (%s s) only because step 9 raised F646 to %s." % (t(d16["fast"]), t(d15["F646"][1]), sz(DSDR["fuses"]["F646"])), BODY),
           PageBreak()]
-t4 = rows("Table_IV.csv")
+t4 = rows("comparison/Table_IV_vs_paper.csv")
 data = [["Node", "Fault", "R1 fast paper / ours", "R1 delayed paper / ours", "R2 fast paper / ours",
          "R2 delayed paper / ours", "Fuse MMT paper / ours", "Status"]]
 colr = []
@@ -693,7 +693,7 @@ inv = [["Paper", "Content", "Replication", "Kind"],
        ["Figs. 15, 16", "LL at 646 with the DSDR", "Fig15_LL_646_DSDR.png, Fig16_LL_646_R1.png", "calculated"],
        ["Fig. 17", "Coordination status with the DSDR", "Fig17_with_DSDR.png", "calculated"]]
 story += [table(inv, [2.0 * cm, 6.3 * cm, 6.2 * cm, 3.5 * cm])]
-t1p = os.path.join(RES, "database", "Table_I_DG_parameters.csv")
+t1p = os.path.join(RES, "comparison", "Table_I_vs_paper.csv")
 if os.path.isfile(t1p):
     t1 = list(csv.reader(open(t1p)))
     story += [Spacer(1, 0.4 * cm), Paragraph("Table I - DG parameters, paper against the PowerFactory model", H2),

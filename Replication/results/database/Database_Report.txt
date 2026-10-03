@@ -8,19 +8,19 @@ Load flow: AC unbalanced, 3-phase (ABC).  Short circuit: complete method (pre-fa
 Reference direction of the reclosers (+ = forward = away from the grid):
   Device | Relay units in the model                         | Relay terminal | Measured element | Forward =   | Line distance from the grid        
   -------+--------------------------------------------------+----------------+------------------+-------------+------------------------------------
-  R1     | R1 Delayed, R1 Fast                              | RG60           | LOHL650-632      | RG60 -> 632 | 0 (relay end) / 2000 (other end)   
-  R2     | R2 Delayed, R2 Fast, R2 Rev Delayed, R2 Rev Fast | 671            | LOHL632-671end   | nDL5 -> 671 | 4000 (relay end) / 3667 (other end)
+  R1     | R1 Fast, R1 Delayed                              | RG60           | LOHL650-632      | RG60 -> 632 | 0 (relay end) / 2000 (other end)   
+  R2     | R2 Fast, R2 Delayed, R2 Rev Fast, R2 Rev Delayed | 671            | LOHL632-671end   | nDL5 -> 671 | 4000 (relay end) / 3667 (other end)
 R2 sits at the 671 end of line 632-671. PowerFactory counts current positive from the terminal into the element, i.e. 671 -> 632 for R2, so R2's PowerFactory values are multiplied by -1 to get the forward reference 632 -> 671. R1's values are used as they are.
 
-Data taken from the paper (Section IV-A, Table I) as found in the model:
+DG and transformer data as found in the model:
   DG: synchronous, 4.05 MVA / 0.69 kV at node 692 through a 4.16/0.69 kV transformer, uk = 15 % (Dyn5)
   Table I: xd 1.400, xq 1.372, xd' 0.231, xq' 0.800, xd'' 0.118, xq'' 0.118, xl 0.050, rstr 0.0014 pu
-Open points - values the paper does NOT give, with what the model uses (nothing was invented here):
-  1. Source: the paper gives no source impedance. Model: External Grid 115 kV, Sk'' = 100000 MVA, behind the 5 MVA 115/4.16 kV substation transformer, uk = 8.06 % (IEEE 13-node benchmark data).
-  2. DG operating point for the load flow: not in the paper. Model: P = 3.24 MW, voltage control (constv) at 1.00 pu; Q follows from the load flow.
-  3. Relay / CT reference direction: not in the paper. Defined above from the paper's use of R2 (forward for faults at 671 and beyond).
-  4. Short-circuit method (IEC 60909 or complete): not in the paper. Complete method used.
-  5. 'Farthest node' of each protection section: not listed in the paper. Taken from the model's line lengths.
+Modelling choices - values not fixed by the method, with what the model uses:
+  1. Source impedance. Model: External Grid 115 kV, Sk'' = 100000 MVA, behind the 5 MVA 115/4.16 kV substation transformer, uk = 8.06 % (IEEE 13-node benchmark data).
+  2. DG operating point for the load flow. Model: P = 3.24 MW, voltage control (constv) at 1.00 pu; Q follows from the load flow.
+  3. Relay / CT reference direction: defined above from the use of R2 (forward for faults at 671 and beyond).
+  4. Short-circuit method: complete method (pre-fault load flow).
+  5. 'Farthest node' of each protection section: taken from the model's line lengths.
   6. Fault location in the upstream section 632-671: the distributed-load lateral 'DL' at the middle of the line.
   7. Regulator taps (fixed, from the model): VregA +10, VregB +8, VregC +11.
 
@@ -605,7 +605,7 @@ VALIDATION BEFORE RELAY COORDINATION
   [PASS ] without DG, R1 and R2 carry the same fault current for faults downstream of R2 (largest difference 5.1 % of the fault current: load between them)
   [PASS ] If,max is the largest bolted fault current of the applicable types at every bus
   [PASS ] If,min (LG, 3 ohm, farthest node) is below If,max in every section
-  [PASS ] If,min rule: farthest node (paper) for Table II; the lowest LG-3-ohm current of each section is listed beside it - it is lower than the farthest-node value in: 632-671 (farthest 652, lowest at 675); 632-671 (farthest 652, lowest at 680); RG60-632 (farthest 652, lowest at 675); RG60-632 (farthest 652, lowest at 680)
+  [PASS ] If,min rule: farthest node for Table II; the lowest LG-3-ohm current of each section is listed beside it - it is lower than the farthest-node value in: 632-671 (farthest 652, lowest at 675); 632-671 (farthest 652, lowest at 680); RG60-632 (farthest 652, lowest at 675); RG60-632 (farthest 652, lowest at 680)
   [PASS ] sensitivity without DG: R1 pickup by eq. (3), 1.25 x 587.7 A = 734.6 A, against the lowest LG-3-ohm current through it, 1074.4 A (fault at 680, phase B)
   [PASS ] sensitivity without DG: R2 pickup by eq. (3), 1.25 x 470.0 A = 587.5 A, against the lowest LG-3-ohm current through it, 878.5 A (fault at 680, phase B)
   [CHECK] sensitivity with DG: R1 pickup by eq. (3), 1.25 x 587.7 A = 734.6 A, against the lowest LG-3-ohm current through it, 576.6 A (fault at 675, phase B) - BELOW THE PICKUP: the DG supplies part of the fault and of the load, so this recloser does not see high-resistance faults at the far end

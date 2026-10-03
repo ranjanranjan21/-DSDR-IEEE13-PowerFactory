@@ -106,7 +106,7 @@ def fig1():
     ax.set_xlim(300, 2e4)
     ax.set_ylabel("Time (s)")
     ax.legend(frameon=True, framealpha=0.92, fontsize=8, loc="upper right")
-    ax.set_title("Fig. 1 (replicated) - conventional recloser-fuse coordination for the fuse-saving scheme",
+    ax.set_title("Fig. 1 - conventional recloser-fuse coordination for the fuse-saving scheme",
                  fontsize=9.5, loc="left")
     fig.tight_layout()
     save(fig, "Fig01_conventional_TCC.png")
@@ -189,7 +189,7 @@ def fig2():
     load(ax, 7.85, -2.0, "L7")
     ax.text(0.2, -2.75, "For fault F1 the series fuses F3-4 and F2-3 carry the grid's and the DG's current; R1 carries the grid's, "
             "R2 only the DG's, in reverse.", fontsize=7.6, color=INK2)
-    ax.set_title("Fig. 2 (redrawn) - a typical distribution network with reclosers, fuses and a DG", fontsize=9.5, loc="left")
+    ax.set_title("Fig. 2 - a typical distribution network with reclosers, fuses and a DG", fontsize=9.5, loc="left")
     fig.tight_layout()
     save(fig, "Fig02_typical_network.png")
 
@@ -230,7 +230,7 @@ def fig3():
         ax.legend(frameon=True, framealpha=0.92, fontsize=7.6, loc="upper center" if unit == "R2rv" else "upper right")
     axes[0].invert_xaxis()
     axes[0].set_ylabel("Time (s)")
-    fig.suptitle("Fig. 3 (replicated) - time-current characteristics of the dual-setting recloser R2: reverse and forward setting",
+    fig.suptitle("Fig. 3 - time-current characteristics of the dual-setting recloser R2: reverse and forward setting",
                  fontsize=10, x=0.01, ha="left")
     fig.tight_layout()
     save(fig, "Fig03_DSDR_TCC.png")
@@ -253,7 +253,7 @@ def fig4():
         ax.plot([i_f], [t], marker="s", ms=6, color=col, mec=SURF, mew=1.3, zorder=6)
         ax.text(i_f * 1.12, t, "%s  %.3f s" % (lab, t), fontsize=8, va="center", color=col, fontweight="bold")
     ok = f1.tct(i_f) < 0.75 * f2.mmt(i_f)
-    ax.text(0.03, 0.04, "LG fault at 652, phase a, DG out: %.0f A through both fuses (paper: 1883 A)\n"
+    ax.text(0.03, 0.04, "LG fault at 652, phase a, DG out: %.0f A through both fuses\n"
             "75 %% rule, eq. (8): F652 clears in %.3f s; 0.75 x F671-2 melting time = %.3f s  ->  %s" % (
                 i_f, f1.tct(i_f), 0.75 * f2.mmt(i_f), "coordinated" if ok else "NOT coordinated"),
             transform=ax.transAxes, fontsize=7.8, color=INK, bbox=dict(boxstyle="round,pad=0.35", fc=SURF, ec=GRID))
@@ -261,7 +261,7 @@ def fig4():
     ax.set_xlim(100, 2e4)
     ax.set_ylabel("Time (s)")
     ax.legend(frameon=True, framealpha=0.92, fontsize=8, loc="upper right")
-    ax.set_title("Fig. 4 (replicated) - series fuse coordination for a single line-to-ground fault", fontsize=9.5, loc="left")
+    ax.set_title("Fig. 4 - series fuse coordination for a single line-to-ground fault", fontsize=9.5, loc="left")
     fig.tight_layout()
     save(fig, "Fig04_series_fuses_SLG.png")
     return i_f, vals, ok
@@ -312,7 +312,7 @@ def fig5():
     ax.plot([0.7, 0.25], [ys[7], ys[7]], color=INK2, lw=1.1)
     ax.add_patch(FancyArrowPatch((0.25, ys[5]), (0.7, ys[5]), arrowstyle="-|>", mutation_scale=11, color=INK2, lw=1.1))
     ax.text(0.32, (ys[5] + ys[7]) / 2, "re-check", fontsize=7.5, color=INK2, rotation=90, va="center")
-    ax.set_title("Fig. 5 (redrawn) - the method for recloser-fuse coordination with the DSDR, with the script of each step",
+    ax.set_title("Fig. 5 - the method for recloser-fuse coordination with the DSDR, with the script of each step",
                  fontsize=9.2, loc="left")
     fig.tight_layout()
     save(fig, "Fig05_method_flowchart.png")
@@ -399,7 +399,7 @@ def fig6():
                        Line2D([], [], color=INK, lw=1.4, ls="-.", label="single-phase line"),
                        Line2D([], [], marker="s", ms=6, color=RED, ls="", label="recloser / fuse (size of the final design)")],
               loc="lower right", fontsize=7.4, frameon=False)
-    ax.set_title("Fig. 6 (redrawn) - IEEE 13-node test feeder with the protective devices of the replication", fontsize=9.5,
+    ax.set_title("Fig. 6 - IEEE 13-node test feeder with the protective devices of this study", fontsize=9.5,
                  loc="left")
     fig.tight_layout()
     save(fig, "Fig06_IEEE13_with_devices.png")

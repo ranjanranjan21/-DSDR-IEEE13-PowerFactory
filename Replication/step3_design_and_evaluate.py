@@ -91,6 +91,10 @@ def save_png(fig, fname):
         print("NOTE: %s is open in another program; the new figure is %s" % (fname, os.path.basename(alt)))
 
 
+CMP = os.path.join(RES, "comparison")             # values of the reference paper, for the comparison only
+os.makedirs(CMP, exist_ok=True)
+
+
 def write_csv(name, header, rows):
     path = os.path.join(RES, name)
     try:
@@ -294,16 +298,16 @@ def table2():
         inom = max(LF["dg_out"][key])
         fmax = [imax(r, key) for r in faults("max", 0.0) if r["where"] in nodes]
         fmin = [imax(r, key) for r in faults("min", 0.0) if r["where"] in nodes]
-        p = PAPER_TABLE2[(frm, to)]
-        rows.append([frm, to, round(inom, 1), round(min(fmin) / 1e3, 2), round(max(fmax) / 1e3, 2), *p])
-    write_csv("Table_II.csv", ["From", "To", "Inom (A)", "If,min (kA)", "If,max (kA)", "paper Inom (A)",
-                               "paper If,min (kA)", "paper If,max (kA)"], rows)
+        rows.append([frm, to, round(inom, 1), round(min(fmin) / 1e3, 2), round(max(fmax) / 1e3, 2)])
+    write_csv("Table_II.csv", ["From", "To", "Inom (A)", "If,min (kA)", "If,max (kA)"], rows)
+    write_csv(os.path.join("comparison", "Table_II_vs_paper.csv"),
+              ["From", "To", "Inom (A)", "If,min (kA)", "If,max (kA)", "paper Inom (A)", "paper If,min (kA)",
+               "paper If,max (kA)"], [r + list(PAPER_TABLE2[(r[0], r[1])]) for r in rows])
     say("\nTABLE II - rated (load flow), minimum (LG through 3 ohm, farthest node) and maximum "
         "(bolted, nearest node) branch current, DG out")
-    say("  %-8s %-5s %8s %8s | %8s %8s | %8s %8s" % ("from", "to", "Inom A", "paper", "Ifmin kA", "paper",
-                                                   "Ifmax kA", "paper"))
+    say("  %-8s %-5s %8s | %8s | %8s" % ("from", "to", "Inom A", "Ifmin kA", "Ifmax kA"))
     for r in rows:
-        say("  %-8s %-5s %8.1f %8.1f | %8.2f %8.2f | %8.2f %8.2f" % (r[0], r[1], r[2], r[5], r[3], r[6], r[4], r[7]))
+        say("  %-8s %-5s %8.1f | %8.2f | %8.2f" % (r[0], r[1], r[2], r[3], r[4]))
     return {"%s-%s" % (r[0], r[1]): r for r in rows}
 
 
@@ -354,8 +358,9 @@ FUSE_PATHS = {   # longest series path through each fuse (fault first), node bel
 def table3(s):
     rows = []
     say("\nTABLE III - fuse coefficient b_i, eq. (9), a_i = -1.8, at the maximum fault current below the fuse (DG out)")
-    say("  %-7s %7s %4s %7s %7s %8s | %6s %9s %6s | %s" % ("fuse", "If A", "i/z", "t_F s", "t_D s", "t_fuse",
-                                                        "b_i", "b(i rev.)", "paper", "b_i of the installed fuse"))
+    say("  %-7s %7s %4s %7s %7s %8s | %6s | %s" % ("fuse", "If A", "i/z", "t_F s", "t_D s", "t_fuse",
+                                                 "b_i", "b_i of the installed fuse"))
+    cmp_rows = []
     for f, (node, path) in FUSE_PATHS.items():
         recs = faults("max", 0.0, node)
         i = max(max(r["ifault"]) for r in recs)
@@ -371,14 +376,18 @@ def table3(s):
         b_rev = math.log10(tgt_rev) - A_FUSE * math.log10(i)
         mmt = fuse(s, f).mmt(i)
         b_fit = math.log10(mmt) - A_FUSE * math.log10(i) if 0 < mmt < INF else float("nan")
-        rows.append([f, round(i), "%d/%d" % (idx, z), round(tf, 3), round(td, 3), round(tgt, 3), round(b, 2),
-                     round(b_rev, 2), PAPER_TABLE3[f], round(b_fit, 2)])
-        say("  %-7s %7.0f %4s %7.3f %7.3f %8.3f | %6.2f %9.2f %6.2f | %.2f  (%s)" % (*rows[-1], s["fuses"][f]))
-        rows[-1] += [s["fuses"][f], fmt(mmt), fmt(fuse(s, f).tct(i))]
+        base = [f, round(i), "%d/%d" % (idx, z), round(tf, 3), round(td, 3), round(tgt, 3), round(b, 2)]
+        rows.append(base + [round(b_fit, 2), s["fuses"][f], fmt(mmt), fmt(fuse(s, f).tct(i))])
+        cmp_rows.append(base + [round(b_rev, 2), PAPER_TABLE3[f]] + rows[-1][7:])
+        say("  %-7s %7.0f %4s %7.3f %7.3f %8.3f | %6.2f | %.2f  (%s)" % (*rows[-1][:8], s["fuses"][f]))
     write_csv("Table_III.csv", ["Fuse", "If (A)", "i/z", "t_fast (s)", "t_delayed (s)", "t_fuse eq.(9) (s)",
-                                "b_i (i=1 closest to fault, ref. [25])", "b_i (i counted from source)",
-                                "paper b_i", "b_i of installed fuse at If", "installed fuse",
+                                "b_i (eq. 9, i=1 closest to fault)", "b_i of installed fuse at If", "installed fuse",
                                 "t_MMT of installed fuse at If (s)", "t_TCT of installed fuse at If (s)"], rows)
+    write_csv(os.path.join("comparison", "Table_III_vs_paper.csv"),
+              ["Fuse", "If (A)", "i/z", "t_fast (s)", "t_delayed (s)", "t_fuse eq.(9) (s)",
+               "b_i (i=1 closest to fault, ref. [25])", "b_i (i counted from source)", "paper b_i",
+               "b_i of installed fuse at If", "installed fuse", "t_MMT of installed fuse at If (s)",
+               "t_TCT of installed fuse at If (s)"], cmp_rows)
     return rows
 
 
@@ -394,7 +403,7 @@ plt.rcParams.update({"font.size": 9, "axes.edgecolor": PAL["ink2"], "axes.labelc
                      "savefig.facecolor": PAL["surface"], "font.family": "DejaVu Sans"})
 
 
-def coord_grid(grid, title, fname, paper_lost):
+def coord_grid(grid, title, fname):
     fig, ax = plt.subplots(figsize=(8.6, 3.1))
     for x, node in enumerate(NODE_ORDER):
         for y, ft in enumerate(FAULT_TYPES[::-1]):
@@ -406,10 +415,6 @@ def coord_grid(grid, title, fname, paper_lost):
                 ax.add_patch(plt.Circle((x, y), 0.36, facecolor="none", edgecolor=c, lw=1.6))
                 ax.text(x, y, "✓" if st == "held" else "✗", ha="center", va="center", fontsize=12,
                         color=c, fontweight="bold")
-            paper = "n/a" if st == "n/a" else ("lost" if (node, ft) in paper_lost else "held")
-            if paper != st:
-                ax.add_patch(plt.Rectangle((x - 0.46, y - 0.46), 0.92, 0.92, fill=False, ls=":", lw=1.1,
-                                           edgecolor=PAL["ink2"]))
     ax.set_xticks(range(len(NODE_ORDER)))
     ax.set_xticklabels(NODE_ORDER)
     ax.set_yticks(range(4))
@@ -424,9 +429,8 @@ def coord_grid(grid, title, fname, paper_lost):
     ax.set_title(title, fontsize=10, loc="left")
     handles = [Line2D([], [], marker="$✓$", color=PAL["good"], ls="", ms=9, label="coordination held"),
                Line2D([], [], marker="$✗$", color=PAL["critical"], ls="", ms=9, label="coordination lost"),
-               Line2D([], [], marker="$–$", color=PAL["ink2"], ls="", ms=9, label="not applicable"),
-               plt.Rectangle((0, 0), 1, 1, fill=False, ls=":", edgecolor=PAL["ink2"], label="differs from paper")]
-    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.3), ncol=4, frameon=False)
+               Line2D([], [], marker="$–$", color=PAL["ink2"], ls="", ms=9, label="not applicable")]
+    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.3), ncol=3, frameon=False)
     fig.tight_layout()
     save_png(fig, fname)
     plt.close(fig)
@@ -522,8 +526,7 @@ def main():
     for e in d14:
         if not e["held"]:
             say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
-    coord_grid(g14, "Fig. 14 (replicated) - without DSDR, DG 4.05 MVA at 692", "Fig14_without_DSDR.png",
-               PAPER_FIG14_LOST)
+    coord_grid(g14, "Fig. 14 - coordination without DSDR, DG 4.05 MVA at 692", "Fig14_without_DSDR.png")
 
     # ---------------- stage C: R2 as DSDR -------------------------------------------------------
     i_rv = max(LF["dg_in"]["R2"])
@@ -554,7 +557,7 @@ def main():
     for e in d17:
         if not e["held"]:
             say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
-    coord_grid(g17, "Fig. 17 (replicated) - with DSDR, DG 4.05 MVA at 692", "Fig17_with_DSDR.png", set())
+    coord_grid(g17, "Fig. 17 - coordination with DSDR, DG 4.05 MVA at 692", "Fig17_with_DSDR.png")
 
     # the same fuse sizes with the conventional R2 (to separate the DSDR's effect from step 9)
     s_mix = copy.deepcopy(s)
@@ -562,13 +565,16 @@ def main():
     g14b, _ = classify(s_mix, False, 1.0)
     say("  check: final fuse sizes but conventional R2 -> %d of %d cells held" % count(g14b))
 
-    rows = [[n, ft, g14[(n, ft)], ("n/a" if g14[(n, ft)] == "n/a" else ("lost" if (n, ft) in PAPER_FIG14_LOST else "held")),
-             g17[(n, ft)], g14b[(n, ft)]] for n in NODE_ORDER for ft in FAULT_TYPES]
-    write_csv("Fig14_Fig17_classification.csv", ["node", "fault", "Fig14 model", "Fig14 paper", "Fig17 model",
-                                                 "final fuses, conventional R2"], rows)
+    rows = [[n, ft, g14[(n, ft)], g17[(n, ft)], g14b[(n, ft)]] for n in NODE_ORDER for ft in FAULT_TYPES]
+    write_csv("Fig14_Fig17_classification.csv", ["node", "fault", "without DSDR (Fig14)", "with DSDR (Fig17)",
+                                                 "revised fuses, conventional R2"], rows)
+    write_csv(os.path.join("comparison", "Fig14_Fig17_vs_paper.csv"),
+              ["node", "fault", "Fig14 model", "Fig14 paper", "Fig17 model", "final fuses, conventional R2"],
+              [[r[0], r[1], r[2], "n/a" if r[2] == "n/a" else ("lost" if (r[0], r[1]) in PAPER_FIG14_LOST else "held"),
+                r[3], r[4]] for r in rows])
     comp = [r for r in rows if r[2] != "n/a"]
-    say("  Fig. 14 agreement with the paper: %d of %d cells;  Fig. 17: %d of %d" % (
-        sum(r[2] == r[3] for r in comp), len(comp), sum(r[4] == "held" for r in comp), len(comp)))
+    say("  Fig. 14: %d of %d cells held;  Fig. 17: %d of %d" % (
+        sum(r[2] == "held" for r in comp), len(comp), sum(r[3] == "held" for r in comp), len(comp)))
 
     det = []
     for tag, dd in (("conventional (Fig. 14)", d14), ("DSDR (Fig. 17)", d17)):
@@ -600,8 +606,8 @@ def main():
     rep = {"632": "LLL", "633": "LLL", "645": "LL", "646": "LL", "DL": "LLL", "671": "LLL", "692": "LLL",
            "675": "LLL", "684": "LL", "680": "LLL", "611": "LG", "652": "LG"}
     say("\nTABLE IV - operating times with the DSDR, DG in; bolted LLL (LL at 2-phase nodes, LG at 1-phase nodes)")
-    say("  %-4s %-3s | %-17s | %-22s | %-7s %-15s | paper: R1 | R2 | fuse" % ("node", "flt", "R1 fast / delayed",
-                                                                          "R2 unit fast / delayed", "fuse", "MMT / TCT"))
+    say("  %-4s %-3s | %-17s | %-22s | %-7s %-15s" % ("node", "flt", "R1 fast / delayed", "R2 unit fast / delayed",
+                                                      "fuse", "MMT / TCT"))
     rows4 = []
     for node, ft in rep.items():
         r = max(faults("max", 1.0, node, ft), key=lambda x: imax(x, "R1"))
@@ -610,18 +616,19 @@ def main():
         unit = "R2fw" if NODES[node]["zone"] == "R2" else "R2rv"
         r1 = (t_r1(i1, s, "f"), t_r1(i1, s, "d"))
         r2 = (t_r2(i2, s, unit, "f"), t_r2(i2, s, unit, "d"))
-        p = PAPER_TABLE4[node]
         rows4.append([node, ft, r["phases"], round(i1), fmt(r1[0]), fmt(r1[1]), round(i2), "fwd" if unit == "R2fw" else "rev",
                       fmt(r2[0]), fmt(r2[1]), e["fuse"] or "---", round(e.get("i_fuse", 0)) if e["fuse"] else "",
                       fmt(e["mmt"]) if e["fuse"] else "---", fmt(e["tct"]) if e["fuse"] else "---",
-                      "held" if e["held"] else "lost", p[0], p[1], p[2], p[3], p[4] or "---"])
-        say("  %-4s %-3s | %7s / %-7s | %s %7s / %-7s | %-7s %6s / %-6s | %.3f/%.3f | %.3f/%.3f | %s%s" % (
+                      "held" if e["held"] else "lost"])
+        say("  %-4s %-3s | %7s / %-7s | %s %7s / %-7s | %-7s %6s / %-6s%s" % (
             node, ft, fmt(r1[0]), fmt(r1[1]), rows4[-1][7], fmt(r2[0]), fmt(r2[1]), e["fuse"] or "---",
-            rows4[-1][12], rows4[-1][13], p[0], p[1], p[2], p[3], p[4] or "---", "" if e["held"] else "   LOST: " + e["reason"]))
-    write_csv("Table_IV.csv", ["node", "fault", "phases", "I R1 (A)", "R1 fast (s)", "R1 delayed (s)", "I R2 (A)",
-                               "R2 unit", "R2 fast (s)", "R2 delayed (s)", "fuse", "I fuse (A)", "fuse MMT (s)",
-                               "fuse TCT (s)", "status", "paper R1 fast", "paper R1 delayed", "paper R2 fast",
-                               "paper R2 delayed", "paper fuse MMT"], rows4)
+            rows4[-1][12], rows4[-1][13], "" if e["held"] else "   LOST: " + e["reason"]))
+    head4 = ["node", "fault", "phases", "I R1 (A)", "R1 fast (s)", "R1 delayed (s)", "I R2 (A)", "R2 unit", "R2 fast (s)",
+             "R2 delayed (s)", "fuse", "I fuse (A)", "fuse MMT (s)", "fuse TCT (s)", "status"]
+    write_csv("Table_IV.csv", head4, rows4)
+    write_csv(os.path.join("comparison", "Table_IV_vs_paper.csv"),
+              head4 + ["paper R1 fast", "paper R1 delayed", "paper R2 fast", "paper R2 delayed", "paper fuse MMT"],
+              [r + [x if x is not None else "---" for x in PAPER_TABLE4[r[0]]] for r in rows4])
 
     # ---------------- time-current figures ------------------------------------------------------
     fr = {c: [r for r in FAULTS if r["case"] == c][0] for c in ("Fig8", "Fig9", "Fig11", "Fig12", "Fig13", "Fig15")}

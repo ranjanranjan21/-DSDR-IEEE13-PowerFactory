@@ -28,7 +28,7 @@ RES = os.path.join(HERE, "results")
 DB = os.path.join(RES, "database")
 TMP = os.path.join(RES, "_pv_tmp")
 os.makedirs(TMP, exist_ok=True)
-OUT = os.path.join(RES, "Paper_vs_Our_Results.pdf")
+OUT = os.path.join(RES, "comparison", "Paper_vs_Our_Results.pdf")
 PAPER = os.path.join(os.path.dirname(HERE), "An Adaptive Overcurrent Protection Scheme for by mohommad yousuf .pdf")
 
 BLUE, ORANGE, AQUA, INK, INK2, GRID, SURF = "#2a78d6", "#eb6834", "#1baf7a", "#0b0b0b", "#52514e", "#d9d8d4", "#fcfcfb"

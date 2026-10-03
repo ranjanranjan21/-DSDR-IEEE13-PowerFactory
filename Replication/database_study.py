@@ -333,23 +333,23 @@ def main():
     tr = obj("2-Winding Transformer", "ElmTr2")
     sub = obj("TrSubstation", "ElmTr2")
     say("")
-    say("Data taken from the paper (Section IV-A, Table I) as found in the model:")
+    say("DG and transformer data as found in the model:")
     say("  DG: synchronous, %.2f MVA / %.2f kV at node %s through a %.2f/%.2f kV transformer, uk = %.0f %% (%s)" % (
         attr(typ, "sgn"), attr(typ, "ugn"), term_of(tr, "bushv"), attr(tr.typ_id, "utrn_h"), attr(tr.typ_id, "utrn_l"),
         attr(tr.typ_id, "uktr"), attr(tr.typ_id, "vecgrp")))
     say("  Table I: xd %.3f, xq %.3f, xd' %.3f, xq' %.3f, xd'' %.3f, xq'' %.3f, xl %.3f, rstr %.4f pu" % tuple(
         attr(typ, k, float("nan")) for k in ("xd", "xq", "xds", "xqs", "xdss", "xqss", "xl", "rstr")))
-    say("Open points - values the paper does NOT give, with what the model uses (nothing was invented here):")
-    say("  1. Source: the paper gives no source impedance. Model: %s, Sk'' = %.0f MVA, behind the %.0f MVA "
+    say("Modelling choices - values not fixed by the method, with what the model uses:")
+    say("  1. Source impedance. Model: %s, Sk'' = %.0f MVA, behind the %.0f MVA "
         "%.0f/%.2f kV substation transformer, uk = %.2f %% (IEEE 13-node benchmark data)." % (
             GRID.loc_name, attr(GRID, "snss"), attr(sub.typ_id, "strn"), attr(sub.typ_id, "utrn_h"),
             attr(sub.typ_id, "utrn_l"), attr(sub.typ_id, "uktr")))
-    say("  2. DG operating point for the load flow: not in the paper. Model: P = %.2f MW, voltage control (%s) at "
+    say("  2. DG operating point for the load flow. Model: P = %.2f MW, voltage control (%s) at "
         "%.2f pu; Q follows from the load flow." % (attr(sym, "pgini"), attr(sym, "av_mode"), attr(sym, "usetp")))
-    say("  3. Relay / CT reference direction: not in the paper. Defined above from the paper's use of R2 "
+    say("  3. Relay / CT reference direction: defined above from the use of R2 "
         "(forward for faults at 671 and beyond).")
-    say("  4. Short-circuit method (IEC 60909 or complete): not in the paper. Complete method used.")
-    say("  5. 'Farthest node' of each protection section: not listed in the paper. Taken from the model's line lengths.")
+    say("  4. Short-circuit method: complete method (pre-fault load flow).")
+    say("  5. 'Farthest node' of each protection section: taken from the model's line lengths.")
     say("  6. Fault location in the upstream section 632-671: the distributed-load lateral 'DL' at the middle of the line.")
     say("  7. Regulator taps (fixed, from the model): %s." % ", ".join(
         "%s %+d" % (o.loc_name, attr(o, "nntap")) for o in app.GetCalcRelevantObjects("Vreg*.ElmTr2")))
@@ -518,7 +518,7 @@ def main():
     # another node gives a lower current, that lower value is listed beside it and is the one used for
     # the sensitivity check below (step 5 of the paper's method: pickup below the minimum fault current).
     off_far = [m for dg in (0, 1) for m in mn[dg] if m["low"] < 0.98 * m["isec"]]
-    check(True, "If,min rule: farthest node (paper) for Table II; the lowest LG-%g-ohm current of each section is "
+    check(True, "If,min rule: farthest node for Table II; the lowest LG-%g-ohm current of each section is "
                 "listed beside it%s" % (RF_MIN, "" if not off_far else " - it is lower than the farthest-node value in: " +
                 "; ".join(sorted({"%s (farthest %s, lowest at %s)" % (m["section"], m["far"], m["low_node"]) for m in off_far}))))
     for dg in (0, 1):

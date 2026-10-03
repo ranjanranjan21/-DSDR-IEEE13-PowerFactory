@@ -1,5 +1,5 @@
 """
-Comparative results of the penetration study: pickups (eq. 3 / eq. 12 of the paper) and short-circuit levels.
+Comparative results of the penetration study: pickups (eq. 3 / eq. 12) and short-circuit levels.
 
 Pickup per level: I_p = 1.25 x I_nom, I_nom = largest phase current of the recloser in that level's load
 flow, then the nearest tap of the relay (IAC77B801A on CT 900/5; CDG34 on CT 1000/5 forward, 500/5

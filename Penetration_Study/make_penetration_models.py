@@ -32,7 +32,7 @@ sys.path.insert(0, REPL)
 from pf_setup import get_app, attr, PROJECT, STUDY_CASE, BUILD_CASE   # noqa: E402
 
 LEVELS = [0, 10, 25, 37, 50, 75, 100]
-S_DG = 4.05                                      # MVA, Section IV-A of the paper
+S_DG = 4.05                                      # MVA, rating of the DG of the study
 PFD = os.path.join(HERE, "pfd")
 RES = os.path.join(HERE, "results")
 os.makedirs(PFD, exist_ok=True)

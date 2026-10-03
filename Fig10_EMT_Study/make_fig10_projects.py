@@ -5,7 +5,7 @@ protection that this study needs.
 
   1. The user's Fig. 10 set-up in "IEEE13 Yousaf2022 Replication" (study case "Study with Substation
      Transformer": short-circuit event, R2 switch events, fuse event, plot page "Curve plot") is copied to
-       "IEEE13 Fig10 EMT - DG out"   (paper's case: DG out of service)
+       "IEEE13 Fig10 EMT - DG out"   (DG out of service)
        "IEEE13 Fig10 EMT - DG in"    (DG in service, switching times recalculated for the higher currents)
      In the copies the relays and fuses are out of service (the sequence is set by the events), the
      simulation is run and the copy is exported to pfd/.

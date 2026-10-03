@@ -61,7 +61,7 @@ size = lambda t: t.replace("A055C", "")
 T = {}
 
 # ---- Table I ----------------------------------------------------------------------------------
-t1 = read(os.path.join(DB, "Table_I_DG_parameters.csv"))
+t1 = read(os.path.join(RES, "comparison", "Table_I_vs_paper.csv"))
 sym = {"Xl": "$X_l$", "Ra": "$R_a$", "Xd": "$X_d$", "X'd": "$X'_d$", "X''d": "$X''_d$", "T'd0": "$T'_{d0}$",
        "T''d0": "$T''_{d0}$", "Xq": "$X_q$", "X'q": "$X'_q$", "X''q": "$X''_q$", "T'q0": "$T'_{q0}$",
        "T''q0": "$T''_{q0}$", "M = 2H": "$M = 2H$", "Sn": "$S_n$", "Un": "$U_n$", "U_HV": "$U_{HV}$", "x_T": "$x_T$"}
@@ -83,7 +83,7 @@ T["TABLE_LF"] = rows([[r["Device"], num(r["Without DG (A)"]), r["Direction witho
                        r["Direction with DG"]] for r in lf])
 
 # ---- Table II ---------------------------------------------------------------------------------
-t2 = read(os.path.join(RES, "Table_II.csv"))
+t2 = read(os.path.join(RES, "comparison", "Table_II_vs_paper.csv"))
 T["TABLE_II"] = rows([["%s--%s" % (r["From"], r["To"]) if r["To"] != "side" else tex(r["From"] + " side"),
                        r["Inom (A)"], r["paper Inom (A)"], dev(r["Inom (A)"], r["paper Inom (A)"], 1),
                        r["If,min (kA)"], r["paper If,min (kA)"], r["If,max (kA)"], r["paper If,max (kA)"],
@@ -97,7 +97,7 @@ T["TABLE_FAULT"] = rows([[r["Bus"], tex(r["Fault with DG"]), "%.0f" % float(r["I
                           "$%+.0f$" % float(r["R2 without DG (A)"]), "$%+.0f$" % float(r["R2 with DG (A)"])] for r in fc])
 
 # ---- Table III --------------------------------------------------------------------------------
-t3 = read(os.path.join(RES, "Table_III.csv"))
+t3 = read(os.path.join(RES, "comparison", "Table_III_vs_paper.csv"))
 T["TABLE_III"] = rows([[r["Fuse"], r["If (A)"], r["i/z"], "%.3f" % float(r["t_fast (s)"]), "%.3f" % float(r["t_delayed (s)"]),
                         "%.3f" % float(r["t_fuse eq.(9) (s)"]), "%.2f" % float(r["b_i (i=1 closest to fault, ref. [25])"]),
                         "%.2f" % float(r["b_i (i counted from source)"]), "%.2f" % float(r["paper b_i"]),
@@ -117,7 +117,7 @@ for n, (_, start, src) in FUSES.items():
 T["TABLE_FUSES"] = rows(fr)
 
 # ---- Table IV ---------------------------------------------------------------------------------
-t4 = read(os.path.join(RES, "Table_IV.csv"))
+t4 = read(os.path.join(RES, "comparison", "Table_IV_vs_paper.csv"))
 T["TABLE_IVA"] = rows([[r["node"], r["fault"], r["I R1 (A)"], "%s / %.3f" % (r["R1 fast (s)"], float(r["paper R1 fast"])),
                         "%s / %.3f" % (r["R1 delayed (s)"], float(r["paper R1 delayed"])), r["I R2 (A)"], r["R2 unit"],
                         "%s / %.3f" % (r["R2 fast (s)"], float(r["paper R2 fast"])),
@@ -133,7 +133,7 @@ for r in t4:
 T["TABLE_IVB"] = rows(ivb)
 
 # ---- coordination grids -----------------------------------------------------------------------
-cl = read(os.path.join(RES, "Fig14_Fig17_classification.csv"))
+cl = read(os.path.join(RES, "comparison", "Fig14_Fig17_vs_paper.csv"))
 gn = ["632", "633", "645", "646", "DL", "671", "692", "675", "680", "684", "611", "652"]
 cell = {"held": r"\ok", "lost": r"\no", "n/a": "--"}
 
@@ -163,7 +163,7 @@ first = lambda s: s.split(" / ")[0].replace(" s", "")
 ca = []
 for r in ft:
     fuse, times = r["Primary fuse melts / clears"].split(": ")
-    ca.append([r["Case"], tex(r["Paper figure"]), tex(r["Fault"]), r["Zf (ohm)"], r["I R1 (A)"],
+    ca.append([r["Case"], tex(r["Figure"]), tex(r["Fault"]), r["Zf (ohm)"], r["I R1 (A)"],
                "%s (%s)" % (r["I R2 (A)"], "fwd" if r["R2 direction"].startswith("for") else "rev"), first(r["R1 fast / delayed"]),
                first(r["R2 fast / delayed, single setting"]), first(r["R2 fast / delayed, dual setting"]),
                "%s: %s" % (fuse, first(times)), r["Fuse saving, single setting"].lower(), r["Fuse saving, dual setting"].lower()])

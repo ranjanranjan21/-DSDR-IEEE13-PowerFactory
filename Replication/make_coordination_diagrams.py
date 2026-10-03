@@ -1,6 +1,6 @@
 """
 Coordination diagrams: the existing scheme (R2 with one setting) against R2 as a dual-setting
-directional recloser (DSDR), for the faults of the paper's figures and for the faults where the
+directional recloser (DSDR), for the faults of the study's figures and for the faults where the
 dual setting decides.  PowerFactory is not needed (results/studies.json, results/settings.json).
 
 Both panels of every diagram use the SAME fuse sizes (the final design), so the only difference
@@ -171,7 +171,7 @@ def fault_rows(rec, node, zf, paper):
     zone = NODES[node]["zone"]
     i1, i2 = m.imax(rec, "R1"), m.imax(rec, "R2")
     up = zone == "R1"
-    rows = [("Fault (paper: %s)" % paper, None),
+    rows = [("Fault (%s)" % paper, None),
             ("Fault impedance Zf", "%.1f ohm" % zf if zf else "0 ohm (bolted)"),
             ("Fault-path current (%s)" % path[0] if path else "Fault current at the node",
              "%.0f A" % (m.imax(rec, path[0]) if path else max(rec["ifault"]))),
@@ -223,7 +223,7 @@ def case_figure(cid, title, rec, node, zf, paper):
     handles.append(Line2D([], [], color=INK2, lw=0.9, label="vertical lines: current through each device"))
     ax1.legend(handles=handles, loc="lower left", fontsize=7.2, frameon=True, framealpha=0.92)
     zf_txt = "Zf = %.1f ohm" % zf if zf else "Zf = 0 ohm (bolted)"
-    fig.suptitle("Case %s - %s, %s, DG 4.05 MVA connected at 692   (paper: %s)" % (cid, title, zf_txt, paper),
+    fig.suptitle("Case %s - %s, %s, DG 4.05 MVA connected at 692   (%s)" % (cid, title, zf_txt, paper),
                  fontsize=11.5, x=0.06, ha="left", y=0.965)
 
     rows, labels, both = fault_rows(rec, node, zf, paper)
@@ -365,7 +365,7 @@ def main():
             "held" if e2["held"] else "LOST"))
     with open_csv(os.path.join(OUT, "Fault_table.csv")) as f:
         w = csv.writer(f)
-        w.writerow(["Case", "Paper figure", "Fault", "Type", "Phases", "Zf (ohm)", "Fault-path current (A)", "I R1 (A)",
+        w.writerow(["Case", "Figure", "Fault", "Type", "Phases", "Zf (ohm)", "Fault-path current (A)", "I R1 (A)",
                     "R1 direction", "I R2 (A)", "R2 direction", "R1 fast / delayed", "R2 fast / delayed, single setting",
                     "R2 fast / delayed, dual setting", "Primary fuse melts / clears", "Fuse saving, single setting",
                     "Fuse saving, dual setting", "Reason if lost, single", "Reason if lost, dual",
@@ -403,11 +403,11 @@ def main():
 
     fw, rv = DS["R2fw"], DS["R2rv"]
     story = [Paragraph("Coordination diagrams: single setting vs dual setting on R2", ParagraphStyle("T", parent=H1, fontSize=19, leading=23)),
-             Paragraph("IEEE 13-node feeder, 4.05 MVA DG at node 692 - replication of Yousaf et al. (2022)", H2),
+             Paragraph("IEEE 13-node feeder, 4.05 MVA DG at node 692 - DSDR recloser-fuse coordination study", H2),
              Paragraph("<b>What is compared.</b> The existing scheme has one setting on the mid-line recloser R2: it is "
                        "non-directional and uses its forward setting for every fault, including the DG's reverse current for "
                        "faults above it. As a dual-setting directional recloser (DSDR) R2 keeps the forward setting for faults "
-                       "below it and uses a second, reverse setting (eq. 12 of the paper) for faults above it. "
+                       "below it and uses a second, reverse setting (eq. 12) for faults above it. "
                        "<b>Both panels of every diagram use the same fuse sizes (the final design)</b>, so the only "
                        "difference between left and right is R2's setting.", BODY),
              Spacer(1, 0.15 * cm),
@@ -420,17 +420,17 @@ def main():
                    "%.1f / %.1f" % (rv["tms_f"], rv["tms_d"])]],
                  [5.5 * cm, 4.2 * cm, 11.5 * cm, 4.3 * cm]),
              Spacer(1, 0.15 * cm),
-             Paragraph("<b>Fault impedance.</b> Each case states its fault impedance Zf: 0 ohm (bolted) or the value the "
-                       "paper gives for that figure (1.0 ohm for Figs. 9 and 11, 1.5 ohm for Fig. 12). Currents are "
+             Paragraph("<b>Fault impedance.</b> Each case states its fault impedance Zf: 0 ohm (bolted) or the value used "
+                       "for that figure (1.0 ohm for Figs. 9 and 11, 1.5 ohm for Fig. 12). Currents are "
                        "initial symmetrical short-circuit currents from PowerFactory (complete method), largest phase. "
                        "Direction: + forward = away from the grid; for faults above R2 the current through R2 is the "
                        "DG's contribution and flows in reverse (confirmed for all 48 bolted faults above R2 in the "
                        "short-circuit database).", BODY),
              Paragraph("<b>Fuse saving holds</b> when every recloser that feeds the fault trips on its fast curve before the "
                        "primary fuse melts, the fuse clears before the recloser's delayed trip, and the backup fuse keeps the "
-                       "75 % margin of eq. (8). No breaker time or safety margin is added (as in the paper).", BODY),
+                       "75 % margin of eq. (8). No breaker time or safety margin is added.", BODY),
              Paragraph("Fault table", H2)]
-    data = [["Case", "Paper", "Fault", "Zf (ohm)", "Fault-path current", "R1 current, direction", "R2 current, direction",
+    data = [["Case", "Figure", "Fault", "Zf (ohm)", "Fault-path current", "R1 current, direction", "R2 current, direction",
              "R2 fast: single -> dual", "Fuse melts", "Single setting", "Dual setting", "No-DG-design fuses: single / dual"]]
     colr = []
     for k, (cid, title, zf, paper, png, e1, e2, rec, node, a1, a2) in enumerate(results, 1):
@@ -482,9 +482,9 @@ def main():
                            len(genuine), cells(genuine), len(strict_only), cells(strict_only)), BODY),
               Paragraph("<b>Faults below R2 (%d cells).</b> In all of them the DG at 692 feeds the fault directly: no recloser "
                         "lies between the DG and the fault, so after R2 has opened the fault stays energised under either "
-                        "setting. The strict rule (and the paper) does not look at this. Fuse saving below R2 therefore "
-                        "relies on the DG's own protection disconnecting it during the dead time, which neither the paper nor "
-                        "this model includes." % s_dn["n"], BODY),
+                        "setting. The strict rule does not look at this. Fuse saving below R2 therefore "
+                        "relies on the DG's own protection disconnecting it during the dead time, which this model does "
+                        "not include." % s_dn["n"], BODY),
               PageBreak()]
 
     imp = [r for r in results if r[2] > 0 and NODES[r[8]]["zone"] == "R1"]

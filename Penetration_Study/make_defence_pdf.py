@@ -25,7 +25,7 @@ sys.path.insert(0, REPL)
 import step3_design_and_evaluate as S3          # noqa: E402  (curves only)
 
 RES = os.path.join(HERE, "results")
-OUT = os.path.join(RES, "Penetration_Defence.pdf")
+OUT = os.path.join(HERE, "comparison", "Penetration_Defence.pdf")
 D = {int(k): v for k, v in json.load(open(os.path.join(RES, "penetration_results.json"))).items()}
 SC = {int(k): v for k, v in json.load(open(os.path.join(RES, "sc_levels.json"))).items()}
 CONV = json.load(open(os.path.join(REPL, "results", "settings.json")))["conventional"]
@@ -135,7 +135,7 @@ for k, pp in enumerate(P):
     rows.append(["%d %%" % pp, "%.0f / %.0f" % (a["I_fuse"], a["I_R1"]), "%+.0f ms" % (1000 * a["CTI_s"]),
                  "%+.1f / %+d" % (ring["633"][k], PAPER["633"][k]), "%.0f / %.0f" % (b["I_fuse"], b["I_R2"]),
                  "%+.0f ms" % (1000 * b["CTI_s"]), "%+.1f / %+d" % (ring["671"][k], PAPER["671"][k])])
-story += [PageBreak(), p("3. Results against the paper", H1), img("Fig07_penetration.png"),
+story += [PageBreak(), p("3. Results against the paper", H1), img("../comparison/Fig07_penetration_vs_paper.png"),
           p("Fig. 7 replicated (left) beside the paper's values (right). Outer ring 671, inner ring 633.", CAP),
           table(rows, [1.3 * cm, 2.9 * cm, 1.8 * cm, 2.9 * cm, 2.9 * cm, 1.8 * cm, W - 13.6 * cm]),
           Spacer(1, 6),
@@ -288,6 +288,31 @@ story += answer("What about other fault types?", [p(
     "Every fault type that passes the DG current through the fuse but not through the recloser shrinks the margin." % (
         1000 * D[0]["faults"]["633 LL"]["CTI_s"], 1000 * D[100]["faults"]["633 LL"]["CTI_s"],
         1000 * D[0]["faults"]["671 LG"]["CTI_s"], 1000 * D[100]["faults"]["671 LG"]["CTI_s"]))])
+
+# ---- Fig. 10 question ------------------------------------------------------------------------
+F10 = json.load(open(os.path.join(REPL, "results", "Fig10_summary.json")))["DG out"]
+n632 = F10["node632"]
+r10f = [["Time (s)", "What happens", "Current at 632 (RMS, phase a / c)"],
+        ["0 - 0.30", "normal operation", "%.0f / %.0f A (load)" % (n632["prefault_rms_a"], n632["prefault_rms_c"])],
+        ["0.30 - 0.42", "fault at 684, R2 fast shot 1", "%.0f / %.0f A (fault)" % (n632["fault_rms_a"], n632["fault_rms_c"])],
+        ["0.42 - 0.62", "R2 open (dead time)", "%.0f / %.0f A (loads between 632 and R2 only)" % (
+            n632["dead_time_rms_a"], n632["dead_time_rms_c"])],
+        ["0.62 - 0.74", "R2 recloses, fault still there, fast shot 2", "fault current again"],
+        ["0.74 - 0.94", "R2 open (dead time)", "small again"],
+        ["0.94 - %.3f" % F10["t_clear"], "R2 recloses, permanent fault: fuse F671-2 melts at %.2f s and clears" % F10["t_melt"],
+         "fault current until the fuse clears"],
+        ["after %.3f" % F10["t_clear"], "lateral 671-684 isolated, rest of the feeder supplied", "load current again (without the lateral)"]]
+story += answer("In Fig. 10 the fault is at node 684. Why is the current plotted at node 632?", [
+    p("Because node 632 is on the path of the fault current - substation, 650, RG60, <b>632</b>, line 632-671 with R2, 671, "
+      "fuse F671-2, <b>684</b> - and it is the point from which the whole protection sequence can be seen. The current at "
+      "632 is R2's current plus the loads between 632 and R2 (633, 645, 646 and the distributed load), so it shows the fault "
+      "being interrupted by each fast shot of R2, the reclosures, the fuse clearing the permanent fault, and - the purpose of "
+      "the figure - the healthy feeder being supplied again afterwards. A measurement at 684 or at the fuse would only show "
+      "the fault current switching off; once the fuse opens that point is disconnected, so the restoration of the rest of "
+      "the feeder would not be visible. The same point is used in the published figure, so the two can be compared directly."),
+    table(r10f, [2.4 * cm, 7.6 * cm, W - 10.0 * cm]),
+    p("Fault: line-to-line a-c at 684 through 0.2 ohm, DG out of service, conventional settings; PowerFactory EMT "
+      "simulation (Fig10_EMT_Study).", NOTE)])
 
 # ---- 5 limitations -------------------------------------------------------------------------------
 story += [p("5. Limitations to state openly", H1), p(
