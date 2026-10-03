@@ -210,6 +210,49 @@ T["TABLE_IVB_OWN"] = rows([row[:6] + row[7:] for row in ivb])
 T["GRID14_OWN"] = grid([("", "Fig14 model")])
 T["TABLE_EMT_OWN"] = rows([[r[0]] + r[2:] for r in emt_rows])
 
+# ---- DG penetration study (Penetration_Study/) ---------------------------------------------------------
+PEN = os.path.join(os.path.dirname(HERE), "Penetration_Study")
+PD = {int(k): v for k, v in json.load(open(os.path.join(PEN, "results", "penetration_results.json"))).items()}
+PL = sorted(PD)
+pf = lambda p, k: PD[p]["faults"][k]
+cti = {n: [pf(p, k)["CTI_s"] for p in PL] for n, k in (("633", "633 LLL"), ("671", "671 LL"))}
+ring = {n: [100.0 * c / sum(abs(x) for x in v) for c in v] for n, v in cti.items()}
+T["PEN_CTI"] = rows([["%d" % p, "%.2f" % PD[p]["loadflow"]["dg_rating_MVA"],
+                      "%.0f / %.0f" % (pf(p, "633 LLL")["I_fuse"], pf(p, "633 LLL")["I_R1"]),
+                      "%.3f / %.3f" % (pf(p, "633 LLL")["t_fuse_MMT"], pf(p, "633 LLL")["t_rec_fast"]),
+                      "$%+.0f$" % (1000 * cti["633"][k]), "$%+.1f$" % ring["633"][k],
+                      "%.0f / %.0f" % (pf(p, "671 LL")["I_fuse"], pf(p, "671 LL")["I_R2"]),
+                      "%.3f / %.3f" % (pf(p, "671 LL")["t_fuse_MMT"], pf(p, "671 LL")["t_rec_fast"]),
+                      "$%+.0f$" % (1000 * cti["671"][k]), "$%+.1f$" % ring["671"][k]] for k, p in enumerate(PL)])
+lf = {p: PD[p]["loadflow"] for p in PL}
+pk = {int(r["DG penetration %"]): r for r in read(os.path.join(PEN, "results", "Pickup_vs_penetration.csv"))}
+mn = {int(r["DG penetration %"]): r for r in read(os.path.join(PEN, "results", "Ifmin_vs_pickup.csv"))}
+T["PEN_LF"] = rows([["%d" % p, "%.2f" % lf[p]["dg_P_MW"], "%.1f" % lf[p]["R1_A"], "%.1f" % lf[p]["R2_A"],
+                     tex(pk[p]["R2 load direction"]), "%.3f" % lf[p]["V"]["671"][0], "%.1f" % float(pk[p]["R1 Ip = 1.25 Inom (A)"]),
+                     "%.1f" % float(pk[p]["R2 Ip = 1.25 Inom (A)"]),
+                     "%.0f%s" % (float(mn[p]["lowest R1 current, LG 3 ohm (A)"]), "" if mn[p]["R1 sees it?"] == "yes" else r"$^\ast$"),
+                     "%.0f%s" % (float(mn[p]["lowest R2 current in its zone, LG 3 ohm (A)"]), "" if mn[p]["R2 sees it?"] == "yes" else r"$^\ast$")]
+                    for p in PL])
+sc = read(os.path.join(PEN, "results", "SC_levels_vs_penetration.csv"))
+T["PEN_SC"] = rows([[r["Node"], tex(r["Fault (largest)"]), r["If,max 0 % (A)"], r["If,max 25 % (A)"], r["If,max 50 % (A)"],
+                     r["If,max 75 % (A)"], r["If,max 100 % (A)"], "$%s$" % r["change 0 -> 100 %"].replace(" %", r"\,\%")] for r in sc])
+pc = read(os.path.join(PEN, "comparison", "Penetration_CTI_vs_paper.csv"))
+T["PEN_VS_PAPER"] = rows([[r["DG penetration %"], "$%s$" % r["633 CTI ring % (model)"], "$%+d$" % int(r["633 paper %"]),
+                           "$%s$" % r["671 CTI ring % (model)"], "$%+d$" % int(r["671 paper %"])] for r in pc])
+f0, f100 = pf(0, "633 LLL"), pf(100, "633 LLL")
+g0, g100 = pf(0, "671 LL"), pf(100, "671 LL")
+T["PEN_633_TXT"] = ("the fuse current rises from %.0f\\,A to %.0f\\,A while R1's current falls from %.0f\\,A to %.0f\\,A; "
+                    "the CTI falls from $%+.0f$\\,ms to $%+.0f$\\,ms" % (f0["I_fuse"], f100["I_fuse"], f0["I_R1"], f100["I_R1"],
+                                                                     1000 * f0["CTI_s"], 1000 * f100["CTI_s"]))
+T["PEN_671_TXT"] = ("the fuse current rises from %.0f\\,A to %.0f\\,A while R2's current stays at about %.0f\\,A; "
+                    "the CTI falls from $%+.0f$\\,ms to $%+.0f$\\,ms" % (g0["I_fuse"], g100["I_fuse"], g100["I_R2"],
+                                                                     1000 * g0["CTI_s"], 1000 * g100["CTI_s"]))
+PFIGS = {"pen_ring.png": ("results", "Fig07_penetration.png"), "pen_currents.png": ("results", "Fig07_penetration_currents.png"),
+         "pen_tcc.png": ("results", "TCC_penetration_overview.png"), "pen_tcc633.png": ("results", "TCC_penetration_633.png"),
+         "pen_ring_vs_paper.png": ("comparison", "Fig07_penetration_vs_paper.png")}
+for dst, (sub, src) in PFIGS.items():
+    shutil.copyfile(os.path.join(PEN, sub, src), os.path.join(FIGS, dst))
+
 # ---- figures ----------------------------------------------------------------------------------
 F = os.path.join(RES, "figures")
 C = os.path.join(RES, "coordination_diagrams")

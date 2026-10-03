@@ -263,6 +263,7 @@ To build and validate a DIgSILENT \PF{} implementation of the DSDR protection-co
 \item Design the forward and reverse settings of R2 as a DSDR and classify the coordination again
       and determine the operating times.
 \item Verify the reclosing sequence in the time domain.
+\item Study how the coordination degrades as the DG penetration rises from 0 to 100\,\%.
 \item Compare the results with the reference paper and explain the differences (Appendix~E).
 \end{enumerate}
 
@@ -286,8 +287,8 @@ respected, and it separates the contribution of the dual setting from the contri
       separate relay units and the direction is assigned from the fault location.
 \item Coordination is judged with a zero-margin criterion (the fuse must not start to melt before the fast
       trip). Section~\ref{sec:margin} shows how the result changes with a breaker time and a fuse margin.
-\item The effect of the DG penetration level (CTI against penetration) is studied separately, in seven
-      dedicated \PF{} models, and is not part of this report.
+\item The DG penetration study (Section~\ref{sec:pen}) uses one DG location (692) and keeps the protection
+      of the design without DG at every level.
 \item The IEEE 34-node feeder has not been modelled.
 \end{itemize}
 
@@ -697,6 +698,7 @@ Maximum faults & out / in & All nodes, LG/LL/LLG/LLL, all phase combinations, bo
 Minimum faults & out / in & LG through 3\ohm{} at all nodes & $I_{f,min}$, pickup check \\
 Figure faults & in & The faults of Figs.~8--13, 15, 16 of the paper & TCC comparison \\
 EMT & out / in & LL a--c at 684 through 0.2\ohm & Reclosing sequence (Fig.~10) \\
+Penetration & 0--100\,\% & LLL at 633, LL at 684, all nodes & CTI, fault levels and pickups against DG size \\
 \bottomrule
 \end{tabularx}
 \caption{Simulation cases.}
@@ -1088,6 +1090,129 @@ melting time, 26 cells are held. The pickups are a second limit: with the DG, th
 through 3\ohm{} is 577\,A at R1 and 368\,A at R2, below the pickups of 734.6\,A and 587.5\,A, because the DG
 supplies part of the fault.
 
+\subsection{Effect of the DG Penetration Level}
+\label{sec:pen}
+To see how the conventional coordination degrades as the DG grows, seven separate \PF{} projects were made,
+copies of the model with the DG at 692 set to 0, 10, 25, 37, 50, 75 and 100\,\% of 4.05\,MVA. The machine, its
+step-up transformer and its active and reactive power are scaled together, so the per-unit data of
+Table~\ref{tab:dg} stay the same; at 0\,\% the DG is out of service. Every model keeps the conventional
+protection of the design without DG (single-setting R2, fuses of the design without DG), and all operating
+times are \PF's own relay and fuse calculations. Two fuse--recloser pairs are followed: fuse F633 against R1
+for a three-phase fault at 633 (R1's zone), and the lateral fuse F671-2 at node 671 against R2 for a
+line-to-line fault at 684 (R2's zone). The coordination time interval is
+\begin{equation}
+CTI = t_{MMT}(\text{fuse}) - t_{F}(\text{recloser}),
+\label{eq:cti}
+\end{equation}
+and, for the doughnut chart of Figure~\ref{fig:penring}, each level's share of the ring,
+$CTI\,\% = 100 \times CTI / \sum |CTI|$ over the seven levels, so that each ring adds up to 100\,\%.
+
+\begin{table}[H]
+\centering\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}cccccccccc@{}}
+\toprule
+\hd & & \multicolumn{4}{c}{\textbf{Node 633: F633 and R1 (LLL)}} & \multicolumn{4}{c}{\textbf{Node 671: F671-2 and R2 (LL at 684)}} \\
+\hd\textbf{DG (\%)} & \textbf{MVA} & \textbf{$I$ fuse / R1 (A)} & \textbf{$t_{MMT}$ / $t_F$ (s)} & \textbf{CTI (ms)} & \textbf{ring \%} &
+\textbf{$I$ fuse / R2 (A)} & \textbf{$t_{MMT}$ / $t_F$ (s)} & \textbf{CTI (ms)} & \textbf{ring \%} \\
+\midrule
+<<PEN_CTI>>
+\bottomrule
+\end{tabular}
+\caption{CTI against DG penetration, conventional protection.}
+\label{tab:pencti}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{pen_ring.png}
+\caption{Percentage variation of the CTI with DG penetration (each ring adds up to 100\,\%; outer ring 671, inner
+ring 633).}
+\label{fig:penring}
+\end{figure}
+
+At node 633 <<PEN_633_TXT>>. At node 671 <<PEN_671_TXT>>. The mechanism is the same at both nodes
+(Figure~\ref{fig:pencur}): the fuse lies between the fault and both sources and carries the grid share and
+the DG share, while the recloser carries only the grid share, which even falls slightly because the DG holds
+up the voltage of the network during the fault. A fuse curve is steep, so the extra current shortens its
+melting time much more than the lower current lengthens the recloser's time, and the CTI decreases. At 633
+the margin is only a few milliseconds without DG and is lost from about 4\,\% penetration; at 671 the margin
+is large and stays positive up to 100\,\%.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pen_currents.png}
+\caption{Currents through the fuse (grid and DG share), the recloser (grid share) and from the DG, and the
+resulting CTI, against DG penetration.}
+\label{fig:pencur}
+\end{figure}
+
+Figure~\ref{fig:pentcc} shows the same on the time--current characteristics: the curves are fixed because
+the settings are not changed, the recloser's operating point stays where it is, and the fuse's operating
+point moves to a higher current and a shorter time with every step. Figure~\ref{fig:pentcc633} gives node 633
+level by level, with the vertical short-circuit lines of the fuse and the recloser currents, the operating
+times and the CTI.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pen_tcc.png}
+\caption{Time--current characteristics at all penetration levels: fuse operating points (squares) and recloser
+operating points (circles).}
+\label{fig:pentcc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pen_tcc633.png}
+\caption{Node 633, fuse F633 and R1, at each penetration level, with the short-circuit currents, operating times
+and CTI.}
+\label{fig:pentcc633}
+\end{figure}
+
+The fault level rises at every node (Table~\ref{tab:pensc}), most near the DG (671, 692, 675: about
+$+60$\,\%) and least behind the 4.16/0.48\,kV transformer (634) and on the single-phase laterals. The current
+through the reclosers does not rise with it.
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+\hd\textbf{Node} & \textbf{Fault} & \textbf{0\,\%} & \textbf{25\,\%} & \textbf{50\,\%} & \textbf{75\,\%} & \textbf{100\,\%} & \textbf{Change} \\
+\midrule
+<<PEN_SC>>
+\bottomrule
+\end{tabular}
+\caption{Largest bolted fault current at each node (A) against DG penetration.}
+\label{tab:pensc}
+\end{table}
+
+The load flow changes as well (Table~\ref{tab:penlf}). The DG supplies part of the load locally, so the load
+current through both reclosers falls, the voltages rise, and the power through R2 reverses between 75 and
+100\,\%. By eq.~\eqref{eq:ipfw} the pickups would have to fall with the penetration; with the fixed settings
+(R1 720\,A, its curve starting at 1080\,A; R2 fast curve starting at 600\,A) the reclosers no longer detect the
+weakest faults (LG through 3\ohm) in their zones, R2 from just above 50\,\%.
+
+\begin{table}[H]
+\centering\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}cccccccccc@{}}
+\toprule
+\hd & \textbf{DG P} & \textbf{R1 load} & \textbf{R2 load} & \textbf{R2} & \textbf{$V_{671,a}$} & \textbf{R1 $1.25\,I_{nom}$} & \textbf{R2 $1.25\,I_{nom}$} & \textbf{R1 lowest} & \textbf{R2 lowest} \\
+\hd\textbf{DG (\%)} & \textbf{(MW)} & \textbf{(A)} & \textbf{(A)} & \textbf{flow} & \textbf{(p.u.)} & \textbf{(A)} & \textbf{(A)} & \textbf{3\,$\Omega$ fault (A)} & \textbf{3\,$\Omega$ fault (A)} \\
+\midrule
+<<PEN_LF>>
+\bottomrule
+\end{tabular}
+\caption{Load flow, pickups by eq.~(3) and lowest fault current through each recloser against DG penetration.
+$^\ast$: below the start of the recloser's curve with the fixed settings (not detected).}
+\label{tab:penlf}
+\end{table}
+
+The penetration study therefore shows the two ways in which fixed settings fail as the DG grows: the fuse
+saving is lost because the fuse speeds up while the recloser does not, and the sensitivity is lost because
+the currents through the reclosers fall. Both are reasons for settings that adapt to the DG, which is what
+the dual-setting directional recloser provides.
+
 \subsection{Results Summary}
 \begin{table}[H]
 \centering\small
@@ -1185,6 +1310,9 @@ faults downstream of R2 remain open.
       DSDR.
 \item The dual setting restores seven cells with the revised fuses and one cell without the revision.
 \item The LG fault at 692 cannot be coordinated within the dial range of R2.
+\item With rising DG penetration and fixed settings the CTI falls at both studied nodes (633: from about
+      $+4$ to $-51$\,ms; 671: from $+403$ to $+75$\,ms), the fault level rises by up to 64\,\%, and R2 stops
+      detecting the weakest fault of its zone above about 50\,\%.
 \item \PF's own relay and fuse models confirm the operating times within <<PF_MAX>>\,\%.
 \item In the EMT simulation the fuse survives the two fast shots without DG and melts at 1.25\,s; with DG it melts during the second fast shot.
 \end{enumerate}
@@ -1290,11 +1418,11 @@ Short-circuit analysis & Completed & All fault types and phase combinations, DG 
 DG connection (dynamic machine) & Completed & Table~\ref{tab:dg} \\
 Conventional coordination without DG & Completed & 39 of 39 cells \\
 Classification with DG (Fig.~14) & Completed & <<N14_HELD>> of <<N_CELLS>> cells held \\
+DG penetration study & Completed & Section~\ref{sec:pen}, seven \PF{} models \\
 DSDR forward and reverse settings & Completed & Table~\ref{tab:settings} \\
 DSDR coordination restoration (Fig.~17, Table~IV) & Completed & <<N17_HELD>> of <<N_CELLS>> cells \\
 Time-domain verification (Fig.~10) & Completed & Table~\ref{tab:emt} \\
 Verification with \PF{} relay models & Completed & <<PF_N>> operating times, max <<PF_MAX>>\,\% \\
-CTI against DG penetration & Completed separately & Seven \PF{} models, 0--100\,\% of 4.05\,MVA \\
 IEEE 34-node extension & Pending & Not started \\
 \bottomrule
 \end{tabularx}
@@ -1468,6 +1596,35 @@ which reproduces the paper's values in R1's zone.}
 \end{tabular}
 \caption{Reclosing sequence of the EMT simulation against the paper's Fig.~10.}
 \label{tab:e6}
+\end{table}
+
+\subsection*{DG penetration (Fig.~7 of the paper)}
+The paper's Fig.~7 gives the CTI at nodes 633 and 671 as shares of a doughnut chart. The trend is the same
+in both: the CTI falls monotonically as the penetration rises. At 671 the shares of the first four levels
+are close to the paper's. The levels at which the CTI changes sign differ: in the paper both nodes cross
+zero at about 40--50\,\%; in this study 633 crosses at about 4\,\% and 671 does not cross up to 100\,\%.
+The crossing depends on the starting margin, which depends on fuse sizes and settings that the paper does
+not publish.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pen_ring_vs_paper.png}
+\caption{CTI against DG penetration: this study (left) and the values read from the paper's Fig.~7 (right).}
+\label{fig:e7}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+\hd & \multicolumn{2}{c}{\textbf{Node 633 (ring \%)}} & \multicolumn{2}{c}{\textbf{Node 671 (ring \%)}} \\
+\hd\textbf{DG (\%)} & \textbf{this study} & \textbf{paper} & \textbf{this study} & \textbf{paper} \\
+\midrule
+<<PEN_VS_PAPER>>
+\bottomrule
+\end{tabular}
+\caption{CTI shares against DG penetration: this study and the paper's Fig.~7.}
+\label{tab:e7}
 \end{table}
 
 \end{document}
