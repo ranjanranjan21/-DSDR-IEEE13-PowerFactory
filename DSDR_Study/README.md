@@ -134,6 +134,7 @@ times, maximum deviation 1.22 %** (`results/PF_vs_Python_times_*.csv`).
 | `make_paper_vs_database_pdf.py` | Database against the paper: Table I, Table II, figure fault currents, direction at R2 | `results/Paper_vs_Our_Results.pdf` |
 | `make_comparison_pdf.py` | Coordination against the paper: Tables III-IV, Figs. 8-17; appendix with the inventory of all tables and figures, Table I and Figs. 1-6 |
 | `make_operating_time_pdf.py` | Hand calculation of Table IV: R1 (IAC equation), R2 (CDG table), fuse t_MMT / t_TCT (A055C curves), five worked examples | `results/Operating_Time_Calculation.pdf` | `results/Comparison_with_Reference_Paper.pdf` |
+| `build_report_pdf.py` | Builds the report PDF on this PC (no Overleaf): runs `make_report_latex.py`, compiles with pdfLaTeX (TinyTeX in %APPDATA%\TinyTeX) three times, checks the log | `report/DSDR_Report.pdf` |
 | `make_report_latex.py` | Project report as LaTeX (layout of `DSDR_Final_Project_Progress_Report`); tables filled from the results; text in `report_template.tex.in` (a template with placeholders: it does not compile on its own) | `report/main.tex`, `report/figures/` (compile with pdfLaTeX, e.g. upload the folder to Overleaf) |
 | `make_coordination_diagrams.py` | Coordination diagrams, single setting vs dual setting on R2, same fuses in both; fault table with Zf, R1 / R2 current and direction | `results/coordination_diagrams/` (9 case PNGs, summary, `Fault_table.csv`, `Coordination_Diagrams.pdf`) |
 
