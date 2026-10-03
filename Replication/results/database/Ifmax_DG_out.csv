@@ -1,0 +1,14 @@
+Bus,"If,max (A)",Fault type,Faulted phases,R1 (A),R2 (A),Comment
+632,4735.2,LLL,ABC,+4734.6,0.0,
+633,4102.5,LLL,ABC,+4162.2,+65.9,
+634,15671.0,LLL,ABC,+2034.2,+298.5,
+645,3418.2,LLG,BC,+3527.9,+477.6,3-phase fault not applicable at this location; maximum fault current is obtained from LLG fault.
+646,3112.2,LLG,BC,+3191.7,+474.8,3-phase fault not applicable at this location; maximum fault current is obtained from LLG fault.
+671,3390.1,LLL,ABC,+3412.7,+3390.1,
+692,3390.1,LLL,ABC,+3412.7,+3390.1,
+675,3151.2,LLL,ABC,+3202.2,+3174.3,
+680,2929.6,LLL,ABC,+3005.5,+2975.6,
+684,2655.3,LLG,AC,+2835.5,+2744.5,3-phase fault not applicable at this location; maximum fault current is obtained from LLG fault.
+652,1873.7,LG,A,+2093.8,+2058.7,3-phase fault not applicable at this location; maximum fault current is obtained from LG fault.
+611,1857.2,LG,C,+2084.5,+1991.4,3-phase fault not applicable at this location; maximum fault current is obtained from LG fault.
+DL,3946.4,LLL,ABC,+3959.0,+1.4,

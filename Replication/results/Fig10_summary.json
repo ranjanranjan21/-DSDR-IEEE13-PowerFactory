@@ -1,0 +1,96 @@
+{
+ "DG out": {
+  "node632": {
+   "prefault_rms_a": 557.3246908109144,
+   "prefault_rms_c": 588.0722423327442,
+   "fault_rms_a": 2361.6534513705333,
+   "fault_rms_c": 2719.0173508577996,
+   "first_peak_a": 4288.212452,
+   "first_peak_c": 4708.225675,
+   "steady_peak_a": 3337.899502,
+   "steady_peak_c": 3842.086885,
+   "dead_time_rms_a": 96.58216883048419,
+   "dead_time_rms_c": 190.6447274374924
+  },
+  "t_fault": 0.3,
+  "t_dead": 0.2,
+  "i_r2": 2606.763065998955,
+  "i_fuse": 2815.7647885965484,
+  "t_fast": 0.12019914357338678,
+  "heat_after_fast_shots": 0.44609044957489546,
+  "t_melt": 1.248416,
+  "t_clear": 1.613116,
+  "final": "F671-2 clears at 1.613 s",
+  "events": [
+   [
+    0.42,
+    "R2 fast trip 1"
+   ],
+   [
+    0.62,
+    "R2 reclose 1"
+   ],
+   [
+    0.74,
+    "R2 fast trip 2"
+   ],
+   [
+    0.94,
+    "R2 reclose 2"
+   ],
+   [
+    1.613,
+    "F671-2 clears"
+   ]
+  ],
+  "fuse": "A055C300E",
+  "fast_shots_before_melt": 2
+ },
+ "DG in": {
+  "node632": {
+   "prefault_rms_a": 261.3636346240827,
+   "prefault_rms_c": 285.63620047278494,
+   "fault_rms_a": 2443.24926236917,
+   "fault_rms_c": 2353.1849059939327,
+   "first_peak_a": 3804.773297,
+   "first_peak_c": 3652.987915,
+   "steady_peak_a": 3516.899879,
+   "steady_peak_c": 3414.349275,
+   "dead_time_rms_a": 91.05763288176682,
+   "dead_time_rms_c": 184.94104968029504
+  },
+  "t_fault": 0.3,
+  "t_dead": 0.2,
+  "i_r2": 2435.9333905230137,
+  "i_fuse": 4322.099223001878,
+  "t_fast": 0.12636683398327242,
+  "heat_after_fast_shots": 1.0473308750580912,
+  "t_melt": 0.752184,
+  "t_clear": 1.252851,
+  "final": "F671-2 clears at 1.253 s",
+  "events": [
+   [
+    0.426,
+    "R2 fast trip 1"
+   ],
+   [
+    0.626,
+    "R2 reclose 1"
+   ],
+   [
+    0.753,
+    "R2 fast trip 2"
+   ],
+   [
+    0.953,
+    "R2 reclose 2"
+   ],
+   [
+    1.253,
+    "F671-2 clears"
+   ]
+  ],
+  "fuse": "A055C300E",
+  "fast_shots_before_melt": 1
+ }
+}

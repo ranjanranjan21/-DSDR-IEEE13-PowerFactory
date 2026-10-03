@@ -1,0 +1,169 @@
+R2 setting,node,fault,phases,zone,strict rule (cell),time-sequence outcome,fuse heat when cut off (%),sequence
+single,632,LG,A,R1,held,held,0,R1 opens 0.136 s; R2 opens 0.944 s
+single,632,LG,B,R1,held,held,0,R1 opens 0.139 s; R2 opens 0.738 s
+single,632,LG,C,R1,held,held,0,R1 opens 0.139 s; R2 opens 0.893 s
+single,632,LL,AB,R1,held,held,0,R1 opens 0.097 s; R2 opens 0.180 s
+single,632,LL,BC,R1,held,held,0,R1 opens 0.110 s; R2 opens 0.162 s
+single,632,LL,AC,R1,held,held,0,R1 opens 0.105 s; R2 opens 0.173 s
+single,632,LLG,AB,R1,held,held,0,R1 opens 0.089 s; R2 opens 0.154 s
+single,632,LLG,BC,R1,held,held,0,R1 opens 0.098 s; R2 opens 0.152 s
+single,632,LLG,AC,R1,held,held,0,R1 opens 0.096 s; R2 opens 0.154 s
+single,632,LLL,ABC,R1,held,held,0,R1 opens 0.081 s; R2 opens 0.118 s
+single,633,LG,A,R1,lost,R2 blind,34,R1 opens 0.173 s; R2 does not trip: 544 A keeps feeding the fault
+single,633,LG,B,R1,lost,held,36,R1 opens 0.178 s; R2 opens 0.974 s; fuse heat 36 %
+single,633,LG,C,R1,lost,R2 blind,33,R1 opens 0.176 s; R2 does not trip: 564 A keeps feeding the fault
+single,633,LL,AB,R1,lost,held,58,R1 opens 0.130 s; R2 opens 0.263 s; fuse heat 58 %
+single,633,LL,BC,R1,lost,held,57,R1 opens 0.146 s; R2 opens 0.217 s; fuse heat 57 %
+single,633,LL,AC,R1,lost,held,58,R1 opens 0.136 s; R2 opens 0.237 s; fuse heat 58 %
+single,633,LLG,AB,R1,lost,held,62,R1 opens 0.119 s; R2 opens 0.222 s; fuse heat 62 %
+single,633,LLG,BC,R1,lost,held,61,R1 opens 0.131 s; R2 opens 0.204 s; fuse heat 61 %
+single,633,LLG,AC,R1,lost,held,60,R1 opens 0.124 s; R2 opens 0.211 s; fuse heat 60 %
+single,633,LLL,ABC,R1,lost,held,71,R1 opens 0.106 s; R2 opens 0.160 s; fuse heat 71 %
+single,645,LG,C,R1,lost,R2 blind,12,R1 opens 0.206 s; R2 does not trip: 504 A keeps feeding the fault
+single,645,LG,B,R1,lost,R2 blind,13,R1 opens 0.210 s; R2 does not trip: 595 A keeps feeding the fault
+single,645,LL,BC,R1,held,held,25,R1 opens 0.155 s; R2 opens 0.228 s; fuse heat 25 %
+single,645,LLG,BC,R1,held,held,26,R1 opens 0.139 s; R2 opens 0.218 s; fuse heat 26 %
+single,646,LG,C,R1,lost,R2 blind,24,R1 opens 0.255 s; R2 does not trip: 469 A keeps feeding the fault
+single,646,LG,B,R1,lost,R2 blind,26,R1 opens 0.264 s; R2 does not trip: 544 A keeps feeding the fault
+single,646,LL,BC,R1,held,held,46,R1 opens 0.189 s; R2 opens 0.278 s; fuse heat 46 %
+single,646,LLG,BC,R1,held,held,46,R1 opens 0.166 s; R2 opens 0.267 s; fuse heat 46 %
+single,671,LG,A,R2,held,DG direct,0,R2 opens 0.089 s; the DG still feeds about 616 A into the fault
+single,671,LG,B,R2,held,DG direct,0,R2 opens 0.093 s; the DG still feeds about 689 A into the fault
+single,671,LG,C,R2,held,DG direct,0,R2 opens 0.095 s; the DG still feeds about 644 A into the fault
+single,671,LL,AB,R2,held,DG direct,0,R2 opens 0.059 s; the DG still feeds about 1549 A into the fault
+single,671,LL,BC,R2,held,DG direct,0,R2 opens 0.067 s; the DG still feeds about 1668 A into the fault
+single,671,LL,AC,R2,held,DG direct,0,R2 opens 0.063 s; the DG still feeds about 1600 A into the fault
+single,671,LLG,AB,R2,held,DG direct,0,R2 opens 0.057 s; the DG still feeds about 1789 A into the fault
+single,671,LLG,BC,R2,held,DG direct,0,R2 opens 0.063 s; the DG still feeds about 1793 A into the fault
+single,671,LLG,AC,R2,held,DG direct,0,R2 opens 0.061 s; the DG still feeds about 1786 A into the fault
+single,671,LLL,ABC,R2,held,DG direct,0,R2 opens 0.054 s; the DG still feeds about 2173 A into the fault
+single,692,LG,A,R2,lost,DG direct,3,R2 opens 0.089 s; fuse heat 3 %; the DG still feeds about 616 A into the fault
+single,692,LG,B,R2,lost,DG direct,3,R2 opens 0.093 s; fuse heat 3 %; the DG still feeds about 689 A into the fault
+single,692,LG,C,R2,lost,DG direct,3,R2 opens 0.095 s; fuse heat 3 %; the DG still feeds about 644 A into the fault
+single,692,LL,AB,R2,held,DG direct,9,R2 opens 0.059 s; fuse heat 9 %; the DG still feeds about 1549 A into the fault
+single,692,LL,BC,R2,held,DG direct,7,R2 opens 0.067 s; fuse heat 7 %; the DG still feeds about 1668 A into the fault
+single,692,LL,AC,R2,held,DG direct,8,R2 opens 0.063 s; fuse heat 8 %; the DG still feeds about 1600 A into the fault
+single,692,LLG,AB,R2,held,DG direct,8,R2 opens 0.057 s; fuse heat 8 %; the DG still feeds about 1789 A into the fault
+single,692,LLG,BC,R2,held,DG direct,6,R2 opens 0.063 s; fuse heat 6 %; the DG still feeds about 1793 A into the fault
+single,692,LLG,AC,R2,held,DG direct,8,R2 opens 0.061 s; fuse heat 8 %; the DG still feeds about 1786 A into the fault
+single,692,LLL,ABC,R2,held,DG direct,10,R2 opens 0.054 s; fuse heat 10 %; the DG still feeds about 2173 A into the fault
+single,675,LG,A,R2,held,DG direct,30,R2 opens 0.101 s; fuse heat 30 %; the DG still feeds about 566 A into the fault; the DG's 566 A then melts F692-R after a further 416.01 s
+single,675,LG,B,R2,held,DG direct,33,R2 opens 0.106 s; fuse heat 33 %; the DG still feeds about 654 A into the fault; the DG's 654 A then melts F692-R after a further 132.43 s
+single,675,LG,C,R2,held,DG direct,31,R2 opens 0.108 s; fuse heat 31 %; the DG still feeds about 596 A into the fault; the DG's 596 A then melts F692-R after a further 275.59 s
+single,675,LL,AB,R2,held,DG direct,71,R2 opens 0.065 s; fuse heat 71 %; the DG still feeds about 1402 A into the fault; the DG's 1503 A then melts F692-R after a further 0.58 s
+single,675,LL,BC,R2,held,DG direct,70,R2 opens 0.075 s; fuse heat 70 %; the DG still feeds about 1521 A into the fault; the DG's 1543 A then melts F692-R after a further 0.53 s
+single,675,LL,AC,R2,held,DG direct,68,R2 opens 0.071 s; fuse heat 68 %; the DG still feeds about 1425 A into the fault; the DG's 1483 A then melts F692-R after a further 0.66 s
+single,675,LLG,AB,R2,held,DG direct,76,R2 opens 0.062 s; fuse heat 76 %; the DG still feeds about 1631 A into the fault; the DG's 1631 A then melts F692-R after a further 0.34 s
+single,675,LLG,BC,R2,held,DG direct,76,R2 opens 0.070 s; fuse heat 76 %; the DG still feeds about 1661 A into the fault; the DG's 1661 A then melts F692-R after a further 0.33 s
+single,675,LLG,AC,R2,held,DG direct,74,R2 opens 0.069 s; fuse heat 74 %; the DG still feeds about 1619 A into the fault; the DG's 1619 A then melts F692-R after a further 0.39 s
+single,675,LLL,ABC,R2,held,DG direct,91,R2 opens 0.059 s; fuse heat 91 %; the DG still feeds about 1972 A into the fault; the DG's 1972 A then melts F692-R after a further 0.07 s
+single,680,LG,A,R2,held,DG direct,0,R2 opens 0.127 s; the DG still feeds about 427 A into the fault
+single,680,LG,B,R2,held,DG direct,0,R2 opens 0.137 s; the DG still feeds about 522 A into the fault
+single,680,LG,C,R2,held,DG direct,0,R2 opens 0.138 s; the DG still feeds about 462 A into the fault
+single,680,LL,AB,R2,held,DG direct,0,R2 opens 0.073 s; the DG still feeds about 1238 A into the fault
+single,680,LL,BC,R2,held,DG direct,0,R2 opens 0.089 s; the DG still feeds about 1294 A into the fault
+single,680,LL,AC,R2,held,DG direct,0,R2 opens 0.081 s; the DG still feeds about 1241 A into the fault
+single,680,LLG,AB,R2,held,DG direct,0,R2 opens 0.072 s; the DG still feeds about 1403 A into the fault
+single,680,LLG,BC,R2,held,DG direct,0,R2 opens 0.087 s; the DG still feeds about 1424 A into the fault
+single,680,LLG,AC,R2,held,DG direct,0,R2 opens 0.077 s; the DG still feeds about 1290 A into the fault
+single,680,LLL,ABC,R2,held,DG direct,0,R2 opens 0.066 s; the DG still feeds about 1703 A into the fault
+single,684,LG,A,R2,held,DG direct,20,R2 opens 0.103 s; fuse heat 20 %; the DG still feeds about 540 A into the fault
+single,684,LG,C,R2,held,DG direct,20,R2 opens 0.111 s; fuse heat 20 %; the DG still feeds about 571 A into the fault
+single,684,LL,AC,R2,held,DG direct,49,R2 opens 0.072 s; fuse heat 49 %; the DG still feeds about 1385 A into the fault; the DG's 1420 A then melts F671-2 after a further 2.19 s
+single,684,LLG,AC,R2,held,DG direct,51,R2 opens 0.069 s; fuse heat 51 %; the DG still feeds about 1456 A into the fault; the DG's 1456 A then melts F671-2 after a further 1.89 s
+single,652,LG,A,R2,held,DG direct,89,R2 opens 0.123 s; fuse heat 89 %; the DG still feeds about 478 A into the fault; the DG's 478 A then melts F652 after a further 1.65 s
+single,611,LG,C,R2,held,DG direct,47,R2 opens 0.128 s; fuse heat 47 %; the DG still feeds about 517 A into the fault; the DG's 517 A then melts F684 after a further 122.81 s
+single,DL,LG,A,R1,lost,held,33,R1 opens 0.216 s; R2 opens 1.079 s; fuse heat 33 %
+single,DL,LG,B,R1,lost,held,34,R1 opens 0.221 s; R2 opens 0.796 s; fuse heat 34 %
+single,DL,LG,C,R1,lost,held,32,R1 opens 0.221 s; R2 opens 0.986 s; fuse heat 32 %
+single,DL,LL,AB,R1,held,held,70,R1 opens 0.128 s; R2 opens 0.159 s; fuse heat 70 %
+single,DL,LL,BC,R1,held,held,68,R2 opens 0.143 s; R1 opens 0.151 s; fuse heat 68 %
+single,DL,LL,AC,R1,held,held,70,R1 opens 0.141 s; R2 opens 0.149 s; fuse heat 70 %
+single,DL,LLG,AB,R1,held,held,75,R1 opens 0.119 s; R2 opens 0.138 s; fuse heat 75 %
+single,DL,LLG,BC,R1,held,held,73,R2 opens 0.135 s; R1 opens 0.136 s; fuse heat 73 %
+single,DL,LLG,AC,R1,held,held,73,R1 opens 0.132 s; R2 opens 0.134 s; fuse heat 73 %
+single,DL,LLL,ABC,R1,held,held,86,R2 opens 0.103 s; R1 opens 0.106 s; fuse heat 86 %
+dual,632,LG,A,R1,held,held,0,R1 opens 0.136 s; R2 opens 0.206 s
+dual,632,LG,B,R1,held,held,0,R1 opens 0.139 s; R2 opens 0.172 s
+dual,632,LG,C,R1,held,held,0,R1 opens 0.139 s; R2 opens 0.197 s
+dual,632,LL,AB,R1,held,held,0,R2 opens 0.064 s; R1 opens 0.097 s
+dual,632,LL,BC,R1,held,held,0,R2 opens 0.060 s; R1 opens 0.110 s
+dual,632,LL,AC,R1,held,held,0,R2 opens 0.063 s; R1 opens 0.105 s
+dual,632,LLG,AB,R1,held,held,0,R2 opens 0.059 s; R1 opens 0.089 s
+dual,632,LLG,BC,R1,held,held,0,R2 opens 0.058 s; R1 opens 0.098 s
+dual,632,LLG,AC,R1,held,held,0,R2 opens 0.059 s; R1 opens 0.096 s
+dual,632,LLL,ABC,R1,held,held,0,R2 opens 0.051 s; R1 opens 0.081 s
+dual,633,LG,A,R1,held,held,34,R1 opens 0.173 s; R2 opens 0.292 s; fuse heat 34 %
+dual,633,LG,B,R1,held,held,36,R1 opens 0.178 s; R2 opens 0.210 s; fuse heat 36 %
+dual,633,LG,C,R1,held,held,33,R1 opens 0.176 s; R2 opens 0.271 s; fuse heat 33 %
+dual,633,LL,AB,R1,held,held,47,R2 opens 0.083 s; R1 opens 0.130 s; fuse heat 47 %
+dual,633,LL,BC,R1,held,held,40,R2 opens 0.073 s; R1 opens 0.146 s; fuse heat 40 %
+dual,633,LL,AC,R1,held,held,44,R2 opens 0.077 s; R1 opens 0.136 s; fuse heat 44 %
+dual,633,LLG,AB,R1,held,held,49,R2 opens 0.074 s; R1 opens 0.119 s; fuse heat 49 %
+dual,633,LLG,BC,R1,held,held,45,R2 opens 0.070 s; R1 opens 0.131 s; fuse heat 45 %
+dual,633,LLG,AC,R1,held,held,46,R2 opens 0.072 s; R1 opens 0.124 s; fuse heat 46 %
+dual,633,LLL,ABC,R1,held,held,54,R2 opens 0.060 s; R1 opens 0.106 s; fuse heat 54 %
+dual,645,LG,C,R1,held,held,12,R1 opens 0.206 s; R2 opens 0.341 s; fuse heat 12 %
+dual,645,LG,B,R1,held,held,13,R1 opens 0.210 s; R2 opens 0.242 s; fuse heat 13 %
+dual,645,LL,BC,R1,held,held,17,R2 opens 0.075 s; R1 opens 0.155 s; fuse heat 17 %
+dual,645,LLG,BC,R1,held,held,18,R2 opens 0.073 s; R1 opens 0.139 s; fuse heat 18 %
+dual,646,LG,C,R1,held,held,24,R1 opens 0.255 s; R2 opens 0.396 s; fuse heat 24 %
+dual,646,LG,B,R1,held,held,26,R1 opens 0.264 s; R2 opens 0.292 s; fuse heat 26 %
+dual,646,LL,BC,R1,held,held,31,R2 opens 0.086 s; R1 opens 0.189 s; fuse heat 31 %
+dual,646,LLG,BC,R1,held,held,34,R2 opens 0.084 s; R1 opens 0.166 s; fuse heat 34 %
+dual,671,LG,A,R2,held,DG direct,0,R2 opens 0.089 s; the DG still feeds about 616 A into the fault
+dual,671,LG,B,R2,held,DG direct,0,R2 opens 0.093 s; the DG still feeds about 689 A into the fault
+dual,671,LG,C,R2,held,DG direct,0,R2 opens 0.095 s; the DG still feeds about 644 A into the fault
+dual,671,LL,AB,R2,held,DG direct,0,R2 opens 0.059 s; the DG still feeds about 1549 A into the fault
+dual,671,LL,BC,R2,held,DG direct,0,R2 opens 0.067 s; the DG still feeds about 1668 A into the fault
+dual,671,LL,AC,R2,held,DG direct,0,R2 opens 0.063 s; the DG still feeds about 1600 A into the fault
+dual,671,LLG,AB,R2,held,DG direct,0,R2 opens 0.057 s; the DG still feeds about 1789 A into the fault
+dual,671,LLG,BC,R2,held,DG direct,0,R2 opens 0.063 s; the DG still feeds about 1793 A into the fault
+dual,671,LLG,AC,R2,held,DG direct,0,R2 opens 0.061 s; the DG still feeds about 1786 A into the fault
+dual,671,LLL,ABC,R2,held,DG direct,0,R2 opens 0.054 s; the DG still feeds about 2173 A into the fault
+dual,692,LG,A,R2,lost,DG direct,3,R2 opens 0.089 s; fuse heat 3 %; the DG still feeds about 616 A into the fault
+dual,692,LG,B,R2,lost,DG direct,3,R2 opens 0.093 s; fuse heat 3 %; the DG still feeds about 689 A into the fault
+dual,692,LG,C,R2,lost,DG direct,3,R2 opens 0.095 s; fuse heat 3 %; the DG still feeds about 644 A into the fault
+dual,692,LL,AB,R2,held,DG direct,9,R2 opens 0.059 s; fuse heat 9 %; the DG still feeds about 1549 A into the fault
+dual,692,LL,BC,R2,held,DG direct,7,R2 opens 0.067 s; fuse heat 7 %; the DG still feeds about 1668 A into the fault
+dual,692,LL,AC,R2,held,DG direct,8,R2 opens 0.063 s; fuse heat 8 %; the DG still feeds about 1600 A into the fault
+dual,692,LLG,AB,R2,held,DG direct,8,R2 opens 0.057 s; fuse heat 8 %; the DG still feeds about 1789 A into the fault
+dual,692,LLG,BC,R2,held,DG direct,6,R2 opens 0.063 s; fuse heat 6 %; the DG still feeds about 1793 A into the fault
+dual,692,LLG,AC,R2,held,DG direct,8,R2 opens 0.061 s; fuse heat 8 %; the DG still feeds about 1786 A into the fault
+dual,692,LLL,ABC,R2,held,DG direct,10,R2 opens 0.054 s; fuse heat 10 %; the DG still feeds about 2173 A into the fault
+dual,675,LG,A,R2,held,DG direct,30,R2 opens 0.101 s; fuse heat 30 %; the DG still feeds about 566 A into the fault; the DG's 566 A then melts F692-R after a further 416.01 s
+dual,675,LG,B,R2,held,DG direct,33,R2 opens 0.106 s; fuse heat 33 %; the DG still feeds about 654 A into the fault; the DG's 654 A then melts F692-R after a further 132.43 s
+dual,675,LG,C,R2,held,DG direct,31,R2 opens 0.108 s; fuse heat 31 %; the DG still feeds about 596 A into the fault; the DG's 596 A then melts F692-R after a further 275.59 s
+dual,675,LL,AB,R2,held,DG direct,71,R2 opens 0.065 s; fuse heat 71 %; the DG still feeds about 1402 A into the fault; the DG's 1503 A then melts F692-R after a further 0.58 s
+dual,675,LL,BC,R2,held,DG direct,70,R2 opens 0.075 s; fuse heat 70 %; the DG still feeds about 1521 A into the fault; the DG's 1543 A then melts F692-R after a further 0.53 s
+dual,675,LL,AC,R2,held,DG direct,68,R2 opens 0.071 s; fuse heat 68 %; the DG still feeds about 1425 A into the fault; the DG's 1483 A then melts F692-R after a further 0.66 s
+dual,675,LLG,AB,R2,held,DG direct,76,R2 opens 0.062 s; fuse heat 76 %; the DG still feeds about 1631 A into the fault; the DG's 1631 A then melts F692-R after a further 0.34 s
+dual,675,LLG,BC,R2,held,DG direct,76,R2 opens 0.070 s; fuse heat 76 %; the DG still feeds about 1661 A into the fault; the DG's 1661 A then melts F692-R after a further 0.33 s
+dual,675,LLG,AC,R2,held,DG direct,74,R2 opens 0.069 s; fuse heat 74 %; the DG still feeds about 1619 A into the fault; the DG's 1619 A then melts F692-R after a further 0.39 s
+dual,675,LLL,ABC,R2,held,DG direct,91,R2 opens 0.059 s; fuse heat 91 %; the DG still feeds about 1972 A into the fault; the DG's 1972 A then melts F692-R after a further 0.07 s
+dual,680,LG,A,R2,held,DG direct,0,R2 opens 0.127 s; the DG still feeds about 427 A into the fault
+dual,680,LG,B,R2,held,DG direct,0,R2 opens 0.137 s; the DG still feeds about 522 A into the fault
+dual,680,LG,C,R2,held,DG direct,0,R2 opens 0.138 s; the DG still feeds about 462 A into the fault
+dual,680,LL,AB,R2,held,DG direct,0,R2 opens 0.073 s; the DG still feeds about 1238 A into the fault
+dual,680,LL,BC,R2,held,DG direct,0,R2 opens 0.089 s; the DG still feeds about 1294 A into the fault
+dual,680,LL,AC,R2,held,DG direct,0,R2 opens 0.081 s; the DG still feeds about 1241 A into the fault
+dual,680,LLG,AB,R2,held,DG direct,0,R2 opens 0.072 s; the DG still feeds about 1403 A into the fault
+dual,680,LLG,BC,R2,held,DG direct,0,R2 opens 0.087 s; the DG still feeds about 1424 A into the fault
+dual,680,LLG,AC,R2,held,DG direct,0,R2 opens 0.077 s; the DG still feeds about 1290 A into the fault
+dual,680,LLL,ABC,R2,held,DG direct,0,R2 opens 0.066 s; the DG still feeds about 1703 A into the fault
+dual,684,LG,A,R2,held,DG direct,20,R2 opens 0.103 s; fuse heat 20 %; the DG still feeds about 540 A into the fault
+dual,684,LG,C,R2,held,DG direct,20,R2 opens 0.111 s; fuse heat 20 %; the DG still feeds about 571 A into the fault
+dual,684,LL,AC,R2,held,DG direct,49,R2 opens 0.072 s; fuse heat 49 %; the DG still feeds about 1385 A into the fault; the DG's 1420 A then melts F671-2 after a further 2.19 s
+dual,684,LLG,AC,R2,held,DG direct,51,R2 opens 0.069 s; fuse heat 51 %; the DG still feeds about 1456 A into the fault; the DG's 1456 A then melts F671-2 after a further 1.89 s
+dual,652,LG,A,R2,held,DG direct,89,R2 opens 0.123 s; fuse heat 89 %; the DG still feeds about 478 A into the fault; the DG's 478 A then melts F652 after a further 1.65 s
+dual,611,LG,C,R2,held,DG direct,47,R2 opens 0.128 s; fuse heat 47 %; the DG still feeds about 517 A into the fault; the DG's 517 A then melts F684 after a further 122.81 s
+dual,DL,LG,A,R1,held,held,33,R1 opens 0.216 s; R2 opens 0.227 s; fuse heat 33 %
+dual,DL,LG,B,R1,held,held,31,R2 opens 0.181 s; R1 opens 0.221 s; fuse heat 31 %
+dual,DL,LG,C,R1,held,held,31,R2 opens 0.212 s; R1 opens 0.221 s; fuse heat 31 %
+dual,DL,LL,AB,R1,held,held,47,R2 opens 0.060 s; R1 opens 0.128 s; fuse heat 47 %
+dual,DL,LL,BC,R1,held,held,41,R2 opens 0.056 s; R1 opens 0.151 s; fuse heat 41 %
+dual,DL,LL,AC,R1,held,held,43,R2 opens 0.058 s; R1 opens 0.141 s; fuse heat 43 %
+dual,DL,LLG,AB,R1,held,held,50,R2 opens 0.055 s; R1 opens 0.119 s; fuse heat 50 %
+dual,DL,LLG,BC,R1,held,held,45,R2 opens 0.055 s; R1 opens 0.136 s; fuse heat 45 %
+dual,DL,LLG,AC,R1,held,held,46,R2 opens 0.054 s; R1 opens 0.132 s; fuse heat 46 %
+dual,DL,LLL,ABC,R1,held,held,57,R2 opens 0.048 s; R1 opens 0.106 s; fuse heat 57 %

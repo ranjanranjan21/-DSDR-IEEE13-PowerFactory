@@ -1,0 +1,19 @@
+# Only the replication and the PowerFactory model are published.
+/*
+!/.gitignore
+!/README.md
+!/IEEE 13 Node Feeder.pfd
+!/Replication/
+
+# not in the repository
+__pycache__/
+*.pyc
+Replication/error/
+Replication/report_overleaf.zip
+Replication/report/main_preview.pdf
+Replication/results/_pdf_tmp/
+*_new.csv
+*_new.png
+# contains figures reproduced from the IEEE paper (copyright) - regenerate with make_comparison_pdf.py
+Replication/results/Comparison_Paper_vs_Replication.pdf
+Replication/results/Paper_vs_Our_Results.pdf

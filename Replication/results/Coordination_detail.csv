@@ -1,0 +1,169 @@
+scheme,node,fault,phases,primary fuse,I fuse (A),MMT (s),TCT (s),reclosers: fast / delayed,status,reason
+conventional (Fig. 14),632,LG,A,,0,,,R1 3376 A: 0.136 / 2.723 s | R2 652 A: 0.944 / no trip s,held,
+conventional (Fig. 14),632,LG,B,,0,,,R1 3339 A: 0.139 / 2.773 s | R2 721 A: 0.738 / no trip s,held,
+conventional (Fig. 14),632,LG,C,,0,,,R1 3339 A: 0.139 / 2.773 s | R2 667 A: 0.893 / no trip s,held,
+conventional (Fig. 14),632,LL,AB,,0,,,R1 4194 A: 0.097 / 1.942 s | R2 1404 A: 0.180 / 11.590 s,held,
+conventional (Fig. 14),632,LL,BC,,0,,,R1 3863 A: 0.110 / 2.201 s | R2 1491 A: 0.162 / 9.983 s,held,
+conventional (Fig. 14),632,LL,AC,,0,,,R1 3987 A: 0.105 / 2.097 s | R2 1435 A: 0.173 / 10.972 s,held,
+conventional (Fig. 14),632,LLG,AB,,0,,,R1 4436 A: 0.089 / 1.788 s | R2 1537 A: 0.154 / 9.241 s,held,
+conventional (Fig. 14),632,LLG,BC,,0,,,R1 4155 A: 0.098 / 1.970 s | R2 1546 A: 0.152 / 9.101 s,held,
+conventional (Fig. 14),632,LLG,AC,,0,,,R1 4222 A: 0.096 / 1.923 s | R2 1536 A: 0.154 / 9.251 s,held,
+conventional (Fig. 14),632,LLL,ABC,,0,,,R1 4734 A: 0.081 / 1.627 s | R2 1813 A: 0.118 / 6.111 s,held,
+conventional (Fig. 14),633,LG,A,F633,3436,0.156,0.238,R1 2929 A: 0.173 / 3.454 s | R2 544 A: no trip / no trip s,lost,R2 does not pick up (544 A); F633 melts (0.156 s) before R1 fast (0.173 s)
+conventional (Fig. 14),633,LG,B,F633,3443,0.155,0.237,R1 2874 A: 0.178 / 3.567 s | R2 644 A: 0.974 / no trip s,lost,F633 melts (0.155 s) before R1 fast (0.178 s); F633 melts (0.155 s) before R2 fast (0.974 s)
+conventional (Fig. 14),633,LG,C,F633,3365,0.164,0.251,R1 2892 A: 0.176 / 3.530 s | R2 564 A: no trip / no trip s,lost,R2 does not pick up (564 A); F633 melts (0.164 s) before R1 fast (0.176 s)
+conventional (Fig. 14),633,LL,AB,F633,4610,0.078,0.127,R1 3479 A: 0.130 / 2.595 s | R2 1144 A: 0.263 / no trip s,lost,F633 melts (0.078 s) before R1 fast (0.130 s); F633 melts (0.078 s) before R2 fast (0.263 s)
+conventional (Fig. 14),633,LL,BC,F633,4359,0.089,0.142,R1 3235 A: 0.146 / 2.921 s | R2 1264 A: 0.217 / 15.112 s,lost,F633 melts (0.089 s) before R1 fast (0.146 s); F633 melts (0.089 s) before R2 fast (0.217 s)
+conventional (Fig. 14),633,LL,AC,F633,4502,0.082,0.133,R1 3378 A: 0.136 / 2.721 s | R2 1206 A: 0.237 / 16.998 s,lost,F633 melts (0.082 s) before R1 fast (0.136 s); F633 melts (0.082 s) before R2 fast (0.237 s)
+conventional (Fig. 14),633,LLG,AB,F633,4889,0.069,0.112,R1 3683 A: 0.119 / 2.370 s | R2 1250 A: 0.222 / 15.521 s,lost,F633 melts (0.069 s) before R1 fast (0.119 s); F633 melts (0.069 s) before R2 fast (0.222 s)
+conventional (Fig. 14),633,LLG,BC,F633,4669,0.076,0.124,R1 3451 A: 0.131 / 2.628 s | R2 1308 A: 0.204 / 13.856 s,lost,F633 melts (0.076 s) before R1 fast (0.131 s); F633 melts (0.076 s) before R2 fast (0.204 s)
+conventional (Fig. 14),633,LLG,AC,F633,4732,0.074,0.120,R1 3584 A: 0.124 / 2.474 s | R2 1284 A: 0.211 / 14.509 s,lost,F633 melts (0.074 s) before R1 fast (0.124 s); F633 melts (0.074 s) before R2 fast (0.211 s)
+conventional (Fig. 14),633,LLL,ABC,F633,5426,0.055,0.091,R1 3970 A: 0.106 / 2.111 s | R2 1500 A: 0.160 / 9.830 s,lost,F633 melts (0.055 s) before R1 fast (0.106 s); F633 melts (0.055 s) before R2 fast (0.160 s)
+conventional (Fig. 14),645,LG,C,F632,3102,0.692,1.247,R1 2648 A: 0.206 / 4.125 s | R2 504 A: no trip / no trip s,lost,R2 does not pick up (504 A)
+conventional (Fig. 14),645,LG,B,F632,3152,0.659,1.172,R1 2620 A: 0.210 / 4.205 s | R2 595 A: no trip / no trip s,lost,R2 does not pick up (595 A)
+conventional (Fig. 14),645,LL,BC,F632,4191,0.286,0.459,R1 3124 A: 0.155 / 3.095 s | R2 1232 A: 0.228 / 16.106 s,held,
+conventional (Fig. 14),645,LLG,BC,F632,4350,0.260,0.413,R1 3330 A: 0.139 / 2.785 s | R2 1262 A: 0.218 / 15.151 s,held,
+conventional (Fig. 14),646,LG,C,F646,2732,0.394,0.627,R1 2359 A: 0.255 / 5.105 s | R2 469 A: no trip / no trip s,lost,R2 does not pick up (469 A)
+conventional (Fig. 14),646,LG,B,F646,2765,0.380,0.603,R1 2318 A: 0.264 / 5.277 s | R2 544 A: no trip / no trip s,lost,R2 does not pick up (544 A)
+conventional (Fig. 14),646,LL,BC,F646,3672,0.178,0.275,R1 2785 A: 0.189 / 3.770 s | R2 1114 A: 0.278 / no trip s,lost,F646 melts (0.178 s) before R1 fast (0.189 s); F646 melts (0.178 s) before R2 fast (0.278 s)
+conventional (Fig. 14),646,LLG,BC,F646,3854,0.158,0.245,R1 3000 A: 0.166 / 3.314 s | R2 1135 A: 0.267 / no trip s,lost,F646 melts (0.158 s) before R1 fast (0.166 s); F646 melts (0.158 s) before R2 fast (0.267 s)
+conventional (Fig. 14),671,LG,A,,0,,,R2 2182 A: 0.089 / 3.958 s,held,
+conventional (Fig. 14),671,LG,B,,0,,,R2 2116 A: 0.093 / 4.258 s,held,
+conventional (Fig. 14),671,LG,C,,0,,,R2 2087 A: 0.095 / 4.397 s,held,
+conventional (Fig. 14),671,LL,AB,,0,,,R2 3059 A: 0.059 / 1.930 s,held,
+conventional (Fig. 14),671,LL,BC,,0,,,R2 2702 A: 0.067 / 2.481 s,held,
+conventional (Fig. 14),671,LL,AC,,0,,,R2 2863 A: 0.063 / 2.202 s,held,
+conventional (Fig. 14),671,LLG,AB,,0,,,R2 3175 A: 0.057 / 1.804 s,held,
+conventional (Fig. 14),671,LLG,BC,,0,,,R2 2857 A: 0.063 / 2.211 s,held,
+conventional (Fig. 14),671,LLG,AC,,0,,,R2 2935 A: 0.061 / 2.092 s,held,
+conventional (Fig. 14),671,LLL,ABC,,0,,,R2 3391 A: 0.054 / 1.600 s,held,
+conventional (Fig. 14),692,LG,A,F671-1,2100,0.903,1.681,R2 2182 A: 0.089 / 3.958 s,held,
+conventional (Fig. 14),692,LG,B,F671-1,2031,1.015,1.928,R2 2116 A: 0.093 / 4.258 s,held,
+conventional (Fig. 14),692,LG,C,F671-1,2000,1.075,2.063,R2 2087 A: 0.095 / 4.397 s,held,
+conventional (Fig. 14),692,LL,AB,F671-1,3128,0.270,0.418,R2 3059 A: 0.059 / 1.930 s,held,
+conventional (Fig. 14),692,LL,BC,F671-1,2815,0.362,0.571,R2 2702 A: 0.067 / 2.481 s,held,
+conventional (Fig. 14),692,LL,AC,F671-1,2955,0.315,0.492,R2 2863 A: 0.063 / 2.202 s,held,
+conventional (Fig. 14),692,LLG,AB,F671-1,3104,0.275,0.427,R2 3175 A: 0.057 / 1.804 s,held,
+conventional (Fig. 14),692,LLG,BC,F671-1,2783,0.374,0.591,R2 2857 A: 0.063 / 2.211 s,held,
+conventional (Fig. 14),692,LLG,AC,F671-1,2977,0.308,0.482,R2 2935 A: 0.061 / 2.092 s,held,
+conventional (Fig. 14),692,LLL,ABC,F671-1,3391,0.218,0.337,R2 3391 A: 0.054 / 1.600 s,held,
+conventional (Fig. 14),675,LG,A,F692-R,2569,0.187,0.289,R2 2003 A: 0.101 / 4.839 s,held,
+conventional (Fig. 14),675,LG,B,F692-R,2599,0.181,0.281,R2 1945 A: 0.106 / 5.183 s,held,
+conventional (Fig. 14),675,LG,C,F692-R,2511,0.198,0.305,R2 1914 A: 0.108 / 5.383 s,held,
+conventional (Fig. 14),675,LL,AB,F692-R,4289,0.054,0.096,R2 2786 A: 0.065 / 2.330 s,lost,F692-R melts (0.054 s) before R2 fast (0.065 s)
+conventional (Fig. 14),675,LL,BC,F692-R,4025,0.063,0.109,R2 2483 A: 0.075 / 2.954 s,lost,F692-R melts (0.063 s) before R2 fast (0.075 s)
+conventional (Fig. 14),675,LL,AC,F692-R,4074,0.061,0.106,R2 2591 A: 0.071 / 2.706 s,lost,F692-R melts (0.061 s) before R2 fast (0.071 s)
+conventional (Fig. 14),675,LLG,AB,F692-R,4520,0.048,0.086,R2 2889 A: 0.062 / 2.162 s,lost,F692-R melts (0.048 s) before R2 fast (0.062 s)
+conventional (Fig. 14),675,LLG,BC,F692-R,4286,0.054,0.096,R2 2625 A: 0.070 / 2.634 s,lost,F692-R melts (0.054 s) before R2 fast (0.070 s)
+conventional (Fig. 14),675,LLG,AC,F692-R,4263,0.055,0.097,R2 2644 A: 0.069 / 2.595 s,lost,F692-R melts (0.055 s) before R2 fast (0.069 s)
+conventional (Fig. 14),675,LLL,ABC,F692-R,5022,0.038,0.071,R2 3050 A: 0.059 / 1.941 s,lost,F692-R melts (0.038 s) before R2 fast (0.059 s)
+conventional (Fig. 14),680,LG,A,,0,,,R2 1729 A: 0.127 / 6.883 s,held,
+conventional (Fig. 14),680,LG,B,,0,,,R2 1653 A: 0.137 / 7.696 s,held,
+conventional (Fig. 14),680,LG,C,,0,,,R2 1641 A: 0.138 / 7.845 s,held,
+conventional (Fig. 14),680,LL,AB,,0,,,R2 2517 A: 0.073 / 2.872 s,held,
+conventional (Fig. 14),680,LL,BC,,0,,,R2 2181 A: 0.089 / 3.963 s,held,
+conventional (Fig. 14),680,LL,AC,,0,,,R2 2334 A: 0.081 / 3.381 s,held,
+conventional (Fig. 14),680,LLG,AB,,0,,,R2 2545 A: 0.072 / 2.807 s,held,
+conventional (Fig. 14),680,LLG,BC,,0,,,R2 2224 A: 0.087 / 3.786 s,held,
+conventional (Fig. 14),680,LLG,AC,,0,,,R2 2423 A: 0.077 / 3.105 s,held,
+conventional (Fig. 14),680,LLL,ABC,,0,,,R2 2757 A: 0.066 / 2.381 s,held,
+conventional (Fig. 14),684,LG,A,F671-2,2512,0.505,0.829,R2 1972 A: 0.103 / 5.022 s,held,
+conventional (Fig. 14),684,LG,C,F671-2,2449,0.547,0.907,R2 1878 A: 0.111 / 5.632 s,held,
+conventional (Fig. 14),684,LL,AC,F671-2,3963,0.148,0.230,R2 2543 A: 0.072 / 2.813 s,held,
+conventional (Fig. 14),684,LLG,AC,F671-2,4107,0.136,0.211,R2 2651 A: 0.069 / 2.581 s,held,
+conventional (Fig. 14),652,LG,A,F652,2239,0.138,0.193,R2 1761 A: 0.123 / 6.570 s,held,
+conventional (Fig. 14),611,LG,C,F684,2236,0.271,0.414,R2 1718 A: 0.128 / 6.986 s,held,
+conventional (Fig. 14),DL,LG,A,F-DL,3161,0.191,0.291,R1 2582 A: 0.216 / 4.317 s | R2 617 A: 1.079 / no trip s,lost,F-DL melts (0.191 s) before R1 fast (0.216 s); F-DL melts (0.191 s) before R2 fast (1.079 s)
+conventional (Fig. 14),DL,LG,B,F-DL,3174,0.189,0.288,R1 2548 A: 0.221 / 4.422 s | R2 699 A: 0.796 / no trip s,lost,F-DL melts (0.189 s) before R1 fast (0.221 s); F-DL melts (0.189 s) before R2 fast (0.796 s)
+conventional (Fig. 14),DL,LG,C,F-DL,3100,0.200,0.305,R1 2549 A: 0.221 / 4.418 s | R2 640 A: 0.986 / no trip s,lost,F-DL melts (0.200 s) before R1 fast (0.221 s); F-DL melts (0.200 s) before R2 fast (0.986 s)
+conventional (Fig. 14),DL,LL,AB,F-DL,4968,0.066,0.109,R1 3507 A: 0.128 / 2.562 s | R2 1504 A: 0.159 / 9.766 s,lost,F-DL melts (0.066 s) before R1 fast (0.128 s); F-DL melts (0.066 s) before R2 fast (0.159 s)
+conventional (Fig. 14),DL,LL,BC,F-DL,4685,0.075,0.123,R1 3166 A: 0.151 / 3.028 s | R2 1608 A: 0.143 / 8.247 s,lost,F-DL melts (0.075 s) before R1 fast (0.151 s); F-DL melts (0.075 s) before R2 fast (0.143 s)
+conventional (Fig. 14),DL,LL,AC,F-DL,4778,0.072,0.118,R1 3305 A: 0.141 / 2.820 s | R2 1568 A: 0.149 / 8.787 s,lost,F-DL melts (0.072 s) before R1 fast (0.141 s); F-DL melts (0.072 s) before R2 fast (0.149 s)
+conventional (Fig. 14),DL,LLG,AB,F-DL,5270,0.058,0.096,R1 3668 A: 0.119 / 2.385 s | R2 1646 A: 0.138 / 7.786 s,lost,F-DL melts (0.058 s) before R1 fast (0.119 s); F-DL melts (0.058 s) before R2 fast (0.138 s)
+conventional (Fig. 14),DL,LLG,BC,F-DL,4958,0.067,0.109,R1 3374 A: 0.136 / 2.726 s | R2 1663 A: 0.135 / 7.583 s,lost,F-DL melts (0.067 s) before R1 fast (0.136 s); F-DL melts (0.067 s) before R2 fast (0.135 s)
+conventional (Fig. 14),DL,LLG,AC,F-DL,5014,0.065,0.107,R1 3449 A: 0.132 / 2.631 s | R2 1670 A: 0.134 / 7.506 s,lost,F-DL melts (0.065 s) before R1 fast (0.132 s); F-DL melts (0.065 s) before R2 fast (0.134 s)
+conventional (Fig. 14),DL,LLL,ABC,F-DL,5902,0.046,0.078,R1 3954 A: 0.106 / 2.123 s | R2 1972 A: 0.103 / 5.022 s,lost,F-DL melts (0.046 s) before R1 fast (0.106 s); F-DL melts (0.046 s) before R2 fast (0.103 s)
+DSDR (Fig. 17),632,LG,A,,0,,,R1 3376 A: 0.136 / 2.723 s | R2 rev 652 A: 0.206 / 13.963 s,held,
+DSDR (Fig. 17),632,LG,B,,0,,,R1 3339 A: 0.139 / 2.773 s | R2 rev 721 A: 0.172 / 10.834 s,held,
+DSDR (Fig. 17),632,LG,C,,0,,,R1 3339 A: 0.139 / 2.773 s | R2 rev 667 A: 0.197 / 13.194 s,held,
+DSDR (Fig. 17),632,LL,AB,,0,,,R1 4194 A: 0.097 / 1.942 s | R2 rev 1404 A: 0.064 / 2.291 s,held,
+DSDR (Fig. 17),632,LL,BC,,0,,,R1 3863 A: 0.110 / 2.201 s | R2 rev 1491 A: 0.060 / 2.026 s,held,
+DSDR (Fig. 17),632,LL,AC,,0,,,R1 3987 A: 0.105 / 2.097 s | R2 rev 1435 A: 0.063 / 2.190 s,held,
+DSDR (Fig. 17),632,LLG,AB,,0,,,R1 4436 A: 0.089 / 1.788 s | R2 rev 1537 A: 0.059 / 1.913 s,held,
+DSDR (Fig. 17),632,LLG,BC,,0,,,R1 4155 A: 0.098 / 1.970 s | R2 rev 1546 A: 0.058 / 1.892 s,held,
+DSDR (Fig. 17),632,LLG,AC,,0,,,R1 4222 A: 0.096 / 1.923 s | R2 rev 1536 A: 0.059 / 1.914 s,held,
+DSDR (Fig. 17),632,LLL,ABC,,0,,,R1 4734 A: 0.081 / 1.627 s | R2 rev 1813 A: 0.051 / 1.416 s,held,
+DSDR (Fig. 17),633,LG,A,F633,3436,0.504,0.852,R1 2929 A: 0.173 / 3.454 s | R2 rev 544 A: 0.292 / no trip s,held,
+DSDR (Fig. 17),633,LG,B,F633,3443,0.502,0.846,R1 2874 A: 0.178 / 3.567 s | R2 rev 644 A: 0.210 / 14.426 s,held,
+DSDR (Fig. 17),633,LG,C,F633,3365,0.538,0.915,R1 2892 A: 0.176 / 3.530 s | R2 rev 564 A: 0.271 / no trip s,held,
+DSDR (Fig. 17),633,LL,AB,F633,4610,0.223,0.353,R1 3479 A: 0.130 / 2.595 s | R2 rev 1144 A: 0.083 / 3.542 s,held,
+DSDR (Fig. 17),633,LL,BC,F633,4359,0.258,0.410,R1 3235 A: 0.146 / 2.921 s | R2 rev 1264 A: 0.073 / 2.849 s,held,
+DSDR (Fig. 17),633,LL,AC,F633,4502,0.237,0.376,R1 3378 A: 0.136 / 2.721 s | R2 rev 1206 A: 0.077 / 3.137 s,held,
+DSDR (Fig. 17),633,LLG,AB,F633,4889,0.191,0.302,R1 3683 A: 0.119 / 2.370 s | R2 rev 1250 A: 0.074 / 2.912 s,held,
+DSDR (Fig. 17),633,LLG,BC,F633,4669,0.215,0.341,R1 3451 A: 0.131 / 2.628 s | R2 rev 1308 A: 0.070 / 2.653 s,held,
+DSDR (Fig. 17),633,LLG,AC,F633,4732,0.208,0.329,R1 3584 A: 0.124 / 2.474 s | R2 rev 1284 A: 0.072 / 2.755 s,held,
+DSDR (Fig. 17),633,LLL,ABC,F633,5426,0.149,0.235,R1 3970 A: 0.106 / 2.111 s | R2 rev 1500 A: 0.060 / 2.001 s,held,
+DSDR (Fig. 17),645,LG,C,F632,3102,1.757,3.256,R1 2648 A: 0.206 / 4.125 s | R2 rev 504 A: 0.341 / no trip s,held,
+DSDR (Fig. 17),645,LG,B,F632,3152,1.658,3.020,R1 2620 A: 0.210 / 4.205 s | R2 rev 595 A: 0.242 / no trip s,held,
+DSDR (Fig. 17),645,LL,BC,F632,4191,0.613,0.970,R1 3124 A: 0.155 / 3.095 s | R2 rev 1232 A: 0.075 / 3.002 s,held,
+DSDR (Fig. 17),645,LLG,BC,F632,4350,0.546,0.855,R1 3330 A: 0.139 / 2.785 s | R2 rev 1262 A: 0.073 / 2.854 s,held,
+DSDR (Fig. 17),646,LG,C,F646,2732,1.057,2.058,R1 2359 A: 0.255 / 5.105 s | R2 rev 469 A: 0.396 / no trip s,held,
+DSDR (Fig. 17),646,LG,B,F646,2765,1.012,1.954,R1 2318 A: 0.264 / 5.277 s | R2 rev 544 A: 0.292 / no trip s,held,
+DSDR (Fig. 17),646,LL,BC,F646,3672,0.415,0.684,R1 2785 A: 0.189 / 3.770 s | R2 rev 1114 A: 0.086 / 3.771 s,held,
+DSDR (Fig. 17),646,LLG,BC,F646,3854,0.362,0.588,R1 3000 A: 0.166 / 3.314 s | R2 rev 1135 A: 0.084 / 3.607 s,held,
+DSDR (Fig. 17),671,LG,A,,0,,,R2 2182 A: 0.089 / 3.958 s,held,
+DSDR (Fig. 17),671,LG,B,,0,,,R2 2116 A: 0.093 / 4.258 s,held,
+DSDR (Fig. 17),671,LG,C,,0,,,R2 2087 A: 0.095 / 4.397 s,held,
+DSDR (Fig. 17),671,LL,AB,,0,,,R2 3059 A: 0.059 / 1.930 s,held,
+DSDR (Fig. 17),671,LL,BC,,0,,,R2 2702 A: 0.067 / 2.481 s,held,
+DSDR (Fig. 17),671,LL,AC,,0,,,R2 2863 A: 0.063 / 2.202 s,held,
+DSDR (Fig. 17),671,LLG,AB,,0,,,R2 3175 A: 0.057 / 1.804 s,held,
+DSDR (Fig. 17),671,LLG,BC,,0,,,R2 2857 A: 0.063 / 2.211 s,held,
+DSDR (Fig. 17),671,LLG,AC,,0,,,R2 2935 A: 0.061 / 2.092 s,held,
+DSDR (Fig. 17),671,LLL,ABC,,0,,,R2 3391 A: 0.054 / 1.600 s,held,
+DSDR (Fig. 17),692,LG,A,F671-1,2100,2.842,7.580,R2 2182 A: 0.089 / 3.958 s,lost,R2 delayed (3.958 s) before F671-1 clears (7.580 s)
+DSDR (Fig. 17),692,LG,B,F671-1,2031,3.268,9.150,R2 2116 A: 0.093 / 4.258 s,lost,R2 delayed (4.258 s) before F671-1 clears (9.150 s)
+DSDR (Fig. 17),692,LG,C,F671-1,2000,3.492,9.997,R2 2087 A: 0.095 / 4.397 s,lost,R2 delayed (4.397 s) before F671-1 clears (9.997 s)
+DSDR (Fig. 17),692,LL,AB,F671-1,3128,0.674,1.207,R2 3059 A: 0.059 / 1.930 s,held,
+DSDR (Fig. 17),692,LL,BC,F671-1,2815,0.952,1.824,R2 2702 A: 0.067 / 2.481 s,held,
+DSDR (Fig. 17),692,LL,AC,F671-1,2955,0.810,1.507,R2 2863 A: 0.063 / 2.202 s,held,
+DSDR (Fig. 17),692,LLG,AB,F671-1,3104,0.691,1.243,R2 3175 A: 0.057 / 1.804 s,held,
+DSDR (Fig. 17),692,LLG,BC,F671-1,2783,0.989,1.906,R2 2857 A: 0.063 / 2.211 s,held,
+DSDR (Fig. 17),692,LLG,AC,F671-1,2977,0.790,1.464,R2 2935 A: 0.061 / 2.092 s,held,
+DSDR (Fig. 17),692,LLL,ABC,F671-1,3391,0.525,0.891,R2 3391 A: 0.054 / 1.600 s,held,
+DSDR (Fig. 17),675,LG,A,F692-R,2569,0.331,0.506,R2 2003 A: 0.101 / 4.839 s,held,
+DSDR (Fig. 17),675,LG,B,F692-R,2599,0.321,0.489,R2 1945 A: 0.106 / 5.183 s,held,
+DSDR (Fig. 17),675,LG,C,F692-R,2511,0.354,0.541,R2 1914 A: 0.108 / 5.383 s,held,
+DSDR (Fig. 17),675,LL,AB,F692-R,4289,0.092,0.147,R2 2786 A: 0.065 / 2.330 s,held,
+DSDR (Fig. 17),675,LL,BC,F692-R,4025,0.107,0.168,R2 2483 A: 0.075 / 2.954 s,held,
+DSDR (Fig. 17),675,LL,AC,F692-R,4074,0.104,0.164,R2 2591 A: 0.071 / 2.706 s,held,
+DSDR (Fig. 17),675,LLG,AB,F692-R,4520,0.082,0.132,R2 2889 A: 0.062 / 2.162 s,held,
+DSDR (Fig. 17),675,LLG,BC,F692-R,4286,0.092,0.147,R2 2625 A: 0.070 / 2.634 s,held,
+DSDR (Fig. 17),675,LLG,AC,F692-R,4263,0.093,0.149,R2 2644 A: 0.069 / 2.595 s,held,
+DSDR (Fig. 17),675,LLL,ABC,F692-R,5022,0.065,0.106,R2 3050 A: 0.059 / 1.941 s,held,
+DSDR (Fig. 17),680,LG,A,,0,,,R2 1729 A: 0.127 / 6.883 s,held,
+DSDR (Fig. 17),680,LG,B,,0,,,R2 1653 A: 0.137 / 7.696 s,held,
+DSDR (Fig. 17),680,LG,C,,0,,,R2 1641 A: 0.138 / 7.845 s,held,
+DSDR (Fig. 17),680,LL,AB,,0,,,R2 2517 A: 0.073 / 2.872 s,held,
+DSDR (Fig. 17),680,LL,BC,,0,,,R2 2181 A: 0.089 / 3.963 s,held,
+DSDR (Fig. 17),680,LL,AC,,0,,,R2 2334 A: 0.081 / 3.381 s,held,
+DSDR (Fig. 17),680,LLG,AB,,0,,,R2 2545 A: 0.072 / 2.807 s,held,
+DSDR (Fig. 17),680,LLG,BC,,0,,,R2 2224 A: 0.087 / 3.786 s,held,
+DSDR (Fig. 17),680,LLG,AC,,0,,,R2 2423 A: 0.077 / 3.105 s,held,
+DSDR (Fig. 17),680,LLL,ABC,,0,,,R2 2757 A: 0.066 / 2.381 s,held,
+DSDR (Fig. 17),684,LG,A,F671-2,2512,0.505,0.829,R2 1972 A: 0.103 / 5.022 s,held,
+DSDR (Fig. 17),684,LG,C,F671-2,2449,0.547,0.907,R2 1878 A: 0.111 / 5.632 s,held,
+DSDR (Fig. 17),684,LL,AC,F671-2,3963,0.148,0.230,R2 2543 A: 0.072 / 2.813 s,held,
+DSDR (Fig. 17),684,LLG,AC,F671-2,4107,0.136,0.211,R2 2651 A: 0.069 / 2.581 s,held,
+DSDR (Fig. 17),652,LG,A,F652,2239,0.138,0.193,R2 1761 A: 0.123 / 6.570 s,held,
+DSDR (Fig. 17),611,LG,C,F684,2236,0.271,0.414,R2 1718 A: 0.128 / 6.986 s,held,
+DSDR (Fig. 17),DL,LG,A,F-DL,3161,0.652,1.158,R1 2582 A: 0.216 / 4.317 s | R2 rev 617 A: 0.227 / 16.037 s,held,
+DSDR (Fig. 17),DL,LG,B,F-DL,3174,0.644,1.140,R1 2548 A: 0.221 / 4.422 s | R2 rev 699 A: 0.181 / 11.719 s,held,
+DSDR (Fig. 17),DL,LG,C,F-DL,3100,0.693,1.249,R1 2549 A: 0.221 / 4.418 s | R2 rev 640 A: 0.212 / 14.615 s,held,
+DSDR (Fig. 17),DL,LL,AB,F-DL,4968,0.184,0.290,R1 3507 A: 0.128 / 2.562 s | R2 rev 1504 A: 0.060 / 1.991 s,held,
+DSDR (Fig. 17),DL,LL,BC,F-DL,4685,0.213,0.338,R1 3166 A: 0.151 / 3.028 s | R2 rev 1608 A: 0.056 / 1.761 s,held,
+DSDR (Fig. 17),DL,LL,AC,F-DL,4778,0.202,0.321,R1 3305 A: 0.141 / 2.820 s | R2 rev 1568 A: 0.058 / 1.844 s,held,
+DSDR (Fig. 17),DL,LLG,AB,F-DL,5270,0.160,0.252,R1 3668 A: 0.119 / 2.385 s | R2 rev 1646 A: 0.055 / 1.689 s,held,
+DSDR (Fig. 17),DL,LLG,BC,F-DL,4958,0.185,0.292,R1 3374 A: 0.136 / 2.726 s | R2 rev 1663 A: 0.055 / 1.657 s,held,
+DSDR (Fig. 17),DL,LLG,AC,F-DL,5014,0.180,0.284,R1 3449 A: 0.132 / 2.631 s | R2 rev 1670 A: 0.054 / 1.645 s,held,
+DSDR (Fig. 17),DL,LLL,ABC,F-DL,5902,0.121,0.193,R1 3954 A: 0.106 / 2.123 s | R2 rev 1972 A: 0.048 / 1.213 s,held,
