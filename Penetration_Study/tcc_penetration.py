@@ -66,13 +66,28 @@ def draw(ax, node, levels, legend=True, compact=False):
         t_f, t_r = f["t_fuse_MMT"], f["t_rec_fast"]
         ax.plot([i_f], [t_f], marker="s", ms=7, color=col, mec="white", mew=1.0, zorder=6)
         ax.plot([i_r], [t_r], marker="o", ms=7, color=col, mec="white", mew=1.0, zorder=6)
-        ax.plot([i_r, i_f], [t_r, t_f], color=col, lw=0.8, ls=":", zorder=5)
+        # vertical short-circuit lines: the fuse and the recloser carry different currents with the DG
+        ax.axvline(i_f, color=FUSEC if compact else col, lw=1.0 if compact else 0.6, ls="-." if compact else ":", alpha=0.9, zorder=3)
+        ax.axvline(i_r, color=BLUE if compact else col, lw=1.0 if compact else 0.6, ls="-." if compact else ":", alpha=0.9, zorder=3)
         if compact:
-            ax.text(0.03, 0.04, "DG %d %% (%.2f MVA)\nfuse %.0f A: melts %.3f s\n%s %.0f A: fast %.3f s\nCTI %+.0f ms" % (
-                p, 4.05 * p / 100, i_f, t_f, c["rec"], i_r, t_r, 1000 * (t_f - t_r)),
-                transform=ax.transAxes, fontsize=7, va="bottom",
-                bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=GRID),
-                color="#9e1b12" if t_f < t_r else "#1a1a1a")
+            # operating times read off on the time axis, and the CTI between them
+            xa = max(i_f, i_r) * 1.45
+            for t_, c_, lab in ((t_f, FUSEC, "t_MMT"), (t_r, BLUE, "t_fast")):
+                ax.plot([500, xa], [t_, t_], color=c_, lw=0.8, ls=":", zorder=3)
+                ax.text(520, t_, "%s %.3f s" % (lab, t_), fontsize=6.4, color=c_,
+                        va="bottom" if t_ >= max(t_f, t_r) else "top")
+            col_cti = "#9e1b12" if t_f < t_r else "#1a1a1a"
+            ax.annotate("", xy=(xa, t_f), xytext=(xa, t_r),
+                        arrowprops=dict(arrowstyle="<->", color=col_cti, lw=1.2, shrinkA=0, shrinkB=0), zorder=7)
+            ax.text(xa * 1.08, (t_f * t_r) ** 0.5, "CTI\n%+.0f ms" % (1000 * (t_f - t_r)), fontsize=7.2, va="center",
+                    fontweight="bold", color=col_cti)
+            # labels of the two vertical lines, staggered so that they do not overlap when the currents are close
+            ax.text(i_f, 70, " I(%s) = %.0f A" % (c["fuse"], i_f), rotation=90, fontsize=6.6, color=FUSEC, va="top",
+                    ha="right" if i_f < i_r else "left")
+            ax.text(i_r, 3.0, " I(%s) = %.0f A" % (c["rec"], i_r), rotation=90, fontsize=6.6, color=BLUE, va="top",
+                    ha="left" if i_f < i_r else "right")
+        else:
+            ax.plot([i_r, i_f], [t_r, t_f], color=col, lw=0.8, ls=":", zorder=5)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlim(500, 20000 if node == "633" else 12000)
@@ -111,7 +126,7 @@ for node in ("633", "671"):
             ax.legend(h, l, loc="center", fontsize=8, frameon=False)
             continue
         draw(ax, node, [P[k]], legend=False, compact=True)
-        ax.set_title("DG penetration %d %%" % P[k], fontsize=9.5, loc="left")
+        ax.set_title("DG penetration %d %% (%.2f MVA)" % (P[k], 4.05 * P[k] / 100), fontsize=9.5, loc="left")
     for ax in axes[1]:
         ax.set_xlabel("Current (A)")
     for ax in axes[:, 0]:
