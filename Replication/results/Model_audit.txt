@@ -1,0 +1,32 @@
+A. Projects: IEEE 13 Node Feeder, IEEE 13 Node Feeder(1), IEEE13 DG penetration 000 %, IEEE13 DG penetration 010 %, IEEE13 DG penetration 025 %, IEEE13 DG penetration 037 %, IEEE13 DG penetration 050 %, IEEE13 DG penetration 075 %, IEEE13 DG penetration 100 %, IEEE13 Fig10 EMT - DG in, IEEE13 Fig10 EMT - DG out, IEEE13 Yousaf2022 Replication
+B. Variation stage 'Substation Transformer': 13 objects
+C. Events in 'Study with Substation Transformer': none
+C. Events in 'Study Detailed Network Model': none (plus 1 without target, from the original .pfd)
+D. Relay units (expected = settings.json, DSDR)
+   R1 Fast         in service  tap 4.0 (exp 4.0)  dial 0.5 (exp 0.5)  CT 900.0/5 (exp 900.0/5)
+   R1 Delayed      in service  tap 4.0 (exp 4.0)  dial 10.0 (exp 10.0)  CT 900.0/5 (exp 900.0/5)
+   R2 Fast         in service  tap 1.5 (exp 1.5)  dial 0.10000000149011612 (exp 0.1)  CT 1000.0/5 (exp 1000.0/5)
+   R2 Delayed      in service  tap 3.0 (exp 3.0)  dial 1.0 (exp 1.0)  CT 1000.0/5 (exp 1000.0/5)
+   R2 Rev Fast     in service  tap 1.5 (exp 1.5)  dial 0.10000000149011612 (exp 0.1)  CT 500.0/5 (exp 500.0/5)
+   R2 Rev Delayed  in service  tap 3.0 (exp 3.0)  dial 1.0 (exp 1.0)  CT 500.0/5 (exp 500.0/5)
+E. Fuses (expected size = settings.json, DSDR)
+   F632    A055C500E   (exp A055C500E  ) at LOHL632-645     (exp LOHL632-645    ) in service
+   F633    A055C400E   (exp A055C400E  ) at LOHL632-633     (exp LOHL632-633    ) in service
+   F634    gL-800A     (exp gL-800A    ) at XFM-1           (exp XFM-1          ) in service
+   F645    A055C250E   (exp A055C250E  ) at L645-YcPQ       (exp L645-YcPQ      ) in service
+   F646    A055C400E   (exp A055C400E  ) at LOHL645-646     (exp LOHL645-646    ) in service
+   F-DL    A055C400E   (exp A055C400E  ) at LDL             (exp LDL            ) in service
+   F671    A055C250E   (exp A055C250E  ) at L571-DcPQ       (exp L571-DcPQ      ) in service
+   F671-1  A055C400E   (exp A055C400E  ) at Switch          (exp Switch         ) in service
+   F692    A055C200E   (exp A055C200E  ) at L692-DcI        (exp L692-DcI       ) in service
+   F692-R  A055C250E   (exp A055C250E  ) at LC692-675       (exp LC692-675      ) in service
+   F675    A055C200E   (exp A055C200E  ) at L675-YcPQ       (exp L675-YcPQ      ) in service
+   F671-2  A055C300E   (exp A055C300E  ) at LOHL671-684     (exp LOHL671-684    ) in service
+   F684    A055C200E   (exp A055C200E  ) at LOHL684-611     (exp LOHL684-611    ) in service
+   F611    A055C125E   (exp A055C125E  ) at L611-YcI        (exp L611-YcI       ) in service
+   F652    A055C150E   (exp A055C150E  ) at LC684-652A      (exp LC684-652A     ) in service
+F. DG: in service, 4.05 MVA, P 3.24 MW, Q 2.43 Mvar, transformer 4.05 MVA uk 15.0 %; Table I as recorded
+G. Load flow DG out / in: largest deviation from studies.json 0.037 %
+H. 188 bolted faults re-run (DG out and in): largest deviation from studies.json 0.086 %
+
+RESULT: model matches the pipeline's results - nothing missing or changed
