@@ -254,7 +254,7 @@ def fig4():
         ax.text(i_f * 1.12, t, "%s  %.3f s" % (lab, t), fontsize=8, va="center", color=col, fontweight="bold")
     ok = f1.tct(i_f) < 0.75 * f2.mmt(i_f)
     ax.text(0.03, 0.04, "LG fault at 652, phase a, DG out: %.0f A through both fuses\n"
-            "75 %% rule, eq. (8): F652 clears in %.3f s; 0.75 x F671-2 melting time = %.3f s  ->  %s" % (
+            "Fuse-fuse coordination, eq. (8): F652 clears in %.3f s; limit for F671-2 = %.3f s  ->  %s" % (
                 i_f, f1.tct(i_f), 0.75 * f2.mmt(i_f), "coordinated" if ok else "NOT coordinated"),
             transform=ax.transAxes, fontsize=7.8, color=INK, bbox=dict(boxstyle="round,pad=0.35", fc=SURF, ec=GRID))
     loglog(ax, "Fault current (A at 4.16 kV)")
@@ -324,7 +324,7 @@ def fig5():
     line([2.6, 7.4], [8.0, 8.0])
     arrow((X, 8.0), (X, 7.65))
     # ---- fuses, fault analysis
-    box(X, 7.25, 6.2, 0.8, "Fuse coefficients $a_i$, $b_i$ of every fuse\n(series fuses: 75 % rule)")
+    box(X, 7.25, 6.2, 0.8, "Fuse coefficients $a_i$, $b_i$ of every fuse\n(fuse-fuse coordination of series fuses)")
     arrow((X, 6.85), (X, 6.45))
     box(X, 6.05, 6.2, 0.8, "Fault analysis for every fault location and type:\ncurrents through the reclosers and fuses")
     arrow((X, 5.65), (X, 5.3))

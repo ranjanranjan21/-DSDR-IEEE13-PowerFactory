@@ -324,10 +324,9 @@ substation.
 
 \subsection{Fuse--Recloser Coordination}
 For fuse saving the fast recloser curve must lie below the minimum-melting curve of the fuse, and the delayed
-curve above its total-clearing curve. Fuses in series are coordinated with the 75\,\% rule: the downstream
-fuse must clear within 75\,\% of the melting time of the upstream fuse. Figure~
-ef{fig:f1} shows the
-principle with the curves of the model.
+curve above its total-clearing curve. Where two fuses are in series, the fuse nearer the fault must clear
+the fault before the upstream fuse starts to melt, so that only the faulted section is disconnected.
+Figure~\ref{fig:f1} shows the principle with the curves of the model.
 
 \begin{figure}[H]
 \centering
@@ -533,7 +532,7 @@ t_{MMT}(I_{fuse}) > t_F \quad\text{for every recloser that feeds the fault throu
 t_{TCT}(I_{fuse}) < t_D \quad\text{for the same reclosers,}
 \label{eq:crit2}
 \end{equation}
-together with the 75\,\% rule of eq.~\eqref{eq:75} for series fuses and a margin of at least 10~cycles
+together with the series-fuse condition of eq.~\eqref{eq:75} and a margin of at least 10~cycles
 between the delayed curves of R2 and R1. A cell (node and fault type) is held only if every phase
 combination of that fault type is held. The fuse and each recloser are evaluated at their own currents,
 because with DG they differ.
@@ -851,7 +850,8 @@ current.}
 
 \subsection{Conventional Coordination Without DG}
 With the starting fuse sizes 35 of the 39 cells are coordinated. The four lost cells are the faults
-at 675, where the series pair F692-R (250E) and F671-1 (300E) breaks the 75\,\% rule. The fuse revision of
+at 675, where the series fuses F692-R (250E) and F671-1 (300E) are not selective: F692-R does not
+clear the fault early enough before F671-1 starts to melt. The fuse revision of
 the method changes F692-R to 200E, after which all 39 cells are coordinated. Figures~\ref{fig:f8}
 and \ref{fig:f9} show two cases: R2's fast curve lies below the fuses and its delayed curve
 above them.
@@ -1150,8 +1150,8 @@ times the largest deviation is 1.22\,\%.
 \subsection{Sensitivity of the Result to the Margin}
 \label{sec:margin}
 The 38 held cells are obtained with a zero margin. If the breaker interrupting time of three cycles
-is added to the fast trip, 31 cells are held; if in addition the fuse may only be loaded to 75\,\% of its
-melting time, 26 cells are held. The pickups are a second limit: with the DG, the lowest LG fault current
+is added to the fast trip, 31 cells are held; if in addition a safety margin is kept on
+the fuse melting time, 26 cells are held. The pickups are a second limit: with the DG, the lowest LG fault current
 through 3\ohm{} is 577\,A at R1 and 368\,A at R2, below the pickups of 734.6\,A and 587.5\,A, because the DG
 supplies part of the fault.
 
