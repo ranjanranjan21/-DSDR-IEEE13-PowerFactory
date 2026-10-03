@@ -112,7 +112,7 @@ WHERE = {"F632": "lateral 632--645, at 632", "F633": "lateral 632--633, at 632",
 fr = []
 for n, (_, start, src) in FUSES.items():
     a, b = size(CONV["fuses"][n]), size(DSDR["fuses"][n])
-    source = tex(src.split(" (")[0]).replace("[8]", r"Benchmark scheme~\cite{yousaf2020},").replace("2022 ", "Paper, ")
+    source = tex(src.split(" (")[0]).replace("[8]", r"Benchmark scheme~\cite{yousaf2020},").replace("2022 ", r"Ref.~\cite{yousaf2022}, ")
     fr.append([n, WHERE[n], size(start), a, r"\textbf{%s}" % b if b != a else b, source])
 T["TABLE_FUSES"] = rows(fr)
 

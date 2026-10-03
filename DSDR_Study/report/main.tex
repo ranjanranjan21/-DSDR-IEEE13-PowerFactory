@@ -270,7 +270,6 @@ To build and validate a DIgSILENT \PF{} implementation of the DSDR protection-co
       and determine the operating times.
 \item Verify the reclosing sequence in the time domain.
 \item Study how the coordination degrades as the DG penetration rises from 0 to 100\,\%.
-\item Compare the results with the reference paper and explain the differences (Appendix~E).
 \end{enumerate}
 
 \subsection{Scope of the Study}
@@ -384,14 +383,14 @@ project adopts the method and validates it stage by stage, starting from the fee
 \chapterhead{THREE}{METHODOLOGY}
 
 \subsection{Research Methodology}
-The work follows the flowchart of the reference paper, shown in Figure~\ref{fig:flow} as it is implemented.
+The work follows the flowchart of the reference method~\cite{yousaf2022}, shown in Figure~\ref{fig:flow} as it is implemented.
 It has three stages: (A) the conventional scheme without DG, (B) the same settings with the DG connected,
 and (C) R2 as a dual-setting directional recloser with the fuse revision of the method.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.78\textwidth]{flowchart.png}
-\caption{Flowchart of the method as implemented (Fig.~5 of the reference paper).}
+\caption{Flowchart of the method as implemented.}
 \label{fig:flow}
 \end{figure}
 
@@ -401,26 +400,6 @@ IEEE 13-node model of the DIgSILENT example library; its lines, loads and regula
 the IEEE data. The study case that includes the 115/4.16\,kV, 5\,MVA substation transformer is used, because
 it reproduces the IEEE short-circuit benchmark~\cite{kersting2012}.
 
-The studies are run through the \PF{} Python interface; Table~\ref{tab:scripts} lists the scripts.
-
-\begin{table}[H]
-\centering\small
-\begin{tabularx}{\textwidth}{@{}lL@{}}
-\toprule
-\hd\textbf{Script} & \textbf{Purpose} \\
-\midrule
-\texttt{step1\_build\_model.py} & Places the 15 fuses and the two reclosers, sets the DG to Table~I (\PF) \\
-\texttt{step2\_studies.py} & Load flows and 273 short circuits; currents through every device (\PF) \\
-\texttt{step3\_design\_and\_evaluate.py} & Settings by the paper's method, classification, Tables II--IV, TCC figures \\
-\texttt{step4\_apply\_settings.py} & Writes the settings into \PF{} and compares \PF's trip times with step~3 \\
-\texttt{step5\_fig10\_emt.py} & EMT simulation of the reclosing sequence (\PF) \\
-\texttt{loadflow\_all\_buses.py}, \texttt{database\_study.py} & Load-flow and short-circuit database, DG out and in \\
-\texttt{make\_coordination\_diagrams.py} & Single setting against dual setting on selected faults \\
-\bottomrule
-\end{tabularx}
-\caption{Scripts of the study.}
-\label{tab:scripts}
-\end{table}
 
 \subsection{Load Flow Analysis}
 The load flow is the unbalanced three-phase AC load flow of \PF. It gives the rated current of every
@@ -428,18 +407,18 @@ protected branch (largest phase), the bus voltages per phase, and the current an
 reclosers with and without the DG.
 
 \subsection{Recloser Pickup Current}
-The paper specifies an overload factor of 1.25. The pickup is 1.25 times the rated current of the protected
+The method uses an overload factor of 1.25~\cite{yousaf2022}. The pickup is 1.25 times the rated current of the protected
 branch, eq.~\eqref{eq:ipfw}, and is then set on the nearest available tap of the relay.
 
 \subsection{Short-Circuit Analysis}
 Short circuits are calculated with the \emph{complete method} of \PF, which starts from the pre-fault load
 flow. LG, LL, LLG and LLL faults are applied at every node for every phase combination that exists there,
 with the DG out and in. The maximum fault current of a branch is a bolted fault at its nearest node; the
-minimum is an LG fault through 3\ohm{} at its farthest node, as in the paper. The current through R1, R2,
+minimum is an LG fault through 3\ohm{} at its farthest node~\cite{yousaf2022}. The current through R1, R2,
 every fuse and every branch of Table~II is stored for each fault.
 
 \subsection{Mathematical Formulation of the DSDR}
-The equations below are those of the reference paper; the numbering follows the paper.
+The equations below are those of the reference method~\cite{yousaf2022}.
 
 \subsubsection{Forward Fast and Delayed Operating Time}
 \begin{equation}
@@ -518,8 +497,7 @@ substation.
 
 \subsection{Device Characteristics Used in the Model}
 \label{sec:curves}
-The paper names the devices but does not print their curve constants. The model uses the curves of the \PF{}
-library for these devices.
+The model uses the time--current curves of the \PF{} library types of the protection devices.
 
 \subsubsection{R1: GE IAC77B801A}
 The operating time of R1 follows the GE IAC extremely inverse characteristic. The manufacturer gives it as
@@ -569,13 +547,13 @@ The steps of Figure~\ref{fig:flow} are applied as follows.
 \begin{enumerate}
 \item Load flow without DG: rated currents (Table~II) and pickups, eq.~\eqref{eq:ipfw}.
 \item Short-circuit study: minimum and maximum fault currents (Table~II).
-\item Recloser dials: R1 as given in the paper; R2 fast at the lowest dial, R2 delayed at the highest dial that
+\item Recloser dials: R1 at TDS 0.5 (fast) and 10 (delayed); R2 fast at the lowest dial, R2 delayed at the highest dial that
       stays 10~cycles below R1.
 \item Fuse coefficients, eqs.~\eqref{eq:bi} and \eqref{eq:biseries} (Table~III), and check of the installed fuses.
 \item Classification without DG; fuse revision until every cell is held.
 \item DG connected, settings unchanged: classification (Fig.~14).
 \item Reverse pickup of R2, eq.~\eqref{eq:iprv}, and reverse dials.
-\item Revision of the dials (step~8 of the paper) and of the fuse sizes (step~9) until the cells are held.
+\item Revision of the dials (step~8 of the method) and of the fuse sizes (step~9) until the cells are held.
 \item Classification with the DSDR (Fig.~17) and operating times (Table~IV).
 \item Verification: \PF's own relay and fuse models, and the EMT simulation.
 \end{enumerate}
@@ -586,14 +564,13 @@ The steps of Figure~\ref{fig:flow} are applied as follows.
 \subsection{DIgSILENT \PF{} Environment}
 The model is the project \emph{IEEE13 DSDR Fuse Coordination} in \PF{} 2021~SP2. Load flows use the
 unbalanced AC method, short circuits the complete method, and the time-domain study the EMT simulation with a
-step of 0.1\,ms. The studies are run from Python~3.9 in engine mode; the same sequence can be started inside
-\PF{} from one script object, which prints the report in the output window.
+step of 0.1\,ms. The relays and fuses are modelled with the \PF{} library types of the actual devices.
 
 \subsection{IEEE 13-Node Feeder Model}
-Figure~\ref{fig:sld} shows the feeder with the protection devices of the reference paper. The feeder has the
+Figure~\ref{fig:sld} shows the feeder with its protection devices. The feeder has the
 voltage regulator at the substation, overhead and cable sections, the 4.16/0.48\,kV transformer XFM-1, spot
 and distributed loads, and two capacitors. The middle part of the distributed load on line 632--671 is placed
-behind a short lateral (node DL) so that a fault there lies below its fuse, as drawn in the paper.
+behind a short lateral (node DL) so that a fault there lies below its fuse.
 
 \begin{figure}[H]
 \centering
@@ -677,19 +654,19 @@ columns are the sizes after the fuse revision of the method without DG and with 
 \toprule
 \hd\textbf{Fuse} & \textbf{Location} & \textbf{Start} & \textbf{No DG} & \textbf{DSDR} & \textbf{Source of the starting size} \\
 \midrule
-F632 & lateral 632--645, at 632 & 400E & 400E & \textbf{500E} & Paper, Figs. 12, 15, 16 \\
+F632 & lateral 632--645, at 632 & 400E & 400E & \textbf{500E} & Ref.~\cite{yousaf2022}, Figs. 12, 15, 16 \\
 F633 & lateral 632--633, at 632 & 250E & 250E & \textbf{400E} & Benchmark scheme~\cite{yousaf2020}, Table V \\
 F634 & XFM-1, 0.48 kV side & gL-800A & gL-800A & gL-800A & Benchmark scheme~\cite{yousaf2020}, Table V \\
 F645 & load at 645 & 250E & 250E & 250E & Benchmark scheme~\cite{yousaf2020}, Table V \\
-F646 & line 645--646, at 645 & 300E & 300E & \textbf{400E} & Paper, Figs. 11, 15, 16 \\
+F646 & line 645--646, at 645 & 300E & 300E & \textbf{400E} & Ref.~\cite{yousaf2022}, Figs. 11, 15, 16 \\
 F-DL & distributed-load lateral on 632--671 & 250E & 250E & \textbf{400E} & Benchmark scheme~\cite{yousaf2020}, Table V \\
 F671 & load at 671 & 250E & 250E & 250E & Benchmark scheme~\cite{yousaf2020}, Table V \\
-F671-1 & 671--692 (switch), at 671 & 300E & 300E & \textbf{400E} & Paper, Fig. 9 \\
+F671-1 & 671--692 (switch), at 671 & 300E & 300E & \textbf{400E} & Ref.~\cite{yousaf2022}, Fig. 9 \\
 F692 & load at 692 & 200E & 200E & 200E & Benchmark scheme~\cite{yousaf2020}, Table V \\
-F692-R & cable 692--675, at 692 & 250E & 200E & \textbf{250E} & Paper, Fig. 9 \\
+F692-R & cable 692--675, at 692 & 250E & 200E & \textbf{250E} & Ref.~\cite{yousaf2022}, Fig. 9 \\
 F675 & load at 675 & 200E & 200E & 200E & Benchmark scheme~\cite{yousaf2020}, Table V \\
-F671-2 & lateral 671--684, at 671 & 300E & 300E & 300E & Paper, Fig. 8 \\
-F684 & line 684--611, at 684 & 200E & 200E & 200E & Paper, Fig. 8 \\
+F671-2 & lateral 671--684, at 671 & 300E & 300E & 300E & Ref.~\cite{yousaf2022}, Fig. 8 \\
+F684 & line 684--611, at 684 & 200E & 200E & 200E & Ref.~\cite{yousaf2022}, Fig. 8 \\
 F611 & load at 611 & 125E & 125E & 125E & Benchmark scheme~\cite{yousaf2020}, Table V \\
 F652 & cable 684--652, at 684 & 150E & 150E & 150E & Benchmark scheme~\cite{yousaf2020}, Table V \\
 \bottomrule
@@ -701,23 +678,21 @@ F652 & cable 684--652, at 684 & 150E & 150E & 150E & Benchmark scheme~\cite{yous
 \subsection{Fault Model}
 Faults are applied at the nodes 632, 633, 634, 645, 646, DL, 671, 692, 675, 680, 684, 611 and 652. Only the
 fault types that the phases of a node allow are applied, for example LL and LLG on phases b--c at 645 and
-646, and LG only at 611 and 652. This gives 39 node/fault-type cells. The faults of the paper's
-figures are added with their fault impedances.
+646, and LG only at 611 and 652. This gives 39 node/fault-type cells. Selected faults
+through a fault impedance are added for the time--current figures.
 
 \subsection{Measurement and Data Acquisition}
 \label{sec:assumptions}
 For every fault the phase currents through R1, R2 and each fuse are read from the short-circuit result. The
 operating current of a device is its largest phase current. The forward direction is away from the grid; R2
 sits at the 671 end of its line, where \PF{} counts the current positive into the line, so its values are
-multiplied by $-1$. The following values are not given in the paper and were chosen:
+multiplied by $-1$. The following modelling choices were made:
 \begin{itemize}
-\item the source (IEEE benchmark substation transformer) and the complete short-circuit method;
-\item the tap and the current transformer of R1 (720\,A reproduces the paper's worked example);
-\item all settings of R2 (Table~\ref{tab:settings}), derived from eqs.~\eqref{eq:ipfw} and \eqref{eq:iprv}
-      and from the curve starts visible in the paper's figures;
-\item the fault behind each row of Table~IV: bolted LLL, LL at two-phase nodes, LG at single-phase nodes;
-\item the reclosing dead time (0.2\,s, read from the paper's Fig.~10) and a breaker time of three cycles in
-      the EMT study.
+\item the source: the IEEE benchmark substation transformer, with the complete short-circuit method;
+\item R1: tap 4\,A on a 900/5 current transformer, i.e.\ a pickup of 720\,A;
+\item R2: all settings of Table~\ref{tab:settings}, derived from eqs.~\eqref{eq:ipfw} and \eqref{eq:iprv};
+\item the operating-time cases of Table~IV: bolted LLL faults, LL at two-phase nodes, LG at single-phase nodes;
+\item the EMT study: a reclosing dead time of 0.2\,s and a breaker time of three cycles.
 \end{itemize}
 
 \subsection{Simulation Cases}
@@ -730,7 +705,7 @@ multiplied by $-1$. The following values are not given in the paper and were cho
 Load flow & out / in & -- & Rated currents, voltages, direction at R1 and R2 \\
 Maximum faults & out / in & All nodes, LG/LL/LLG/LLL, all phase combinations, bolted & Classification, Tables II--IV \\
 Minimum faults & out / in & LG through 3\ohm{} at all nodes & $I_{f,min}$, pickup check \\
-Figure faults & in & The faults of Figs.~8--13, 15, 16 of the paper & TCC comparison \\
+Figure faults & in & Selected faults, bolted and through a fault impedance & Time--current figures \\
 EMT & out / in & LL a--c at 684 through 0.2\ohm & Reclosing sequence (Fig.~10) \\
 Penetration & 0--100\,\% & LLL at 633, LL at 684, all nodes & CTI, fault levels and pickups against DG size \\
 \bottomrule
@@ -1101,7 +1076,7 @@ of R1 and R2 reverse above it). Nodes 632, 671 and 680 are on the main feeder an
 
 \subsection{Single Setting Against Dual Setting on Selected Faults}
 Table~\ref{tab:cases9} compares the two settings of R2 on nine faults with the same (revised) fuses: the six
-faults of the figures above and three cells of the classification. Figure~\ref{fig:cdsum} summarises it and
+faults of the figures above and three cells of the classification.
 Figures~\ref{fig:case5} and \ref{fig:case7} show two of the diagrams.
 
 \begin{table}[H]
@@ -1135,13 +1110,6 @@ these lower currents.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{cd_summary.png}
-\caption{Summary of the nine faults: single setting against dual setting.}
-\label{fig:cdsum}
-\end{figure}
-
-\begin{figure}[H]
-\centering
 \includegraphics[width=\textwidth]{case05.png}
 \caption{Three-phase fault at 10\,\% of line 632--633: single setting (left) and dual setting (right).}
 \label{fig:case5}
@@ -1172,7 +1140,7 @@ at 692 feeds the fault directly, with no recloser in its path, and the result is
 
 \subsection{Time-Domain Verification (Fig. 10)}
 Figure~\ref{fig:f10} is the EMT simulation of an LL (a--c) fault at 684 through 0.2\ohm{} with the
-conventional settings. The recloser trips are scripted from R2's fast curve applied to the simulated current,
+conventional settings. The recloser trips follow R2's fast curve applied to the simulated current,
 and the fuse F671-2 (300E) melts when the accumulated heating $\sum \Delta t / t_{MMT}(I)$ reaches one.
 Without DG the two fast shots use 45\,\% of the melting heat, the fuse survives both and then clears the
 permanent fault. With the DG the fuse melts at the end of the second fast shot, because the DG keeps feeding
@@ -1208,8 +1176,8 @@ Fuse heat after the fast shots & 45\,\% & 105\,\% \\
 \end{table}
 
 \subsection{Verification With the Relay and Fuse Models of \PF}
-The operating times of Chapter Five are calculated in Python from the library curves. As a check, the
-settings were written into the relay and fuse elements of the model, and \PF{} itself calculated the tripping
+The operating times of Chapter Five are calculated from the time--current curves of the devices. As a check,
+the settings were entered into the relay and fuse elements of the model, and \PF{} itself calculated the tripping
 time of every device for every fault, for the conventional and for the DSDR settings. Over 1896 operating
 times the largest deviation is 1.22\,\%.
 
@@ -1473,15 +1441,10 @@ faults downstream of R2 remain open.
 \item A time-domain verification and a verification with the relay models of the tool.
 \end{itemize}
 
-\subsection{Remaining Work}
-\begin{enumerate}
-\item Extend the study to the IEEE 34-node feeder.
-\item Model the directional element of R2 explicitly instead of assigning the direction from the fault location.
-\item Repeat the classification with a practical margin (breaker time and 75\,\% of the fuse melting time).
-\end{enumerate}
-
 \subsection{Future Work}
-Future work may include a recloser with a wider dial range or with user-defined curves, a setting-group
+Future work may include the extension of the study to the IEEE 34-node test feeder, an explicit directional
+element for R2, a classification with a practical margin (breaker time and a fuse margin), a recloser with a
+wider dial range or with user-defined curves, a setting-group
 change triggered by the DG state, the disconnection logic of the DG during the reclosing dead time, the
 sensitivity to fault impedance, inverter-based generation, and hardware-in-the-loop tests.
 
@@ -1528,10 +1491,7 @@ PDF copy in accordance with the requirement of the department. It is not reprodu
 \item R2: relay type CDG34 at the 671 end of line 632--671, units ``R2 Fast'', ``R2 Delayed'', ``R2 Rev Fast''
       and ``R2 Rev Delayed''.
 \item Fuses: fuse elements with the library types A055C (4.16\,kV) and gL-800A (0.48\,kV).
-\item The protection devices are created in the base network. Changes made while the substation-transformer
-      variation is active are recorded in that variation and are removed by the scripts after each run.
-\item \PF{} must be closed when the scripts are run from Python; inside \PF{} the script object
-      \texttt{Final(1)} runs the same sequence.
+\item The protection devices are part of the base network, so they are present in every study case.
 \end{itemize}
 
 \appendixhead{C}{IMPLEMENTATION FORMULAS}
@@ -1572,7 +1532,6 @@ DSDR forward and reverse settings & Completed & Table~\ref{tab:settings} \\
 DSDR coordination restoration (Fig.~17, Table~IV) & Completed & 38 of 39 cells \\
 Time-domain verification (Fig.~10) & Completed & Table~\ref{tab:emt} \\
 Verification with \PF{} relay models & Completed & 1896 operating times, max 1.22\,\% \\
-IEEE 34-node extension & Pending & Not started \\
 \bottomrule
 \end{tabularx}
 \caption{Status of the work packages.}
