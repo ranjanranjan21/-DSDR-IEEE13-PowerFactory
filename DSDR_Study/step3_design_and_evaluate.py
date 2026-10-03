@@ -487,7 +487,7 @@ def tcc(fig_id, rec, s, devices, title, fname, dsdr):
     ax.set_ylabel("Time (s)")
     status = evaluate(rec, s, dsdr) if rec["where"] in NODES else None
     extra = "" if status is None else ("  -  coordination held" if status["held"] else "  -  coordination LOST")
-    ax.set_title("%s  %s%s" % (fig_id, title, extra), fontsize=9.5, loc="left")
+    ax.set_title("%s%s" % (title, extra), fontsize=9.5, loc="left")      # the figure number is in the caption
     ax.legend(handles=handles, loc="upper right", fontsize=7.3, frameon=True, framealpha=0.92)
     fig.tight_layout()
     save_png(fig, fname)
@@ -526,7 +526,7 @@ def main():
     for e in d14:
         if not e["held"]:
             say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
-    coord_grid(g14, "Fig. 14 - coordination without DSDR, DG 4.05 MVA at 692", "Fig14_without_DSDR.png")
+    coord_grid(g14, "Coordination without DSDR, DG 4.05 MVA at 692", "Fig14_without_DSDR.png")
 
     # ---------------- stage C: R2 as DSDR -------------------------------------------------------
     i_rv = max(LF["dg_in"]["R2"])
@@ -557,7 +557,7 @@ def main():
     for e in d17:
         if not e["held"]:
             say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
-    coord_grid(g17, "Fig. 17 - coordination with DSDR, DG 4.05 MVA at 692", "Fig17_with_DSDR.png")
+    coord_grid(g17, "Coordination with DSDR, DG 4.05 MVA at 692", "Fig17_with_DSDR.png")
 
     # the same fuse sizes with the conventional R2 (to separate the DSDR's effect from step 9)
     s_mix = copy.deepcopy(s)

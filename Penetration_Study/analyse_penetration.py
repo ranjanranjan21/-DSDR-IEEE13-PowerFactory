@@ -84,7 +84,7 @@ def doughnut(panels, path, width):
     ax.set_title(title, fontsize=10.5)
   fig.legend(handles=[plt.Rectangle((0, 0), 1, 1, fc=c, ec="black", lw=0.8, label="%d %%" % p) for c, p in zip(cols, P)],
              title="DG penetration", loc="center right", frameon=False, fontsize=9)
-  fig.suptitle("Fig. 7 - percentage variation of the CTI with DG penetration (each ring = 100 %; negative = fuse melts "
+  fig.suptitle("Percentage variation of the CTI with DG penetration\n(each ring = 100 %; negative = fuse melts "
                "before the recloser's fast trip)", fontsize=9.5, x=0.01, ha="left")
   fig.tight_layout(rect=(0, 0, 0.82 if len(panels) == 1 else 0.9, 0.93))
   fig.savefig(path, dpi=160)

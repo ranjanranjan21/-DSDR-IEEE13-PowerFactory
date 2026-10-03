@@ -171,7 +171,7 @@ def fault_rows(rec, node, zf, paper):
     zone = NODES[node]["zone"]
     i1, i2 = m.imax(rec, "R1"), m.imax(rec, "R2")
     up = zone == "R1"
-    rows = [("Fault (%s)" % paper, None),
+    rows = [("Fault", None),
             ("Fault impedance Zf", "%.1f ohm" % zf if zf else "0 ohm (bolted)"),
             ("Fault-path current (%s)" % path[0] if path else "Fault current at the node",
              "%.0f A" % (m.imax(rec, path[0]) if path else max(rec["ifault"]))),
@@ -223,7 +223,7 @@ def case_figure(cid, title, rec, node, zf, paper):
     handles.append(Line2D([], [], color=INK2, lw=0.9, label="vertical lines: current through each device"))
     ax1.legend(handles=handles, loc="lower left", fontsize=7.2, frameon=True, framealpha=0.92)
     zf_txt = "Zf = %.1f ohm" % zf if zf else "Zf = 0 ohm (bolted)"
-    fig.suptitle("Case %s - %s, %s, DG 4.05 MVA connected at 692   (%s)" % (cid, title, zf_txt, paper),
+    fig.suptitle("Case %s - %s, %s, DG 4.05 MVA connected at 692" % (cid, title, zf_txt),
                  fontsize=11.5, x=0.06, ha="left", y=0.965)
 
     rows, labels, both = fault_rows(rec, node, zf, paper)

@@ -261,7 +261,7 @@ for ax, (tag, t, w, events, heat, t_melt) in zip(axes, cases):
         ax.spines[sp].set_visible(False)
 axes[0].legend(frameon=False, fontsize=7.2, loc="lower left", ncol=3)
 axes[1].set_xlabel("Time (s)")
-fig.suptitle("Fig. 10 - current at node 632, LL a-c fault at 684 through 0.2 ohm, PowerFactory EMT",
+fig.suptitle("Current at node 632, LL a-c fault at 684 through 0.2 ohm, PowerFactory EMT",
              fontsize=9.5, x=0.01, ha="left")
 fig.tight_layout()
 try:
