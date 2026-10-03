@@ -1023,8 +1023,7 @@ at 692 feeds the fault directly, with no recloser in its path, and the result is
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{cd_sequence.png}
-\caption{Time-sequence check of all <<N_CELLS>> cells: in each cell S is the single setting and D the dual
-setting on R2.}
+\caption{Time-sequence check of all <<N_CELLS>> cells, single against dual setting.}
 \label{fig:seq}
 \end{figure}
 

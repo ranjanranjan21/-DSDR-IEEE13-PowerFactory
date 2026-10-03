@@ -103,8 +103,8 @@ GUIDE = [
      r"The reverse group starts at a lower current, picks up and trips; the fuse is saved."),
     ("cd_sequence.png", "Time-sequence check",
      r"All 39 cells checked by following each fault in time (fuse heating accumulates while current flows), "
-     r"for the single (S) and dual (D) setting side by side.",
-     r"Left block: faults above R2; right block: faults below R2. Colour gives the outcome of each half-cell.",
+     r"for the single and the dual setting.",
+     r"Upper grid: single setting; lower grid: dual setting. Each circle is one node and fault type; the symbol gives the outcome (see the legend). A dotted square marks a cell where the time sequence differs from the strict rule.",
      r"Above R2 the dual setting holds 18 of 18 against 15 of 18. The three restored cells are LG faults at "
      r"633, 645 and 646, where the single-setting R2 does not trip on the reverse current. Below R2 the DG feeds "
      r"the fault directly and the setting of R2 makes no difference."),

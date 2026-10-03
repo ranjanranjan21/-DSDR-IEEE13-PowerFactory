@@ -154,74 +154,53 @@ def run(fuses=None, write=True):
     return grids, rows
 
 
-COLOR = {"held": "#3a9d4a", "melts": "#d03b3b", "R2 blind": "#eb8a34", "DG direct": "#6a5acd", "other": "#9a9993"}
-LABEL = {"held": "held: fault cleared before the fuse melts",
-         "melts": "fuse melts before the reclosers finish",
-         "R2 blind": "R2 does not trip on the reverse (DG) current",
-         "DG direct": "below R2: the DG keeps feeding the fault",
-         "other": "a delayed-trip or series-fuse condition fails"}
+SYMBOL = {"held": ("✓", "#0ca30c"), "melts": ("✗", "#d03b3b"), "R2 blind": ("B", "#eb6834"),
+          "DG direct": ("D", "#4a3aa7"), "other": ("o", "#52514e")}
+LABEL = {"held": "held: fault cut off, fuse below 100 % heat", "melts": "fuse melts before the reclosers finish",
+         "R2 blind": "R2 does not trip on the DG's reverse current", "DG direct": "below R2: the DG keeps feeding the fault",
+         "other": "fast sequence fine, a delayed-trip / series condition fails"}
 
 
 def figure(grids, path):
-    """One grid: columns = fault nodes (above R2, then below R2), rows = fault types.  Every cell is split:
-    left half = single setting on R2, right half = dual setting (DSDR)."""
-    up = [n for n in NODE_ORDER if NODES[n]["zone"] == "R1"]
-    dn = [n for n in NODE_ORDER if NODES[n]["zone"] == "R2"]
-    cols = up + dn
-    gap = 0.6                                              # space between the two zones
-    xs = [k + (gap if n in dn else 0) for k, n in enumerate(cols)]
-    rows = FAULT_TYPES
-    fig, ax = plt.subplots(figsize=(10.2, 4.0), facecolor="white")
-    ax.set_facecolor("white")
-    for n, x in zip(cols, xs):
-        for yk, ft in enumerate(rows):
-            y = len(rows) - 1 - yk
-            for half, dual in ((0, False), (1, True)):
-                st = grids[dual][0][(n, ft)]
-                x0 = x - 0.45 + 0.45 * half
+    fig, axes = plt.subplots(2, 1, figsize=(9.2, 6.4))
+    for ax, dual, title in ((axes[0], False, "Single setting on R2"), (axes[1], True, "Dual setting on R2 (DSDR)")):
+        g, strict = grids[dual]
+        for xk, node in enumerate(NODE_ORDER):
+            for yk, ft in enumerate(FAULT_TYPES[::-1]):
+                st = g[(node, ft)]
                 if st == "n/a":
-                    ax.add_patch(plt.Rectangle((x0, y - 0.4), 0.45, 0.8, fc="#f1f1ef", ec="white", lw=1.5))
+                    ax.text(xk, yk, "-", ha="center", va="center", fontsize=11, color="#52514e")
                     continue
-                ax.add_patch(plt.Rectangle((x0, y - 0.4), 0.45, 0.8, fc=COLOR[st], ec="white", lw=1.5))
-                ax.text(x0 + 0.225, y, "S" if half == 0 else "D", ha="center", va="center", fontsize=7,
-                        color="white", fontweight="bold")
-    # zone headers
-    for group, label in ((up, "Faults above R2 (the DG current flows in reverse through R2)"),
-                         (dn, "Faults below R2 (the DG at 692 feeds the fault directly)")):
-        gx = [x for n, x in zip(cols, xs) if n in group]
-        ax.plot([gx[0] - 0.45, gx[-1] + 0.45], [len(rows) - 0.3] * 2, color="#52514e", lw=1.0)
-        ax.text((gx[0] + gx[-1]) / 2, len(rows) - 0.15, label, ha="center", va="bottom", fontsize=8.5,
-                color="#0b0b0b")
-    # held counts per zone and setting, on the right
-    xr = xs[-1] + 0.9
-    for yk, (lab, dual) in enumerate((("Single setting (S)", False), ("Dual setting (D)", True))):
-        g = grids[dual][0]
-        ku = [(n, ft) for n in up for ft in rows if g[(n, ft)] != "n/a"]
-        kd = [(n, ft) for n in dn for ft in rows if g[(n, ft)] != "n/a"]
-        ax.text(xr, 2.6 - 1.3 * yk, "%s\nabove R2: %d of %d held\nbelow R2: DG feeds %d of %d" % (
-            lab, sum(g[k] == "held" for k in ku), len(ku), sum(g[k] == "DG direct" for k in kd), len(kd)),
-            ha="left", va="center", fontsize=8.2, linespacing=1.5)
-    ax.set_xticks(xs)
-    ax.set_xticklabels(cols, fontsize=9)
-    ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels(rows[::-1], fontsize=9)
-    ax.set_xlabel("Fault node", fontsize=9)
-    ax.set_xlim(-0.6, xr + 2.6)
-    ax.set_ylim(-0.6, len(rows) + 0.35)
-    ax.set_aspect("equal")
-    for sp in ax.spines.values():
-        sp.set_visible(False)
-    ax.tick_params(length=0)
-    present = {v for d in (False, True) for v in grids[d][0].values()}
-    handles = [plt.Rectangle((0, 0), 1, 1, fc=COLOR[k], ec="none", label=LABEL[k]) for k in ORDER[::-1] if k in present]
-    handles.append(plt.Rectangle((0, 0), 1, 1, fc="#f1f1ef", ec="none", label="not part of the study grid"))
-    fig.legend(handles=handles, loc="lower center", ncol=3, frameon=False, fontsize=7.8, handlelength=1.4)
-    fig.tight_layout(rect=(0, 0.12, 1, 1))
+                sym, col = SYMBOL[st]
+                ax.add_patch(plt.Circle((xk, yk), 0.36, facecolor="none", edgecolor=col, lw=1.6))
+                ax.text(xk, yk, sym, ha="center", va="center", fontsize=11, color=col, fontweight="bold")
+                if (strict[(node, ft)] == "held") != (st == "held"):          # differs from the strict rule
+                    ax.add_patch(plt.Rectangle((xk - 0.46, yk - 0.46), 0.92, 0.92, fill=False, lw=1.0, ls=":", edgecolor="#0b0b0b"))
+        ax.axvline(5.5 - 0.0, color="#b9b8b3", lw=0.0)
+        ax.set_xticks(range(len(NODE_ORDER)))
+        ax.set_xticklabels(["%s\n%s" % (n, "above R2" if NODES[n]["zone"] == "R1" else "below R2") for n in NODE_ORDER], fontsize=7.5)
+        ax.set_yticks(range(4))
+        ax.set_yticklabels(FAULT_TYPES[::-1])
+        ax.set_xlim(-0.6, len(NODE_ORDER) - 0.4)
+        ax.set_ylim(-0.6, 3.6)
+        ax.set_aspect("equal")
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+        ax.tick_params(length=0)
+        up = [k for k, v in g.items() if v != "n/a" and NODES[k[0]]["zone"] == "R1"]
+        dn = [k for k, v in g.items() if v != "n/a" and NODES[k[0]]["zone"] == "R2"]
+        ax.set_title("%s - time sequence: above R2 %d of %d held; below R2 the DG keeps feeding %d of %d" % (
+            title, sum(g[k] == "held" for k in up), len(up), sum(g[k] == "DG direct" for k in dn), len(dn)),
+            fontsize=10, loc="left")
+    handles = [Line2D([], [], marker="$%s$" % SYMBOL[k][0], color=SYMBOL[k][1], ls="", ms=9, label=LABEL[k]) for k in ORDER[::-1]]
+    handles.append(plt.Rectangle((0, 0), 1, 1, fill=False, ls=":", edgecolor="#0b0b0b", label="differs from the strict rule"))
+    fig.legend(handles=handles, loc="lower center", ncol=2, frameon=False, fontsize=8)
+    fig.tight_layout(rect=(0, 0.11, 1, 1))
     try:
-        fig.savefig(path, dpi=170, facecolor="white", bbox_inches="tight", pad_inches=0.08)
+        fig.savefig(path, dpi=170, facecolor="#fcfcfb")
     except OSError:                                   # open in a viewer: locked on Windows
         path = path[:-4] + "_new.png"
-        fig.savefig(path, dpi=170, facecolor="white", bbox_inches="tight", pad_inches=0.08)
+        fig.savefig(path, dpi=170, facecolor="#fcfcfb")
     plt.close(fig)
     return path
 
