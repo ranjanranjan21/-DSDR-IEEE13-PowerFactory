@@ -9,6 +9,7 @@ framed tables and a page break before every chapter.
 Needs: pypandoc_binary, python-docx (pip install pypandoc_binary python-docx) and TinyTeX.
 """
 
+import copy
 import os
 import re
 import shutil
@@ -267,8 +268,49 @@ def title_page(doc, tex):
             continue
         r = p.add_run(text)
         r.font.size, r.bold, r.italic = Pt(size), bold, ital
-    p = first.insert_paragraph_before()
-    p.add_run().add_break(WD_BREAK.PAGE)
+    return first.insert_paragraph_before()           # carries the section break after the title page
+
+
+def section_break(doc, paragraph):
+    """end a section at this paragraph (next section starts on a new page)"""
+    body_sect = doc.element.body.find(qn("w:sectPr"))
+    new = copy.deepcopy(body_sect)
+    for ref in new.findall(qn("w:headerReference")) + new.findall(qn("w:footerReference")):
+        new.remove(ref)
+    paragraph._p.get_or_add_pPr().append(new)
+
+
+def page_numbers(section, fmt):
+    """centred page number in the footer, counting from 1 in this section (fmt: lowerRoman, decimal)"""
+    pg = section._sectPr.find(qn("w:pgNumType"))
+    if pg is None:
+        pg = OxmlElement("w:pgNumType")
+        section._sectPr.append(pg)
+    pg.set(qn("w:fmt"), fmt)
+    pg.set(qn("w:start"), "1")
+    footer = section.footer
+    footer.is_linked_to_previous = False
+    p = footer.paragraphs[0]
+    p.text = ""
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run()
+    run.font.name, run.font.size = "Times New Roman", Pt(12)
+    for kind, text in (("begin", None), (None, "PAGE"), ("end", None)):
+        if kind:
+            f = OxmlElement("w:fldChar")
+            f.set(qn("w:fldCharType"), kind)
+            run._r.append(f)
+        else:
+            t = OxmlElement("w:instrText")
+            t.set(qn("xml:space"), "preserve")
+            t.text = text
+            run._r.append(t)
+
+
+def no_page_number(section):
+    section.footer.is_linked_to_previous = False
+    for p in section.footer.paragraphs:
+        p.text = ""
 
 
 def polish(path, tex):
@@ -308,7 +350,18 @@ def polish(path, tex):
             toc_field(p)
         if any(r._r.find(qn("w:drawing")) is not None for r in p.runs):
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title_page(doc, tex)
+    # ---- three sections: title page (no number), front matter (i, ii, ...), chapters (1, 2, ...)
+    end_title = title_page(doc, tex)
+    section_break(doc, end_title)
+    heads = [p for p in doc.paragraphs if p.style.name == "Heading 1"]
+    heads[0].paragraph_format.page_break_before = False          # ABSTRACT: the section already starts a page
+    ch1 = next(p for p in heads if p.text.startswith("CHAPTER ONE"))
+    ch1.paragraph_format.page_break_before = False
+    section_break(doc, ch1.insert_paragraph_before())
+    secs = doc.sections
+    no_page_number(secs[0])
+    page_numbers(secs[1], "lowerRoman")
+    page_numbers(secs[2], "decimal")
     s = doc.settings.element
     u = OxmlElement("w:updateFields")
     u.set(qn("w:val"), "true")
