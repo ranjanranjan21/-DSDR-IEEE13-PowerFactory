@@ -20,14 +20,15 @@
 \usepackage[font=small,labelfont=bf,labelsep=colon]{caption}
 \usepackage[hidelinks]{hyperref}
 
-\graphicspath{{figures/}{./}}
+\graphicspath{{figures/}{./}{OVERLEAF_PROJECT/figures/}}
 % a picture that has not been uploaded gives a framed note instead of stopping the compilation
 \let\OrigIncludegraphics\includegraphics
 \renewcommand{\includegraphics}[2][]{%
   \IfFileExists{#2}{\OrigIncludegraphics[#1]{#2}}{%
   \IfFileExists{figures/#2}{\OrigIncludegraphics[#1]{figures/#2}}{%
+  \IfFileExists{OVERLEAF_PROJECT/figures/#2}{\OrigIncludegraphics[#1]{OVERLEAF_PROJECT/figures/#2}}{%
   \IfFileExists{report_pictures.pdf}{\OrigIncludegraphics[#1,page=\csname pic@#2\endcsname]{report_pictures.pdf}}{%
-  \fbox{\parbox{0.6\linewidth}{\centering\small picture \texttt{\detokenize{#2}} not uploaded yet}}}}}}
+  \fbox{\parbox{0.6\linewidth}{\centering\small picture \texttt{\detokenize{#2}} not uploaded yet}}}}}}}
 % page of each picture in report_pictures.pdf (all pictures in one file)
 <<PICTURE_PAGES>>
 \onehalfspacing
