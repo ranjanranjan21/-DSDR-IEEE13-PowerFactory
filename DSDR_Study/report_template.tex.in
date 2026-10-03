@@ -367,7 +367,7 @@ and (C) R2 as a dual-setting directional recloser with the fuse revision of the 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.78\textwidth]{flowchart.png}
-\caption{Flowchart of the recloser--fuse coordination method with the DSDR (adapted from~\cite{yousaf2022}).}
+\caption{Flowchart of the recloser--fuse coordination method with the DSDR.}
 \label{fig:flow}
 \end{figure}
 
