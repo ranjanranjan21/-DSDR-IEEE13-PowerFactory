@@ -269,52 +269,90 @@ def fig4():
 
 # ---------------------------------------------------------------------------------------------
 def fig5():
-    boxes = [
-        ("box", "Start"),
-        ("box", "1  Load flow with and without the DG\nrated currents I nom"),
-        ("box", "2-3  Place reclosers and fuses; pickups by eqs. (3), (12)\nI p = OLF x I nom, forward and reverse"),
-        ("box", "4  Fuse coefficients a, b by eqs. (6)-(9)\nseries fuses: 75 % rule, eq. (8)"),
-        ("box", "5  Fault analysis: every node, LG / LL / LLG / LLL\ncurrent through R1, R2 and every fuse"),
-        ("box", "6-7  Operating times; classify every fault\ncoordination held or lost"),
-        ("dec", "Coordination held?"),
-        ("box", "8  Revise the recloser TDS by I f,Rec / I f,Fuse\nwithin TDS min ... TDS max"),
-        ("box", "9-10  TDS limit reached: revise the fuse size\nseries fuses re-checked with eq. (8)"),
-        ("box", "11  Settings valid for this DG capacity\nwrite them into the model and verify"),
-    ]
-    fig, ax = plt.subplots(figsize=(6.8, 9.0))
+    """The DSDR coordination method, drawn after the flowchart of the reference method (its Fig. 5):
+    forward and reverse settings side by side, then fuses, fault analysis, the coordination check and
+    the two revisions (recloser TDS, fuse size).  The relay's on-line fault-detection loop of the original
+    is left out: it describes how the relay operates, not how the settings are designed."""
+    NAVY, FILL, SIDE, DEC = "#1f3b5c", "#ffffff", "#f4f7fb", "#fdf6e3"
+    GREEN, REDC = "#2e7d32", "#c62828"
+    fig, ax = plt.subplots(figsize=(7.2, 10.2))
     ax.set_xlim(0, 10)
-    ax.set_ylim(0, len(boxes) * 1.0 + 0.3)
+    ax.set_ylim(0, 14.2)
     ax.axis("off")
-    ys = {}
-    for k, (kind, text) in enumerate(boxes):
-        y = len(boxes) - k - 0.3
-        ys[k] = y
-        if kind == "dec":
-            ax.add_patch(Polygon([(5, y + 0.42), (7.6, y), (5, y - 0.42), (2.4, y)], closed=True, fc="#fff3d6", ec=INK2, lw=1.2))
-            ax.text(5, y, text, ha="center", va="center", fontsize=8.6, fontweight="bold")
-        else:
-            w = 2.2 if text == "Start" else 8.6
-            ax.add_patch(FancyBboxPatch((5 - w / 2, y - 0.34), w, 0.68, boxstyle="round,pad=0.02,rounding_size=0.1",
-                                        fc="#eef4fc", ec=BLUE, lw=1.2))
-            ax.text(5, y, text, ha="center", va="center", fontsize=7.9, linespacing=1.25)
-        if k:
-            top = ys[k - 1] - (0.42 if boxes[k - 1][0] == "dec" else 0.34)
-            ax.add_patch(FancyArrowPatch((5, top), (5, y + (0.42 if kind == "dec" else 0.34)), arrowstyle="-|>",
-                                         mutation_scale=11, color=INK2, lw=1.1))
-    yd = ys[6]
-    ax.text(5.15, yd - 0.52, "lost", fontsize=8, color=RED, fontweight="bold")
-    # held -> step 11
-    ax.plot([7.6, 9.75, 9.75], [yd, yd, ys[9]], color=INK2, lw=1.1)
-    ax.add_patch(FancyArrowPatch((9.75, ys[9]), (9.3, ys[9]), arrowstyle="-|>", mutation_scale=11, color=INK2, lw=1.1))
-    ax.text(8.0, yd + 0.1, "held", fontsize=8, color="#0ca30c", fontweight="bold")
-    # after 8 and 9-10: back to the classification
-    ax.plot([0.7, 0.25, 0.25], [ys[8], ys[8], ys[5]], color=INK2, lw=1.1)
-    ax.plot([0.7, 0.25], [ys[7], ys[7]], color=INK2, lw=1.1)
-    ax.add_patch(FancyArrowPatch((0.25, ys[5]), (0.7, ys[5]), arrowstyle="-|>", mutation_scale=11, color=INK2, lw=1.1))
-    ax.text(0.32, (ys[5] + ys[7]) / 2, "re-check", fontsize=7.5, color=INK2, rotation=90, va="center")
-    ax.set_title("Recloser-fuse coordination method with the DSDR",
-                 fontsize=9.2, loc="left")
-    fig.tight_layout()
+
+    def box(x, y, w, h, text, fc=FILL, round_=False, bold=False, size=8.4):
+        style = "round,pad=0.02,rounding_size=%.2f" % (h / 2 if round_ else 0.06)
+        ax.add_patch(FancyBboxPatch((x - w / 2, y - h / 2), w, h, boxstyle=style, fc=fc, ec=NAVY, lw=1.3, zorder=3))
+        ax.text(x, y, text, ha="center", va="center", fontsize=size, color=INK, zorder=4,
+                fontweight="bold" if bold else "normal", linespacing=1.35)
+
+    def diamond(x, y, w, h, text):
+        ax.add_patch(Polygon([(x, y + h / 2), (x + w / 2, y), (x, y - h / 2), (x - w / 2, y)], closed=True,
+                             fc=DEC, ec=NAVY, lw=1.3, zorder=3))
+        ax.text(x, y, text, ha="center", va="center", fontsize=8.2, zorder=4, linespacing=1.3)
+
+    def arrow(p, q, color=NAVY):
+        ax.add_patch(FancyArrowPatch(p, q, arrowstyle="-|>", mutation_scale=12, color=color, lw=1.3, zorder=2,
+                                     shrinkA=0, shrinkB=0))
+
+    def line(xs, ys, color=NAVY):
+        ax.plot(xs, ys, color=color, lw=1.3, zorder=2, solid_capstyle="butt")
+
+    def label(x, y, text, color):
+        ax.text(x, y, text, fontsize=8, color=color, fontweight="bold", ha="center", va="center", zorder=5)
+
+    X = 5.0
+    # ---- top: start, load flow, devices
+    box(X, 13.7, 2.0, 0.5, "Start", round_=True, bold=True)
+    arrow((X, 13.45), (X, 13.05))
+    box(X, 12.65, 6.2, 0.8, "Load flow with the DG\n(DG location and penetration level)")
+    arrow((X, 12.25), (X, 11.85))
+    box(X, 11.45, 6.2, 0.8, "Place the dual-setting directional recloser,\nthe feeder recloser and the fuses")
+    # ---- forward / reverse settings side by side
+    line([X, X], [11.05, 10.75])
+    line([2.6, 7.4], [10.75, 10.75])
+    for xc, name in ((2.6, "Reverse direction"), (7.4, "Forward direction")):
+        sup = "rv" if xc < 5 else "fw"
+        ax.add_patch(FancyBboxPatch((xc - 2.25, 8.25), 4.5, 2.3, boxstyle="round,pad=0.02,rounding_size=0.12",
+                                    fc=SIDE, ec="#9db4cf", lw=1.0, ls=(0, (4, 3)), zorder=1))
+        ax.text(xc - 2.1, 10.33, name, ha="left", fontsize=8.2, color=NAVY, fontweight="bold", zorder=4)
+        arrow((xc, 10.75), (xc, 10.05))
+        box(xc, 9.7, 3.9, 0.62, r"$I_{p,k}^{%s} = OLF \times I_{nom,k}^{%s}$" % (sup, sup), size=8.8)
+        arrow((xc, 9.39), (xc, 9.13))
+        box(xc, 8.8, 3.9, 0.62, r"$TDS_{min} < TDS_{F}^{%s},\ TDS_{D}^{%s} < TDS_{max}$" % (sup, sup), size=8.4)
+        line([xc, xc], [8.49, 8.0])
+    line([2.6, 7.4], [8.0, 8.0])
+    arrow((X, 8.0), (X, 7.65))
+    # ---- fuses, fault analysis
+    box(X, 7.25, 6.2, 0.8, "Fuse coefficients $a_i$, $b_i$ of every fuse\n(series fuses: 75 % rule)")
+    arrow((X, 6.85), (X, 6.45))
+    box(X, 6.05, 6.2, 0.8, "Fault analysis for every fault location and type:\ncurrents through the reclosers and fuses")
+    arrow((X, 5.65), (X, 5.3))
+    # ---- coordination check
+    diamond(X, 4.65, 3.6, 1.3, "Coordination\nheld?")
+    label(X + 0.35, 3.82, "Lost", REDC)
+    arrow((X, 4.0), (X, 3.45))
+    box(5.2, 3.05, 4.2, 0.8, r"Revise the recloser TDS by $I_{f,Rec}\,/\,I_{f,Fuse}$" + "\nwithin the dial range")
+    arrow((X, 2.65), (X, 2.25))
+    diamond(X, 1.6, 3.6, 1.3, "Coordination\nestablished?")
+    # no: dial limit reached -> fuse size upgrade
+    line([X - 1.8, 1.5], [1.6, 1.6])
+    label(2.45, 1.82, "No (dial limit)", REDC)
+    arrow((1.5, 1.6), (1.5, 2.65))
+    box(1.5, 3.05, 2.3, 0.8, "Upgrade the fuse size\n(fuse-fuse check)")
+    line([1.5, 1.5], [3.45, 4.65])
+    arrow((1.5, 4.65), (X - 1.8, 4.65))
+    # held / yes -> settings valid -> stop
+    line([X + 1.8, 8.6], [4.65, 4.65])
+    label(7.3, 4.88, "Held", GREEN)
+    line([X + 1.8, 8.6], [1.6, 1.6])
+    label(7.3, 1.82, "Yes", GREEN)
+    line([8.6, 8.6], [4.65, 1.0])
+    arrow((8.6, 1.0), (8.6, 0.85))
+    box(8.6, 0.55, 2.4, 0.6, "Settings valid for\nthe DG capacity", size=7.8)
+    arrow((7.4, 0.55), (6.55, 0.55))
+    box(5.6, 0.55, 1.9, 0.5, "Stop", round_=True, bold=True)
+    fig.tight_layout(pad=0.4)
     save(fig, "Fig05_method_flowchart.png")
 
 
