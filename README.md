@@ -15,6 +15,7 @@ in DIgSILENT PowerFactory 2021 SP2, driven by Python.
 | `Replication/` | All scripts, the results, the figures and the LaTeX report — see [`Replication/README.md`](Replication/README.md) |
 | `Replication/results/` | Tables I–IV, figures 1–6 and 8–17, load-flow / short-circuit database, PDFs |
 | `Replication/report/` | Project report (LaTeX source and figures) |
+| `Penetration_Study/` | DG penetration study (Fig. 7): seven PowerFactory models (0–100 % of 4.05 MVA), scripts and results — see [`Penetration_Study/README.md`](Penetration_Study/README.md) |
 
 Run everything (PowerFactory closed, Python 3.9 with matplotlib, reportlab, PyMuPDF):
 
