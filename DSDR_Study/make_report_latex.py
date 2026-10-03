@@ -210,7 +210,7 @@ pf = read(os.path.join(RES, "PF_vs_Python_times_conventional.csv")) + read(os.pa
 d = [abs(float(r["deviation %"])) for r in pf if r["deviation %"] != "-"]
 T["PF_N"], T["PF_MAX"] = str(len(d)), "%.2f" % max(d)
 
-# ---- the study's own tables (chapters 4 and 5); the *_vs_paper versions above are for Appendix E -------------
+# ---- the study's own tables (chapters 4 and 5); the *_vs_paper versions above are for Appendix C -------------
 t1o = read(os.path.join(DB, "Table_I_DG_parameters.csv"))
 T["TABLE_I_OWN"] = rows([[tex(r["Parameter"]), sym.get(r["Symbol"], tex(r["Symbol"])), tex(r["Value"]), tex(r["Unit"]) or "--"]
                          for r in t1o if r["Symbol"]])

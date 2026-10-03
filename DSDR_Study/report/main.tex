@@ -299,7 +299,7 @@ Chapter One introduces the problem and the objectives. Chapter Two reviews the l
 method followed. Chapter Three gives the method and its equations. Chapter Four describes the \PF{} model,
 the DG, the protection devices and the simulation cases. Chapter Five presents the results. Chapter Six
 discusses the findings and their limits. Chapter Seven gives the conclusions and the future work. The
-comparison with the reference paper is in Appendix~E.
+comparison with the reference paper is in Appendix~C.
 
 % =====================================================================================================
 \chapterhead{TWO}{LITERATURE REVIEW}
@@ -1484,22 +1484,7 @@ P/N 1601-0048-DK (GEK-106291F), Markham, ON, Canada, 2010, Ch.~5: Overcurrent Cu
 The complete reference paper~\cite{yousaf2022} is attached as a separate, unchanged
 PDF copy in accordance with the requirement of the department. It is not reproduced inside this document.
 
-\appendixhead{B}{POWERFACTORY MODEL AND PARAMETER NOTES}
-\begin{itemize}
-\item Project: \emph{IEEE13 DSDR Fuse Coordination}, imported from \texttt{IEEE 13 Node Feeder.pfd}; study
-      case \emph{Study with Substation Transformer}.
-\item Source: external grid 115\,kV, substation transformer 115/4.16\,kV, 5\,MVA, $u_k = 8.06\,\%$.
-\item Regulator taps fixed at +10 (a), +8 (b), +11 (c).
-\item DG: synchronous machine 4.05\,MVA, 0.69\,kV, round rotor, data of Table~\ref{tab:dg}; transformer
-      4.16/0.69\,kV, $u_k = 15\,\%$; operating point 3.24\,MW, voltage control at 1.0\,p.u.
-\item R1: relay type IAC77B801A at RG60--632, units ``R1 Fast'' and ``R1 Delayed''.
-\item R2: relay type CDG34 at the 671 end of line 632--671, units ``R2 Fast'', ``R2 Delayed'', ``R2 Rev Fast''
-      and ``R2 Rev Delayed''.
-\item Fuses: fuse elements with the library types A055C (4.16\,kV) and gL-800A (0.48\,kV).
-\item The protection devices are part of the base network, so they are present in every study case.
-\end{itemize}
-
-\appendixhead{C}{IMPLEMENTATION FORMULAS}
+\appendixhead{B}{IMPLEMENTATION FORMULAS}
 The operating times are evaluated with the following expressions, where $M = I_f/I_p$ for R1 and
 $M = I_f/I_s$ for R2.
 \begin{align}
@@ -1519,29 +1504,7 @@ carries 5426\,A, the sum of both contributions: its curve points are 4800\,A at 
 $f = \ln(5426/4800)/\ln(6392/4800) = 0.428$, $t_{MMT} = 0.2\times0.5^{0.428} = 0.149$\,s. The fuse outlasts the
 last fast trip (0.106\,s) by 0.043\,s.
 
-\appendixhead{D}{CURRENT PROJECT STATUS}
-\begin{table}[H]
-\centering\small
-\begin{tabularx}{\textwidth}{|L|l|L|}
-\hline
-\textbf{Work package} & \textbf{Status} & \textbf{Evidence} \\ \hline
-IEEE 13-node model in \PF & Completed & Rated currents within 2\,\%, fault levels at the IEEE benchmark \\ \hline
-Unbalanced load flow & Completed & Tables~\ref{tab:volt} and \ref{tab:lf} \\ \hline
-Short-circuit analysis & Completed & All fault types and phase combinations, DG out and in \\ \hline
-DG connection (dynamic machine) & Completed & Table~\ref{tab:dg} \\ \hline
-Conventional coordination without DG & Completed & 39 of 39 cells \\ \hline
-Classification with DG (Fig.~14) & Completed & 24 of 39 cells held \\ \hline
-DG penetration study & Completed & Section~\ref{sec:pen}, seven \PF{} models \\ \hline
-DSDR forward and reverse settings & Completed & Table~\ref{tab:settings} \\ \hline
-DSDR coordination restoration (Fig.~17, Table~IV) & Completed & 38 of 39 cells \\ \hline
-Time-domain verification (Fig.~10) & Completed & Table~\ref{tab:emt} \\ \hline
-Verification with \PF{} relay models & Completed & 1896 operating times, max 1.22\,\% \\ \hline
-\end{tabularx}
-\caption{Status of the work packages.}
-\label{tab:status}
-\end{table}
-
-\appendixhead{E}{COMPARISON WITH THE REFERENCE PAPER}
+\appendixhead{C}{COMPARISON WITH THE REFERENCE PAPER}
 This appendix compares the results of Chapter Five with the values printed in the reference
 paper~\cite{yousaf2022} or read from its figures.
 
