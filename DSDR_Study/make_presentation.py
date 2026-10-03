@@ -226,9 +226,10 @@ NOTES = [
     direction. I implemented this in PowerFactory with real relay and fuse curves.""",
     # 5 objectives
     """The general objective was to build and validate a PowerFactory implementation of the DSDR method on
-    the IEEE 13-node feeder, with and without DG. The specific objectives are listed: the model, load flow and
-    short circuit, the settings, coordination without and with the DG, the dual setting of R2, a time-domain
-    check, and the effect of DG penetration.""",
+    the IEEE 13-node feeder, with and without DG. To reach it I set seven specific objectives, shown here as
+    steps: the model, load flow and short circuit, the settings, coordination without and with the DG, the
+    dual setting of R2, a time-domain check, and the effect of DG penetration. Under each step is the slide
+    where its result is shown.""",
     # 6 scope
     """The study covers four fault types at twelve locations, which gives 39 node and fault-type cells,
     plus one EMT simulation and a penetration study. The limitations: some settings are not published and
@@ -301,6 +302,85 @@ NOTES = [
 ]
 
 
+def objectives_slide(prs):
+    """general objective as a banner with a target mark; the specific objectives as a numbered path of
+    seven steps, each with the slide where its result is shown"""
+    s = new_slide(prs, "2. Objectives")
+    BLUE = RGBColor(0x2F, 0x6F, 0xB3)
+    # ---- general objective: navy banner with a target symbol
+    ban = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, emu(0.65), emu(1.15), emu(12.0), emu(1.45))
+    ban.adjustments[0] = 0.12
+    ban.fill.solid()
+    ban.fill.fore_color.rgb = NAVY
+    ban.line.fill.background()
+    for d, col in ((1.05, RGBColor(0xFF, 0xFF, 0xFF)), (0.72, NAVY), (0.42, RGBColor(0xFF, 0xFF, 0xFF)),
+                   (0.16, RED)):
+        c = s.shapes.add_shape(MSO_SHAPE.OVAL, emu(1.45 - d / 2), emu(1.875 - d / 2), emu(d), emu(d))
+        c.fill.solid()
+        c.fill.fore_color.rgb = col
+        c.line.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+    tb = s.shapes.add_textbox(emu(2.25), emu(1.22), emu(10.2), emu(1.3))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    r = tf.paragraphs[0].add_run()
+    r.text = "GENERAL OBJECTIVE"
+    r.font.size, r.font.bold, r.font.name = Pt(13), True, "Aptos"
+    r.font.color.rgb = RGBColor(0x9D, 0xC3, 0xE6)
+    p = tf.add_paragraph()
+    r = p.add_run()
+    r.text = ("To build and validate a DIgSILENT PowerFactory implementation of the dual-setting directional "
+              "recloser (DSDR) coordination method on the IEEE 13-node feeder, with and without DG.")
+    r.font.size, r.font.name = Pt(18), "Aptos"
+    r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+    # ---- specific objectives: a path of seven numbered steps
+    lab = s.shapes.add_textbox(emu(0.65), emu(2.85), emu(6), emu(0.4))
+    r = lab.text_frame.paragraphs[0].add_run()
+    r.text = "SPECIFIC OBJECTIVES"
+    r.font.size, r.font.bold, r.font.name = Pt(14), True, "Aptos"
+    r.font.color.rgb = BLUE
+    steps = [("Model", "Build and verify the IEEE 13-node feeder with its protection", "slide 8"),
+             ("Studies", "Unbalanced load flow and short circuit, LG / LL / LLG / LLL", "slide 10"),
+             ("Settings", "Pickups, time dials and fuse coefficients", "slide 9"),
+             ("Coordination", "Without DG, then with a 4.05 MVA DG at 692", "slides 10–11"),
+             ("DSDR", "Forward and reverse settings for R2; classify again", "slides 12–14"),
+             ("Time domain", "Verify the reclosing sequence with EMT", "slide 15"),
+             ("Penetration", "Effect of DG from 0 to 100 %", "slide 16")]
+    n = len(steps)
+    x0, x1, yc, d = 0.65, 12.65, 3.85, 0.78
+    gap = (x1 - x0) / n
+    line = s.shapes.add_connector(1, emu(x0 + gap / 2), emu(yc), emu(x1 - gap / 2), emu(yc))
+    line.line.color.rgb = RGBColor(0x9D, 0xB4, 0xCF)
+    line.line.width = Pt(3)
+    for k, (head, body, where) in enumerate(steps):
+        xc = x0 + gap * (k + 0.5)
+        c = s.shapes.add_shape(MSO_SHAPE.OVAL, emu(xc - d / 2), emu(yc - d / 2), emu(d), emu(d))
+        c.fill.solid()
+        c.fill.fore_color.rgb = NAVY if k % 2 == 0 else BLUE
+        c.line.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+        c.line.width = Pt(2.5)
+        p = c.text_frame.paragraphs[0]
+        p.alignment = PP_ALIGN.CENTER
+        r = p.add_run()
+        r.text = str(k + 1)
+        r.font.size, r.font.bold, r.font.name = Pt(22), True, "Aptos Display"
+        r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+        tb = s.shapes.add_textbox(emu(xc - gap / 2 + 0.05), emu(yc + d / 2 + 0.12), emu(gap - 0.1), emu(1.9))
+        tf = tb.text_frame
+        tf.word_wrap = True
+        for j, (t, size, bold, col) in enumerate(((head, 15, True, NAVY), (body, 12, False, INK),
+                                                   (where, 11, False, GREY))):
+            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
+            p.alignment = PP_ALIGN.CENTER
+            p.space_after = Pt(4)
+            r = p.add_run()
+            r.text = t
+            r.font.size, r.font.bold, r.font.name = Pt(size), bold, "Aptos"
+            r.font.italic = j == 2
+            r.font.color.rgb = col
+    return s
+
+
 def title_slide(prs):
     """keep slide 1 of the earlier presentation, with the final wording; drop all other slides"""
     ids = prs.slides._sldIdLst
@@ -361,18 +441,7 @@ def build():
         "PowerFactory with the real characteristics of commercial relays and fuses."])
 
     # ---- objectives ------------------------------------------------------------------------
-    s = new_slide(prs, "2. Objectives")
-    text(s, 0.75, 1.25, 11.4, 0.9, [
-        "**General objective:** to build and validate a DIgSILENT PowerFactory implementation of the DSDR "
-        "protection-coordination method on the IEEE 13-node feeder, with and without DG."], bullet=False)
-    text(s, 0.75, 2.2, 11.4, 4.2, [
-        "Build and verify the IEEE 13-node feeder with its recloser and fuse protection.",
-        "Unbalanced load-flow and short-circuit studies for all fault types (LG, LL, LLG, LLL).",
-        "Calculate recloser pickups, time dials and fuse coefficients with the method's equations.",
-        "Establish the conventional coordination without DG, then with a 4.05 MVA synchronous DG at node 692.",
-        "Design the forward and reverse settings of R2 as a DSDR and classify the coordination again.",
-        "Verify the reclosing sequence in the time domain (EMT simulation).",
-        "Study how coordination degrades as DG penetration rises from 0 to 100 %."], size=16, space=6)
+    objectives_slide(prs)
 
     # ---- scope -----------------------------------------------------------------------------
     s = new_slide(prs, "3. Scope and Limitations")
