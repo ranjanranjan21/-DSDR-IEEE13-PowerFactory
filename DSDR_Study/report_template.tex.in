@@ -113,31 +113,19 @@ October 2026\par
 
 % =====================================================================================================
 \fronthead{ABSTRACT}
-Distributed generation (DG) changes the magnitude and the direction of the fault current in medium-voltage
-distribution feeders and can therefore invalidate a conventional, fixed-setting recloser--fuse coordination.
-This project independently implements and evaluates the dual-setting directional recloser (DSDR) method of
-Yousaf \textit{et al.} on the IEEE 13-node test feeder. The earlier phase of the project used
-MATLAB/Simulink; the complete study has now been rebuilt in \textbf{DIgSILENT \PF{} 2021}, driven by Python
-scripts, so that every table and figure is regenerated from the model by one command.
-
-The model uses the feeder of the DIgSILENT example library with the 115/4.16\,kV substation transformer, a
-4.05\,MVA synchronous DG at node 692 with its full machine data, the manufacturer
-curves of the two reclosers (GE IAC77B801A and GE/Alstom CDG34) and library fuse curves (Gould-Shawmut
-A055C). Unbalanced load flow, short-circuit calculation for all fault types and phase combinations, and an
-electromagnetic-transient (EMT) simulation of the reclosing sequence were carried out.
-
-The fault levels of the model agree with the IEEE 13-node short-circuit benchmark within about 2\,\%.
-Without DG the
-scheme is coordinated in all <<N_CELLS>> node/fault-type cells. With the DG and a conventional single-setting
-recloser R2, coordination is held in only <<N14_HELD>> of <<N_CELLS>> cells. With R2 as a DSDR and the fuse revision of the method, coordination is held in
-<<N17_HELD>> of <<N_CELLS>> cells. With the same fuses and a single-setting R2 only <<N17_SINGLE>> cells are
-held, so the dual setting itself restores seven cells. One cell (line-to-ground fault at 692) cannot be
-restored with the available dial range, and faults downstream of R2 remain fed directly by the DG.
-\PF's own relay and fuse models confirm the calculated operating times within <<PF_MAX>>\,\% over
-<<PF_N>> operating times.
-
-The report documents the model, the settings, the results and the work that remains: the extension to the
-IEEE 34-node feeder. The comparison with the reference paper is given separately in Appendix~E.
+The recloser--fuse coordination of distribution networks with distributed generation (DG) can be lost when
+conventional overcurrent protection is used, because the DG changes the magnitude and the direction of the
+fault current seen by the protective devices. This project studies a protection coordination strategy based
+on a dual-setting directional recloser (DSDR) for the fuse-saving scheme of an unbalanced distribution
+network. The mid-line recloser is given independent forward and reverse settings, so that it coordinates with
+the lateral fuses for faults on both sides of it. The strategy is implemented on the IEEE 13-node test feeder
+in DIgSILENT \PF{} with a synchronous DG, the characteristics of commercial recloser relays and fuses,
+unbalanced load-flow and short-circuit studies, and an electromagnetic-transient simulation of the reclosing
+sequence. The results show that the DG makes the fuses operate before the fast operation of a conventional
+recloser, increasingly so as the DG penetration rises, and that the dual-setting directional recloser,
+together with a revision of the fuse sizes, restores the fuse-saving coordination in the zone between the grid
+and the DG. They also show the limits of the strategy: the dial range of the recloser and the DG infeed to
+faults beyond the recloser.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
 coordination, IEEE 13-node feeder, DIgSILENT \PF.
@@ -231,8 +219,8 @@ depends on the fault location, the topology and the DG, and a single fixed setti
 both directions.
 
 The dual-setting directional recloser (DSDR) addresses this by giving the mid-line recloser separate pickup
-and time-dial settings for the forward and for the reverse direction. This project implements the method of
-Yousaf \textit{et al.}~\cite{yousaf2022} on the IEEE 13-node feeder in DIgSILENT \PF{} and evaluates it.
+and time-dial settings for the forward and for the reverse direction. This project implements the DSDR method
+of~\cite{yousaf2022} on the IEEE 13-node feeder in DIgSILENT \PF{} and evaluates it.
 
 \subsection{Problem Statement}
 The problem addressed is the loss of recloser--fuse coordination caused by the change of fault-current
@@ -288,14 +276,14 @@ respected, and it separates the contribution of the dual setting from the contri
 \end{itemize}
 
 \subsection{Organization of the Report}
-Chapter One introduces the problem and the objectives. Chapter Two reviews the protection concepts and the
-reference method. Chapter Three gives the method and its equations. Chapter Four describes the \PF{} model,
+Chapter One introduces the problem and the objectives. Chapter Two reviews the literature on the protection concepts and the
+method followed. Chapter Three gives the method and its equations. Chapter Four describes the \PF{} model,
 the DG, the protection devices and the simulation cases. Chapter Five presents the results. Chapter Six
 discusses the findings and their limits. Chapter Seven gives the conclusions and the remaining work. The
 comparison with the reference paper is in Appendix~E.
 
 % =====================================================================================================
-\chapterhead{TWO}{LITERATURE REVIEW AND REFERENCE PAPER}
+\chapterhead{TWO}{LITERATURE REVIEW}
 
 \subsection{Overview of Overcurrent Protection}
 An overcurrent device operates when the current exceeds its pickup. With an inverse-time characteristic the
@@ -346,22 +334,20 @@ unbalanced loads. The calculations must therefore keep the phases that really ex
 per phase.
 
 \subsection{Review of Related Research}
-Naiem \textit{et al.}~\cite{naiem2012} classify whether recloser--fuse coordination exists for each fault
-with DG. Yousaf \textit{et al.}~\cite{yousaf2020} give a benchmark overcurrent protection scheme, with
-device types and fuse sizes, for the IEEE 13-node feeder; the present work takes the fuse sizes that the
-reference paper does not show from that source. Kersting and Shirek~\cite{kersting2012} publish the
-short-circuit currents of the IEEE test feeders, which are used here to validate the fault levels.
+A classification technique for recloser--fuse coordination with DG decides for each fault whether the
+coordination exists~\cite{naiem2012}. A benchmark overcurrent protection scheme for the IEEE 13-node feeder,
+with device types and fuse sizes, is given in~\cite{yousaf2020}; the present work takes from it the fuse sizes
+that the reference method does not show. The short-circuit currents of the IEEE test feeders are published
+in~\cite{kersting2012} and are used here to validate the fault levels. The time--current characteristics of
+the recloser relays are those of the manufacturers' instruction manuals~\cite{gemultilin}.
 
-\subsection{Reference Paper Followed}
-The principal reference is M.~Yousaf, A.~Jalilian, K.~M.~Muttaqi and D.~Sutanto, ``An Adaptive Overcurrent
-Protection Scheme for Dual-Setting Directional Recloser and Fuse Coordination in Unbalanced Distribution
-Networks With Distributed Generation,'' \textit{IEEE Transactions on Industry Applications}, vol.~58, no.~2,
-pp.~1831--1842, 2022~\cite{yousaf2022}. The project uses its equations for the forward and reverse operating
-times, the pickup currents, the fuse characteristic and coefficients, the series-fuse rule and the setting
+\subsection{Method Followed in this Study}
+The study follows the adaptive overcurrent protection scheme with a dual-setting directional recloser
+of~\cite{yousaf2022}. The project uses its equations for the forward and reverse operating times, the pickup currents, the fuse characteristic and coefficients, the series-fuse rule and the setting
 constraints, and its flowchart for the design sequence.
 
 \subsection{Research Gap}
-The paper reports that the DSDR restores coordination in every case, but it does not publish the settings of
+The reference method reports that the DSDR restores coordination in every case, but it does not publish the settings of
 the DSDR, and its figures use fuse curves that differ from its own fuse equation. The gap addressed here is
 an independent implementation in \PF{} that uses the real dial ranges and fuse sizes, shows which part of the
 improvement comes from the dual setting, and states where the method reaches the limits of the devices.
@@ -387,15 +373,12 @@ and (C) R2 as a dual-setting directional recloser with the fuse revision of the 
 \end{figure}
 
 \subsection{Model Setup in DIgSILENT \PF}
-The earlier phase of the project used MATLAB/Simulink Specialized Power Systems. That model could not solve
-the dynamic synchronous machine reliably, used a substitute relay curve, and left several fault cases
-unresolved. The study was therefore rebuilt in DIgSILENT \PF{} 2021~SP2~\cite{pf2021}. The feeder is the
+The study is carried out in DIgSILENT \PF{} 2021~SP2~\cite{pf2021}. The feeder is the
 IEEE 13-node model of the DIgSILENT example library; its lines, loads and regulator taps were checked against
 the IEEE data. The study case that includes the 115/4.16\,kV, 5\,MVA substation transformer is used, because
 it reproduces the IEEE short-circuit benchmark~\cite{kersting2012}.
 
-All studies are run through the \PF{} Python interface. Table~\ref{tab:scripts} lists the scripts; the
-command \texttt{python run\_all.py} rebuilds the protection system and every result in about five minutes.
+The studies are run through the \PF{} Python interface; Table~\ref{tab:scripts} lists the scripts.
 
 \begin{table}[H]
 \centering\small
@@ -516,7 +499,10 @@ The paper names the devices but does not print their curve constants. The model 
 library for these devices.
 
 \subsubsection{R1: GE IAC77B801A}
-The extremely inverse IAC curve is
+The operating time of R1 follows the GE IAC extremely inverse characteristic. The manufacturer gives it as
+$t = M_{TDS}\,[A + B/(M-C) + D/(M-C)^2 + E/(M-C)^3]$ with $A = 0.004$, $B = 0.638$, $C = 0.620$, $D = 1.787$
+and $E = 0.246$~\cite{gemultilin}. With the constants of the \PF{} library type (the same values to four
+digits) the curve is
 \begin{equation}
 t = TDS\left[0.004+\frac{0.6379}{M-0.62}+\frac{1.7872}{(M-0.62)^2}+\frac{0.2461}{(M-0.62)^3}\right],
 \qquad M=\frac{I_f}{I_p},
@@ -1266,14 +1252,6 @@ network: the larger fuses that are needed with the DG are too slow for two cells
 faults through impedance. Fuse sizes cannot adapt to the DG state. For faults downstream of R2 the fuse
 saving relies on the DG's own protection disconnecting it during the dead time, which is not part of the method.
 
-\subsection{Change of the Simulation Tool}
-Rebuilding the study in \PF{} removed the main limitations of the earlier MATLAB\slash Simulink phase. The DG is a
-dynamic synchronous machine with its full data instead of a static source. The reclosers use the curves of
-the actual devices instead of a substitute curve. All <<N_CELLS>> cells are
-resolved, including the three-phase faults and the single-phase nodes that could not be built before. The
-complete DSDR stage, which was pending, is finished. The earlier model remains useful as an independent
-cross-check of the load flow.
-
 \subsection{Engineering Implication}
 Adaptive directional protection is justified where a DG is downstream of a mid-line recloser. To apply it,
 the engineer must check the dial range of the actual relay, revise the fuse sizes for the DG state, verify the
@@ -1284,7 +1262,7 @@ recloser.
 \chapterhead{SEVEN}{CONCLUSION AND FUTURE WORK}
 
 \subsection{Conclusion}
-The DSDR method of Yousaf \textit{et al.} was implemented on the IEEE 13-node feeder in DIgSILENT \PF{} with
+The DSDR method of~\cite{yousaf2022} was implemented on the IEEE 13-node feeder in DIgSILENT \PF{} with
 the real characteristics of the protection devices. The feeder model agrees with the IEEE short-circuit
 benchmark within about 2\,\%. Without DG the
 conventional scheme is coordinated in all <<N_CELLS>> cells. With the 4.05\,MVA DG at node 692 and a
@@ -1355,11 +1333,13 @@ General Meeting}, 2020, doi: 10.1109/PESGM41954.2020.9281529.
 \bibitem{kersting2012} W.~H.~Kersting and G.~Shirek, ``Short circuit analysis of IEEE test feeders,'' in
 \textit{Proc.\ IEEE PES Transmission and Distribution Conference and Exposition}, 2012.
 \bibitem{pf2021} DIgSILENT GmbH, \textit{PowerFactory 2021 User Manual}, Gomaringen, Germany, 2021.
+\bibitem{gemultilin} GE Multilin, \textit{735/737 Feeder Protection Relay -- Instruction Manual}, manual
+P/N 1601-0048-DK (GEK-106291F), Markham, ON, Canada, 2010, Ch.~5: Overcurrent Curves (IAC curves).
 \end{thebibliography}
 
 % =====================================================================================================
 \appendixhead{A}{COMPLETE COPY OF THE REFERENCE PAPER}
-The complete reference paper by Yousaf \textit{et al.}~\cite{yousaf2022} is attached as a separate, unchanged
+The complete reference paper~\cite{yousaf2022} is attached as a separate, unchanged
 PDF copy in accordance with the requirement of the department. It is not reproduced inside this document.
 
 \appendixhead{B}{POWERFACTORY MODEL AND PARAMETER NOTES}
@@ -1461,7 +1441,7 @@ IEEE 34-node feeder & not modelled & validated & Remaining work \\
 
 \subsection*{Base-Case Comparison}
 The rated currents test the feeder model independently of the protection and of the DG. Their agreement
-within 2\,\% (the MATLAB/Simulink model of the earlier phase reached 2 to 9\,\%) shows that the topology, the
+within 2\,\% shows that the topology, the
 loads and the regulator are implemented as in the paper.
 
 \subsection*{Fault-Current Magnitude Difference}
@@ -1469,8 +1449,7 @@ The maximum fault currents of the feeder branches are 4 to 60\,\% below the pape
 published IEEE short-circuit results instead, which it meets within about 2\,\%. The paper's values cannot
 all be correct: 6.73\,kA on 632--633 and 7.83\,kA on 692--675 exceed its own 5.41\,kA at the feeder head. The
 two worked cases of the paper illustrate the remaining difference: R2 carries 1718\,A for the LG fault at
-611 (paper: 1974\,A) and 1114\,A in reverse for the LL fault at 646 (paper: 1542\,A). In the earlier
-MATLAB/Simulink phase these currents were 702\,A and 838\,A, because the DG was a static Thevenin source.
+611 (paper: 1974\,A) and 1114\,A in reverse for the LL fault at 646 (paper: 1542\,A).
 
 \subsection*{Fuse and Coordination Comparison}
 The paper's Table~III could be reproduced only with the series index reversed. The fuse times in the paper's
