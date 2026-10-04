@@ -52,6 +52,60 @@ def grid(ws, r0, rows, widths=None, header=True):
             ws.column_dimensions[get_column_letter(j + 1)].width = w
 
 
+def farthest(wb, sc):
+    """Sheet: line distance from each recloser to every node of its zone (from the model's line lengths),
+    and the lowest LG 3-ohm current through the recloser for a fault at that node."""
+    import json
+    path = os.path.join(DB, "Zone_distances.json")
+    if not os.path.exists(path):
+        return
+    zd = json.load(open(path))
+    ws = wb.create_sheet("Farthest_node")
+    ws["A1"] = "Farthest node of each recloser zone, and where the minimum fault current really is (DG out)"
+    ws["A1"].font = Font(bold=True, size=13)
+    r0 = 3
+    for dev, col in (("R1", "R1 current (A)"), ("R2", "R2 current (A)")):
+        dist = zd[dev]["dist"]
+        rows = [["Node (zone of %s)" % dev, "Line length from %s (ft)" % zd[dev]["start"], "Fault current at the node, "
+                 "lowest phase (A)", "Current through %s, lowest phase (A)" % dev, "Remark"]]
+        far = max(dist, key=dist.get)
+        lows = {}
+        for n in sorted(dist, key=dist.get):
+            recs = [r for r in sc if r["Faulted bus"] == n]
+            low = min(recs, key=lambda r: float(r[col]))
+            lows[n] = float(low[col])
+            rows.append([n, dist[n], round(min(float(r["Fault current (A)"]) for r in recs), 1), "%.1f (phase %s)" % (
+                float(low[col]), low["Phases"]), ""])
+        lowest = min(lows, key=lows.get)
+        for row in rows[1:]:
+            notes = []
+            if row[0] == far:
+                notes.append("farthest node")
+            if row[0] == lowest:
+                notes.append("lowest recloser current = If,min")
+            row[4] = "; ".join(notes)
+        grid(ws, r0, rows, [18, 30, 30, 30, 32])
+        for i, row in enumerate(rows[1:], r0 + 1):
+            if row[4]:
+                for c in range(1, 6):
+                    ws.cell(row=i, column=c).fill = KEY
+        r0 += len(rows) + 2
+    notes = [
+        "Farthest node: largest line length from the recloser to a node of its zone, from the line lengths of the "
+        "PowerFactory model (feet). R1: from RG60 at the feeder head; R2: from its position at the 671 end of line 632-671.",
+        "R1: 650-632 2000 + 632-671 2000 + 671-684 300 + 684-652 800 = 5100 ft to node 652.",
+        "R2: 671-684 300 + 684-652 800 = 1100 ft to node 652.",
+        "The method takes If,min as the LG fault through 3 ohm at the farthest node (652). Because the recloser also "
+        "carries the load current of its phase, the lowest recloser current is found at 680 (phase B): 1074.4 A at R1 "
+        "and 878.5 A at R2. The pickups are checked against these lowest values, which is the safer choice.",
+    ]
+    for k, t in enumerate(notes):
+        c = ws.cell(row=r0 + k, column=1, value=t)
+        c.alignment = Alignment(wrap_text=True, vertical="top")
+        ws.merge_cells(start_row=c.row, start_column=1, end_row=c.row, end_column=5)
+        ws.row_dimensions[c.row].height = 32
+
+
 def hand_check(wb):
     """Sheet 5: hand calculation of the If,min case (LG through 3 ohm at 680, phase B, DG out) with symmetrical
     components and superposition, against PowerFactory.  Data: results/database/Ifmin_validation.json
@@ -238,6 +292,7 @@ def main():
     grid(ws, 1, src, [16, 10, 12, 8, 9, 8, 14, 20, 34])
     ws.freeze_panes = "A2"
 
+    farthest(wb, sc)
     hand_check(wb)
     try:
         wb.save(OUT)
