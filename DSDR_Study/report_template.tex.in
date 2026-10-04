@@ -870,7 +870,7 @@ contribution, faults beyond 671), each with one fault of the model.}
 
 \subsection{Coordination With the DSDR}
 With R2 as a DSDR and the revised fuses, coordination is held in <<N17_HELD>> of <<N_CELLS>> cells
-(Table~\ref{tab:g17}, Figure~\ref{fig:f17}). With the same fuses and a single-setting R2 only
+(Table~\ref{tab:g17}, Figure~\ref{fig:f17}). With the same revised fuses but a single-setting R2 only
 <<N17_SINGLE>> cells are held. The dual setting itself therefore restores seven cells: all four fault types at
 633, and the LG faults at 645, 646 and DL.
 
@@ -1277,7 +1277,7 @@ recloser.
 
 \subsection{Conclusion}
 The DSDR method of~\cite{yousaf2022} was implemented on the IEEE 13-node feeder in DIgSILENT \PF{} with
-the real characteristics of the protection devices. The feeder model agrees with the IEEE short-circuit
+the manufacturer-based time--current characteristics of the protection devices. The feeder model agrees with the IEEE short-circuit
 benchmark within about 2 per cent. Without DG, the revised fuse scheme achieves coordination in all
 <<N_CELLS>> cells, compared with 35 of <<N_CELLS>> cells with the starting fuse sizes. With the 4.05\,MVA DG at
 node 692 and a conventional R2, coordination is held in <<N14_HELD>> cells. The dual setting alone, with the
