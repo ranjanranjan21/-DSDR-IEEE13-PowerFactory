@@ -125,7 +125,7 @@ def body_for_pandoc(tex, labels, cites):
             block = s[m.end():end]
             lab = re.search(r"\\label\{([^}]*)\}", block)
             num = labels.get(lab.group(1), "?") if lab else "?"
-            block = replace_cmd(block, "caption", lambda c, n=num: BS + "caption{%s %s: %s}" % (word, n, c))
+            block = replace_cmd(block, "caption", lambda c, n=num: BS + "caption{%s %s %s}" % (word, n, c))
             out += [s[pos:m.start()], "\\begin{%s}" % kind, block]
             pos = end
         out.append(s[pos:])
@@ -134,15 +134,31 @@ def body_for_pandoc(tex, labels, cites):
     env("table", "Table")
     # ---- equation numbers: every equation environment is numbered in turn, as in LaTeX; the number is
     #      written next to the equation because Word equations have no \tag
-    count = [0]
+    state = {"pre": "0", "n": 0, "chap": 0}
 
-    def eqn(m):
-        count[0] += 1
-        body = re.sub(r"\\label\{[^}]*\}", "", m.group(1)).strip()
-        return "\\begin{equation*}%s\\qquad\\qquad(%d)\\end{equation*}" % (body, count[0])
+    def number(m):
+        if m.group("chap") is not None:                         # a new chapter or appendix
+            if m.group("chap").startswith("APPENDIX"):
+                state["pre"] = m.group("chap").split()[1].rstrip(":")
+            else:
+                state["chap"] += 1
+                state["pre"] = str(state["chap"])
+            state["n"] = 0
+            return m.group(0)
+        env, body = m.group("env"), m.group("body")
+        body = re.sub(r"\\label\{[^}]*\}", "", body).strip()
+        if env == "equation":
+            state["n"] += 1
+            return "\\begin{equation*}%s\\qquad\\qquad(%s.%d)\\end{equation*}" % (body, state["pre"], state["n"])
+        lines = []
+        for ln in re.split(r"\\\\", body):                   # align: every line numbered
+            if ln.strip():
+                state["n"] += 1
+                lines.append("%s\\qquad(%s.%d)" % (ln.rstrip(), state["pre"], state["n"]))
+        return "\\begin{align*}%s\\end{align*}" % "\\\\".join(lines)
 
-    s = re.sub(r"\\begin\{equation\}(.*?)\\end\{equation\}", eqn, s, flags=re.S)
-    s = re.sub(r"\\tag\{([^}]*)\}", lambda m: "\\qquad(%s)" % m.group(1), s)
+    s = re.sub(r"\\section\*\{(?P<chap>(?:CHAPTER|APPENDIX) [^}]*)\}"
+               r"|\\begin\{(?P<env>equation|align)\}(?P<body>.*?)\\end\{(?P=env)\}", number, s, flags=re.S)
     # ---- references and citations
     s = re.sub(r"\\eqref\{([^}]*)\}", lambda m: "(%s)" % labels.get(m.group(1), "?"), s)
     s = re.sub(r"\\ref\{([^}]*)\}", lambda m: labels.get(m.group(1), "?"), s)
@@ -247,23 +263,23 @@ def toc_field(paragraph, instr=None):
 
 
 def title_page(doc, tex):
+    """title page as in the IoE guideline: logo, university, institute, campus, title, BY, name, purpose, date"""
     tp = tex[tex.index("\\begin{titlepage}"):tex.index("\\end{titlepage}")]
-    title = re.search(r"\\large\\bfseries (An Adaptive.*?)\\par", tp, re.S).group(1)
+    title = re.search(r"\\itshape (An Adaptive.*?)\\par", tp, re.S).group(1)
     title = " ".join(title.replace("\\\\", " ").split())
     first = doc.paragraphs[0]
-    lines = [("TRIBHUVAN UNIVERSITY", 14, True, False), ("INSTITUTE OF ENGINEERING", 12, True, False),
-             ("PULCHOWK CAMPUS", 12, True, False), ("LOGO", 0, False, False), ("PROJECT REPORT", 12, True, False),
-             ("on", 12, False, True), (title, 15, True, False), ("Submitted by", 12, True, False),
-             ("Jhala Nath Kafle", 12, True, False), ("Roll No. 081MSPSE009", 12, False, False),
-             ("A report submitted in partial fulfillment of the requirements for the 3rd semester project of the "
-              "Master's Degree in Power System Engineering", 11, False, True),
-             ("Department of Electrical Engineering", 12, False, False)]
-    date = re.search(r"Department of Electrical Engineering\\par\s*(.*?)\\par", tp).group(1)
-    lines.append((date, 12, False, False))
-    for text, size, bold, ital in lines:
+    lines = [("LOGO", 0, False, False, 24), ("TRIBHUVAN UNIVERSITY", 14, False, False, 4),
+             ("INSTITUTE OF ENGINEERING", 16, True, False, 4), ("PULCHOWK CAMPUS", 14, True, False, 40),
+             (title, 14, True, True, 40), ("BY:", 12, False, False, 4), ("Jhala Nath Kafle", 12, True, True, 4),
+             ("(081MSPSE009)", 12, False, False, 90),
+             ("A PROJECT REPORT SUBMITTED IN PARTIAL FULFILLMENT OF THE REQUIREMENTS FOR THE MASTER'S DEGREE IN "
+              "POWER SYSTEM ENGINEERING", 12, False, False, 10),
+             ("DEPARTMENT OF ELECTRICAL ENGINEERING", 12, False, False, 30), ("OCTOBER, 2026", 12, False, True, 0)]
+    for text, size, bold, ital, after in lines:
         p = first.insert_paragraph_before()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p.paragraph_format.space_after = Pt(10)
+        p.paragraph_format.first_line_indent = Cm(0)
+        p.paragraph_format.space_after = Pt(after)
         if text == "LOGO":
             p.add_run().add_picture(os.path.join(FIGS, "tu_logo.png"), width=Cm(3.4))
             continue
@@ -281,19 +297,22 @@ def section_break(doc, paragraph):
     paragraph._p.get_or_add_pPr().append(new)
 
 
-def page_numbers(section, fmt):
-    """centred page number in the footer, counting from 1 in this section (fmt: lowerRoman, decimal)"""
+def page_numbers(section, fmt, start=1):
+    """page number at the top right (header), fmt: lowerRoman or decimal; start: first number"""
     pg = section._sectPr.find(qn("w:pgNumType"))
     if pg is None:
         pg = OxmlElement("w:pgNumType")
         section._sectPr.append(pg)
     pg.set(qn("w:fmt"), fmt)
-    pg.set(qn("w:start"), "1")
-    footer = section.footer
-    footer.is_linked_to_previous = False
-    p = footer.paragraphs[0]
+    pg.set(qn("w:start"), str(start))
+    section.footer.is_linked_to_previous = False
+    for fp in section.footer.paragraphs:
+        fp.text = ""
+    header = section.header
+    header.is_linked_to_previous = False
+    p = header.paragraphs[0]
     p.text = ""
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     run = p.add_run()
     run.font.name, run.font.size = "Times New Roman", Pt(12)
     for kind, text in (("begin", None), (None, "PAGE"), ("end", None)):
@@ -309,16 +328,19 @@ def page_numbers(section, fmt):
 
 
 def no_page_number(section):
-    section.footer.is_linked_to_previous = False
-    for p in section.footer.paragraphs:
-        p.text = ""
+    for part in (section.footer, section.header):
+        part.is_linked_to_previous = False
+        for p in part.paragraphs:
+            p.text = ""
 
 
 def polish(path, tex):
     doc = Document(path)
     for sec in doc.sections:
-        sec.left_margin, sec.right_margin = Cm(3.05), Cm(2.54)
-        sec.top_margin, sec.bottom_margin = Cm(2.54), Cm(2.54)
+        sec.page_width, sec.page_height = Cm(21.0), Cm(29.7)      # A4
+        sec.left_margin, sec.right_margin = Cm(3.5), Cm(2.0)
+        sec.top_margin, sec.bottom_margin = Cm(3.5), Cm(2.0)
+        sec.header_distance = Cm(2.0)
     st = doc.styles
     for name in ("Normal", "Body Text", "First Paragraph", "Compact"):
         if name in [s.name for s in st]:
@@ -330,6 +352,7 @@ def polish(path, tex):
                 pf.line_spacing = Pt(17)
                 pf.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
                 pf.space_before, pf.space_after = Pt(0), Pt(6)
+                pf.first_line_indent = Cm(1)
             pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY if name != "Compact" else None
     for name, size in (("Heading 1", 14), ("Heading 2", 12), ("Heading 3", 12)):
         set_font(st[name], size, True)
@@ -340,7 +363,7 @@ def polish(path, tex):
     st["Heading 1"].paragraph_format.page_break_before = True
     for name in ("Image Caption", "Table Caption", "Captioned Figure"):
         if name in [s.name for s in st]:
-            set_font(st[name], 10.5, color=True)
+            set_font(st[name], 12, color=True)
             st[name].font.italic = False
             st[name].paragraph_format.space_before = Pt(3)
             st[name].paragraph_format.space_after = Pt(6)
@@ -348,15 +371,17 @@ def polish(path, tex):
             st[name].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     for t in doc.tables:
         borders(t)
+        size = Pt(8) if len(t.columns) >= 8 else Pt(8.5)      # wide tables at the guideline minimum of 8 pt
         for row in t.rows:
             for c in row.cells:
                 for p in c.paragraphs:
                     p.paragraph_format.line_spacing = 1.0
                     p.paragraph_format.space_before = Pt(0)
                     p.paragraph_format.space_after = Pt(0)
+                    p.paragraph_format.first_line_indent = Cm(0)
                     p.paragraph_format.alignment = None
                     for r in p.runs:
-                        r.font.size = Pt(9)
+                        r.font.size = size
         # full text width, small cell margins: fewer wrapped lines, closer to the LaTeX tables
         pr = t._tbl.tblPr
         tw = pr.find(qn("w:tblW"))
@@ -381,7 +406,7 @@ def polish(path, tex):
             h = p.insert_paragraph_before("TABLE OF CONTENTS", style="Heading 1")
             toc_field(p)
             # lists of figures and tables: Word tables of contents built from the caption styles
-            nxt = next(q for q in doc.paragraphs if q.style.name == "Heading 1" and q.text.startswith("LIST OF ABBREVIATIONS"))
+            nxt = next(q for q in doc.paragraphs if q.style.name == "Heading 1" and q.text.startswith("LIST OF SYMBOLS"))
             for title, style in (("LIST OF FIGURES", "Image Caption"), ("LIST OF TABLES", "Table Caption")):
                 nxt.insert_paragraph_before(title, style="Heading 1")
                 toc_field(nxt.insert_paragraph_before(), 'TOC '+chr(92)+'h '+chr(92)+'z '+chr(92)+'t "%s,1"' % style)
@@ -397,7 +422,7 @@ def polish(path, tex):
     section_break(doc, ch1.insert_paragraph_before())
     secs = doc.sections
     no_page_number(secs[0])
-    page_numbers(secs[1], "lowerRoman")
+    page_numbers(secs[1], "lowerRoman", start=2)      # the title page counts as page i
     page_numbers(secs[2], "decimal")
     s = doc.settings.element
     u = OxmlElement("w:updateFields")
@@ -447,7 +472,7 @@ def update_in_word(path, front=()):
           # compact entries in the contents and the lists of figures and tables (Word's built-in styles
           # toc 1-3 = -20..-22, table of figures = -36; 5 = multiple line spacing, 13.8 pt = 1.15 lines)
           "foreach ($k in -20,-21,-22,-36) { $f = $d.Styles.Item($k).ParagraphFormat; $f.LineSpacingRule = 5; "
-          "$f.LineSpacing = 13.8; $f.SpaceAfter = 4; $f.SpaceBefore = 0; $f.Alignment = 0 }; "
+          "$f.LineSpacing = 12; $f.SpaceAfter = 2; $f.SpaceBefore = 0; $f.Alignment = 0 }; "
           "foreach ($t in $d.TablesOfContents) { $t.Update() }; "
           # the empty paragraph that ends each list is made 1 pt high, so that it never spills onto a page
           # of its own when a list fills its last page exactly

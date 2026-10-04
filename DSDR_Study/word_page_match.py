@@ -21,6 +21,19 @@ from docx.oxml.ns import qn
 W_P, W_TBL = qn("w:p"), qn("w:tbl")
 
 
+PAGE_NO = re.compile(r"^\s*(\d+|[ivxlc]+)\s*$")
+
+
+def page_text(page):
+    """text of a page without its page number (top or bottom)"""
+    lines = [x for x in page.get_text().strip().splitlines() if x.strip()]
+    while lines and PAGE_NO.match(lines[0]):
+        lines = lines[1:]
+    while lines and PAGE_NO.match(lines[-1]):
+        lines = lines[:-1]
+    return "\n".join(lines)
+
+
 def norm(text):
     text = unicodedata.normalize("NFKC", text).lower()
     return re.sub(r"[^a-z0-9]", "", text)
@@ -34,12 +47,16 @@ def pdf_pages(pdf_path):
     kind = 'text' (first text line), 'figure' (the page starts with a picture; text = its caption)
     or 'table' (the page starts with a table; text = its caption)."""
     doc = fitz.open(pdf_path)
-    start = next(i for i, p in enumerate(doc) if p.get_text().lstrip().startswith("CHAPTER ONE"))
+    start = next(i for i, p in enumerate(doc) if page_text(p).startswith("LIST OF SYMBOLS"))
     out = []
     for i in range(start + 1, len(doc)):
+        if page_text(doc[i]).startswith("CHAPTER ONE"):           # starts a new section anyway
+            continue
         page = doc[i]
         h = page.rect.height
-        blocks = [b for b in page.get_text("dict")["blocks"] if b["bbox"][1] < h - 60]   # drop the page number
+        blocks = [b for b in page.get_text("dict")["blocks"] if b["bbox"][1] < h - 60      # drop the page number
+                  and not (b["bbox"][3] < 90 and b["type"] == 0 and
+                           PAGE_NO.match("".join(sp["text"] for ln in b["lines"] for sp in ln["spans"])))]
         blocks.sort(key=lambda b: (round(b["bbox"][1]), b["bbox"][0]))
         if not blocks:
             continue
@@ -50,9 +67,9 @@ def pdf_pages(pdf_path):
                 continue
             for ln in b["lines"]:
                 t = "".join(sp["text"] for sp in ln["spans"]).strip()
-                if t:
+                if t and not (ln["bbox"][3] < 90 and PAGE_NO.match(t)):      # skip the page number at the top
                     lines.append((t, ln["bbox"]))
-        caps = [t for t, _ in lines if t != "IMG" and re.match(r"^(Figure|Table) \d+:", t)]
+        caps = [t for t, _ in lines if t != "IMG" and re.match(r"^(Figure|Table) (\d+|[A-Z])(\.\d+)?[: ]", t)]
         first = lines[0][0]
         if first == "IMG":
             cap = next((t for t, _ in lines if t != "IMG" and t.startswith("Figure")), None)
@@ -64,10 +81,18 @@ def pdf_pages(pdf_path):
         if tab_cap and _starts_with_table(lines, tab_cap):
             out.append((i, "table", tab_cap))
             continue
+        # a section number extracted as its own line ("4.5" / "Recloser Model"): join it with the title
+        if re.fullmatch(r"\d+(\.\d+)+", first) and len(lines) > 1 and lines[1][0] != "IMG":
+            first = first + " " + lines[1][0]
+            lines = [(first, lines[0][1])] + lines[2:]
+        if len(first) < 8 and len(lines) > 1 and lines[1][0] != "IMG" and _clean(lines[1][0]) \
+                and not re.search(r"[\u2200-\u23ff]", first):
+            first = first + " " + lines[1][0]
+            lines = [(first, lines[0][1])] + lines[2:]
         # a page that starts with an equation (garbled text): take the first clean line, break before the equation
         if not _clean(first):
-            num = next((t for t, _ in lines if re.fullmatch(r"\((\d+)\)", t.strip())), None)
-            out.append((i, "equation", num.strip("()") if num else None))
+            num = next((t for t, _ in lines if re.fullmatch(r"\(((\d+|[A-Z])\.)?\d+\)", t.strip())), None)
+            out.append((i, "equation", num.strip().strip("()") if num else None))
             continue
         # first text line, extended with the next line when it is short
         key = first
@@ -97,10 +122,10 @@ def _starts_with_table(lines, tab_cap):
         before.append(t)
     if len(before) < 4:
         return False
-    first4 = [t for t in before[:4] if t != "IMG"]
+    first3 = [t for t in before[:3] if t != "IMG"]
     if re.match(r"^(\d+(\.\d+)+|CHAPTER|APPENDIX)\b", before[0]):     # a heading, not a table cell
         return False
-    return all(len(t) < 28 for t in first4)
+    return all(len(t) < 45 for t in first3)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -123,7 +148,35 @@ def style_of(p):
     return st.get(qn("w:val")) if st is not None else ""
 
 
+def _shrink_empty_before(el):
+    """an empty paragraph just before a forced break would spill onto a page of its own: make it 1 pt high"""
+    prev = el.getprevious()
+    while prev is not None and prev.tag == W_P and not "".join(t.text or "" for t in prev.iter(qn("w:t"))).strip() \
+            and prev.find(".//" + qn("w:drawing")) is None and prev.find(".//" + qn("m:oMath")) is None:
+        ppr = prev.find(qn("w:pPr"))
+        if ppr is None:
+            ppr = OxmlElement("w:pPr")
+            prev.insert(0, ppr)
+        for tag in ("w:spacing", "w:rPr"):
+            old = ppr.find(qn(tag))
+            if old is not None:
+                ppr.remove(old)
+        sp = OxmlElement("w:spacing")
+        sp.set(qn("w:before"), "0")
+        sp.set(qn("w:after"), "0")
+        sp.set(qn("w:line"), "20")
+        sp.set(qn("w:lineRule"), "exact")
+        ppr.append(sp)
+        rpr = OxmlElement("w:rPr")
+        sz = OxmlElement("w:sz")
+        sz.set(qn("w:val"), "2")
+        rpr.append(sz)
+        ppr.append(rpr)
+        prev = prev.getprevious()
+
+
 def break_before(p):
+    _shrink_empty_before(p)
     ppr = p.find(qn("w:pPr"))
     if ppr is None:
         ppr = OxmlElement("w:pPr")
@@ -180,10 +233,10 @@ def front_breaks(pdf_path):
     """Entries of the table of contents and the lists of figures and tables that start a new page in the PDF:
     [(list number 1/2/3, text the entry starts with)]"""
     doc = fitz.open(pdf_path)
-    body = next(i for i, p in enumerate(doc) if p.get_text().lstrip().startswith("CHAPTER ONE"))
+    body = next(i for i, p in enumerate(doc) if page_text(p).startswith("CHAPTER ONE"))
     current, out = 0, []
     for i in range(1, body):
-        lines = [x.strip() for x in doc[i].get_text().splitlines() if x.strip()]
+        lines = [x.strip() for x in page_text(doc[i]).splitlines() if x.strip()]
         if not lines:
             continue
         head = lines[0]
@@ -201,8 +254,10 @@ def front_breaks(pdf_path):
             continue
         if current == 1:
             out.append((1, head))
-        elif current in (2, 3) and re.fullmatch(r"\d+", head):
-            out.append((current, ("Figure " if current == 2 else "Table ") + head + ":"))
+        elif current in (2, 3):
+            m = re.match(r"(Figure|Table) ([A-Z]|\d+)\.\d+", head)
+            if m:
+                out.append((current, m.group(0) + " "))
     return out
 
 
@@ -224,7 +279,7 @@ def match(doc, pdf_path, log=None):
         log.append("pictures sized as in the PDF: %s" % size_images(doc, pdf_path))
     pages = pdf_pages(pdf_path)
     blocks = body_blocks(doc)
-    start = next(k for k, (el, kind, txt) in enumerate(blocks) if txt.startswith("chapterone"))
+    start = next(k for k, (el, kind, txt) in enumerate(blocks) if txt.startswith("listofsymbols"))
     # one string of the whole body from Chapter One on, with the block of every character
     text, owner, offset = [], [], []
     for k in range(start, len(blocks)):
@@ -237,12 +292,18 @@ def match(doc, pdf_path, log=None):
     eqs = [k for k in range(start, len(blocks)) if blocks[k][1] == "p"
            and blocks[k][0].find(".//" + qn("m:oMathPara")) is not None]
     for page, kind, line in pages:
-        if kind == "equation":                       # the page starts with display equation number <line>
-            n = int(line) if line else 0
-            if 0 < n <= len(eqs):
-                break_before(blocks[eqs[n - 1]][0])
+        if kind == "equation":                       # the page starts with display equation (<line>)
+            tag = "(%s)" % line if line else None
+            hit_eq = None
+            for m in eqs:
+                txt = "".join(t.text or "" for t in blocks[m][0].iter(qn("m:t")))
+                if tag and tag in txt.replace(" ", ""):
+                    hit_eq = m
+                    break
+            if hit_eq is not None:
+                break_before(blocks[hit_eq][0])
                 done += 1
-                pos = max(pos, sum(len(blocks[m][2]) for m in range(start, eqs[n - 1])))
+                pos = max(pos, sum(len(blocks[k][2]) for k in range(start, hit_eq)))
             else:
                 missed.append((page, kind, str(line)))
             continue

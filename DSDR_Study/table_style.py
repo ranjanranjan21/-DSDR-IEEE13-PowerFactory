@@ -82,6 +82,10 @@ def excel_tables(tex):
         spec = tex[spec_start + 1:spec_end - 1]
         env = m.group(1)
         end = tex.index("\\end{%s}" % env, spec_end)
+        if tex.startswith("%plain", spec_end):          # a list without frame (symbols, abbreviations)
+            out.append(tex[pos:end])
+            pos = end
+            continue
         cols = _columns(spec)
         new_spec = "|" + "|".join(cols) + "|"
         out.append(tex[pos:m.start()])

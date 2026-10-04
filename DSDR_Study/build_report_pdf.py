@@ -72,6 +72,8 @@ full = open(os.path.join(work, "main.log"), encoding="latin-1").read()
 issues = {"undefined references": len(re.findall(r"undefined", full)),
           "text into the margin (overfull boxes)": len(re.findall(r"Overfull \\hbox", full)),
           "pictures not found": len(re.findall(r"not uploaded yet|File `[^']+' not found", full))}
+for m in re.finditer(r"Overfull \\hbox[^\n]*\n[^\n]*", full):     # show where, so it can be fixed
+    print("   ", m.group(0).replace("\n", " | ")[:200])
 pages = re.search(r"Output written on main\.pdf \((\d+) pages", log)
 try:
     shutil.copy(os.path.join(work, "main.pdf"), OUT_PDF)
