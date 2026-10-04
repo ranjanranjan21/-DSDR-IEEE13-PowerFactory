@@ -127,8 +127,11 @@ def draw_panel(ax, rec, node, s, dual, title):
     path = NODES[node]["path"]
     i1, i2 = m.imax(rec, "R1"), m.imax(rec, "R2")
     unit = r2_unit(node, dual)
+    opts = []
     for name, col, fun, i_dev in (("R1", BLUE, lambda i, md: m.t_r1(i, s, md), i1),
                                   ("R2", ORANGE, lambda i, md, u=unit: m.t_r2(i, s, u, md), i2)):
+        opts.append(("R2rv" if (name == "R2" and unit == "R2rv") else name, i_dev,
+                     [fun(i_dev, "f"), fun(i_dev, "d")], col))
         for md, ls in (("f", "-"), ("d", "--")):
             pts = [(i, fun(i, md)) for i in ii if fun(i, md) < 100]
             if pts:
@@ -150,11 +153,13 @@ def draw_panel(ax, rec, node, s, dual, title):
         for t in (fz.mmt(i_f), fz.tct(i_f)):
             if t < INF:
                 ax.plot([i_f], [t], marker="s", ms=5.5, color=col, mec=SURF, mew=1.2, zorder=6)
+        opts.append((f, i_f, [fz.mmt(i_f), fz.tct(i_f)], col))
     e = evaluate(rec, node, s, dual)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlim(100, 2e4)
     ax.set_ylim(0.01, 100)
+    m.annotate_times(ax, opts)
     ax.grid(True, which="major", color=GRID, lw=0.8)
     ax.grid(True, which="minor", color=GRID, lw=0.3, alpha=0.6)
     ax.set_xlabel("Current (A at 4.16 kV)")

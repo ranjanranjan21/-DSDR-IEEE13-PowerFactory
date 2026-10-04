@@ -1,0 +1,99 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\definecolor{navy}{HTML}{1B3755}
+\definecolor{hl}{HTML}{FFF2CC}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.22}
+\newcommand{\sect}[1]{\bigskip{\Large\color{navy}\bfseries #1}\par\smallskip{\color{navy}\hrule height 0.8pt}\smallskip}
+\newcommand{\say}[1]{\par\smallskip\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\textbf{In one sentence:} #1}}\par}
+
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{navy} The LG 3\,$\Omega$ Fault Table Explained}\\[4pt]
+{\large Sheet \texttt{LG\_3ohm\_faults} of \texttt{Minimum\_Fault\_Current\_Calculation.xlsx}}\\[2pt]
+IEEE 13-node feeder, DIgSILENT PowerFactory, DG out of service
+\end{center}
+
+\sect{1. What the table is}
+Each row is one short-circuit calculation in PowerFactory: a \textbf{line-to-ground (LG) fault through a fault
+resistance of 3\,$\Omega$} at one node, on one phase, with the DG disconnected. This is the \emph{weakest} fault of the
+study, the one that gives the smallest fault current. It is used to check that each recloser's pickup is low enough
+to see every fault of its zone. The calculation uses the \emph{complete method}, i.e.\ it starts from the load flow,
+so the loads keep drawing current during the fault.
+
+\sect{2. The columns}
+\begin{center}
+\begin{tabular}{|l|>{\raggedright\arraybackslash}p{12.2cm}|}
+\hline
+\textbf{Column} & \textbf{Meaning} \\ \hline
+Faulted node & Node where the fault is applied (DL = the distributed load on line 632--671). \\ \hline
+Faulted phase & Phase that is short-circuited to ground. Only the phases that exist at the node appear: 645 and 646 have
+phases B and C, 684 has A and C, 652 only A, 611 only C. \\ \hline
+Rf (ohm) & Fault resistance, 3\,$\Omega$ for every row. \\ \hline
+Current at the fault (A) & Current flowing into the fault itself, i.e.\ to ground at the faulted node. \\ \hline
+Current through R1 (A) & Largest phase current measured at R1 (feeder head) during the fault: fault current \emph{plus}
+the load current that R1 still carries. \\ \hline
+Current through R2 (A) & Largest phase current measured at R2 (on line 632--671) during the fault. \\ \hline
+In R1 zone & ``yes'' if the fault is in the zone R1 must protect (every node except 634). \\ \hline
+In R2 zone & ``yes'' if the fault is downstream of R2 (671, 692, 675, 680, 684, 652, 611). \\ \hline
+Yellow cells & The lowest recloser current of each zone: this is \textbf{If,min} used in the pickup check. \\ \hline
+\end{tabular}
+\end{center}
+
+\sect{3. How to read the numbers}
+\textbf{(a) Why is the R1 current larger than the fault current?}\\
+Because R1 carries everything that flows into the feeder: the fault current \emph{and} the load current of the phase.
+Example, row 680 phase B: the fault draws 701.5\,A, but R1 measures 1074.4\,A. With phasors:
+$I_{R1} \approx I_{load,R1} + I_{fault}$ = 411\,A\,$\angle{-173.5^\circ}$ + 701.5\,A\,$\angle{-176.0^\circ}$
+$\approx$ 1112\,A (PowerFactory: 1074\,A, a little less because the loads draw less while the voltage sags).
+
+\textbf{(b) Why does R2 show about 465\,A for faults at 645, 646 or DL?}\\
+These faults are \emph{upstream} of R2 (between the feeder head and R2). With the DG out, no fault current flows through
+R2; R2 only carries the load beyond it (about 465--470\,A). So the ``In R2 zone'' column is ``no'' for them and these rows
+are not used for R2.
+
+\textbf{(c) Why are rows 671 and 692 identical?}\\
+671 and 692 are joined by a switch of zero length, so electrically they are the same point.
+
+\textbf{(d) Why is node 634 excluded?}\\
+634 is on the 0.48\,kV side of transformer XFM-1. A 3\,$\Omega$ fault there draws only about 91\,A at 4.16\,kV --- about the
+transformer's own load current. That node is protected by its own fuse on the transformer, not by R1 or R2, so it is
+not part of either recloser zone for this check.
+
+\textbf{(e) Why is the lowest value at 680 and not at the farthest node 652?}\\
+The farthest node (652) gives the smallest current \emph{at the fault} (617.2\,A). But the recloser current also contains
+the load current of the faulted phase. Phase B carries the least load, so the LG fault on phase B at 680 gives the
+smallest current \emph{through the recloser}: 1074.4\,A at R1 and 878.5\,A at R2.
+
+\sect{4. What the table proves}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Recloser} & \textbf{If,min (yellow)} & \textbf{Where} & \textbf{Pickup used} & \textbf{Check} \\ \hline
+R1 & 1074.4\,A & 680, phase B & 720\,A & 720 $<$ 1074 \checkmark \\ \hline
+R2 & 878.5\,A & 680, phase B & 600\,A (curve start) & 600 $<$ 879 \checkmark \\ \hline
+\end{tabular}
+\end{center}
+Both pickups are below the weakest fault current of their zones, so both reclosers detect every fault they must
+protect against (without DG).
+
+\say{The table lists the weakest fault (LG through 3\,$\Omega$) at every node and phase; for each recloser the smallest
+current it measures for a fault in its own zone is 1074\,A (R1) and 879\,A (R2), both above the pickups of 720\,A and
+600\,A, so the pickups are correctly set.}
+
+\sect{5. Likely questions}
+\textbf{Why 3\,$\Omega$?} It is the fault resistance prescribed by the method for the minimum fault (weakest
+realistic fault).\\
+\textbf{Why the largest phase current at the recloser?} A phase-overcurrent relay operates on the phase with the
+largest current; that is the current it compares with its pickup.\\
+\textbf{What changes with DG?} With the DG in service the grid share falls; at 100\,\% DG the weakest fault drops to
+577\,A at R1 and 368\,A at R2, below the pickups (shown in the DG penetration study).
+\end{document}

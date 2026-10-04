@@ -436,11 +436,71 @@ def coord_grid(grid, title, fname):
     plt.close(fig)
 
 
+def annotate_times(ax, opts, x_left=100.0):
+    """Operating times on a TCC: a dotted line from each operating point to the time axis with its value,
+    and the coordination margins as arrows at the primary fuse current:
+      CTI = t_MMT(primary fuse) - t_fast(recloser)        (fast trip before the fuse melts)
+      t_delayed(recloser) - t_TCT(primary fuse)            (fuse clears before the delayed trip)
+    opts: [(device, current, [t1, t2], colour)] - for a recloser t1/t2 = fast/delayed, for a fuse MMT/TCT."""
+    import math
+    labels = []
+    for dev, i_dev, ops, c in opts:
+        names = ("melts", "clears") if dev in FUSES else ("fast", "delayed")
+        short = dev.replace("R2rv", "R2 rev").replace("R2fw", "R2")
+        for t, nm in zip(ops, names):
+            if t < INF and 0.01 < t < 1000:
+                ax.plot([x_left, i_dev], [t, t], color=c, lw=0.7, ls=":", alpha=0.9, zorder=2)
+                labels.append([t, "%s %s %.3f s" % (short, nm, t), c])
+    # labels at the left edge, spread so that they do not overlap (log axis)
+    labels.sort(key=lambda x: x[0])
+    ys = []
+    for t, _, _ in labels:
+        y = math.log10(t)
+        if ys and y - ys[-1] < 0.13:
+            y = ys[-1] + 0.13
+        ys.append(y)
+    for (t, txt, c), y in zip(labels, ys):
+        ax.text(x_left * 1.08, 10 ** y, txt, fontsize=6.4, color=c, va="bottom", ha="left",
+                bbox=dict(boxstyle="square,pad=0.08", fc="white", ec="none", alpha=0.75), zorder=7)
+    recs = [o for o in opts if o[0] not in FUSES]
+    fuses = [o for o in opts if o[0] in FUSES]
+    if not recs or not fuses:
+        return
+    # a recloser that carries current but does not pick up
+    lo_y, hi_y = ax.get_ylim()
+    for dev, i_dev, (tf, _), c in recs:
+        if tf == INF and i_dev > 1.0:
+            ax.text(i_dev * 1.05, (lo_y * hi_y) ** 0.5 / 3, "%s: %.0f A, does not trip" % (
+                dev.replace("R2rv", "R2 rev").replace("R2fw", "R2"), i_dev), rotation=90, fontsize=7.4,
+                color="#c62828", fontweight="bold", va="center", ha="left", zorder=8,
+                bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="#c62828", lw=0.6, alpha=0.9))
+    # the recloser that decides: the one with the latest fast trip (it must still beat the fuse)
+    live = [r for r in recs if r[2][0] < INF]
+    if not live:
+        return
+    _, i_rec, (tf, td), _ = max(live, key=lambda r: r[2][0])
+    _, i_fu, (mmt, tct), _ = fuses[0]
+    x = i_fu * 1.35
+    for lo, hi, name in ((tf, mmt, "CTI"), (tct, td, "t$_D$ − t$_{TCT}$")):
+        if not (lo < INF and hi < INF and 0.01 < min(lo, hi) and max(lo, hi) < 1000):
+            continue
+        ok = hi > lo
+        col = "#2e7d32" if ok else "#c62828"
+        d = hi - lo
+        val = ("%+.0f ms" % (1000 * d)) if abs(d) < 1 else ("%+.2f s" % d)
+        ax.annotate("", xy=(x, hi), xytext=(x, lo), arrowprops=dict(arrowstyle="<->", color=col, lw=1.3), zorder=8)
+        right = x * 4.5 < ax.get_xlim()[1]                    # room for the label right of the arrow?
+        ax.text(x * 1.06 if right else x / 1.06, (lo * hi) ** 0.5, "%s = %s" % (name, val.replace("-", "−")),
+                fontsize=7.2, color=col, fontweight="bold", va="center", ha="left" if right else "right", zorder=8,
+                bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=col, lw=0.6, alpha=0.9))
+
+
 def tcc(fig_id, rec, s, devices, title, fname, dsdr):
     fig, ax = plt.subplots(figsize=(6.6, 4.8))
     ii = [10 ** (2 + k / 200.0) for k in range(601)]
     colors = [PAL["blue"], PAL["orange"], PAL["aqua"], PAL["violet"]]
     handles = []
+    opts = []
     for n, dev in enumerate(devices):
         c = colors[n]
         if dev in FUSES:
@@ -476,11 +536,13 @@ def tcc(fig_id, rec, s, devices, title, fname, dsdr):
             if t < INF:
                 ax.plot([i_dev], [t], marker="o", ms=6, color=c, mec=PAL["surface"], mew=1.5, zorder=5)
         handles.append(Line2D([], [], color=c, lw=1.7, label=label))
+        opts.append((dev, i_dev, ops, c))
     handles.append(Line2D([], [], color=PAL["ink2"], lw=1.2, ls="--", label="dashed: recloser delayed curve"))
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlim(100, 1e5)
     ax.set_ylim(0.01, 1000)
+    annotate_times(ax, opts)
     ax.grid(True, which="major", color=PAL["grid"], lw=0.8)
     ax.grid(True, which="minor", color=PAL["grid"], lw=0.3, alpha=0.6)
     ax.set_xlabel("Current (A at 4.16 kV)")
