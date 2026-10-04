@@ -486,7 +486,7 @@ def build():
         "Coordination held in **38 of 39** cells.",
         "Same fuses with a single-setting R2: 31 cells.",
         "The dual setting restores **7 cells**: all faults at 633 and the LG faults at 645, 646 and DL.",
-        "Still lost: LG fault at 692 – the series fuses need sizes beyond the dial range of R2."],
+        "Still lost: LG fault at 692 – the 400E fuse F671-1 clears after R2's delayed trip (7.6 s vs 4.0 s); the delayed dial is already at its maximum."],
         size=16, space=8)
 
     s = new_slide(prs, "5. Results: Single vs Dual Setting (3-phase fault near 632)")

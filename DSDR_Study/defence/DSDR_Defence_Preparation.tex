@@ -176,9 +176,10 @@ restored cells need the dual setting; the two measures work together.}
 \Q{Which cells does the dual setting restore?}{All four fault types at 633 and the LG faults at 645, 646 and the
 distributed load --- all in the zone between the grid and the DG, where R2 sees reverse current.}
 
-\Q{Why is the LG fault at 692 still lost?}{F671-1 must be 400E to stay selective with F692-R, and then for the LG
-fault at 692 the fast curve of R2 would have to be faster than its smallest dial (TMS 0.1) allows. It is a limit
-of the real device's dial range.}
+\Q{Why is the LG fault at 692 still lost?}{F671-1 must be 400E to stay selective with F692-R. For the LG fault at 692
+(small current) the 400E fuse is slow: it clears in about 7.6\,s, while R2's delayed curve trips at about 4.0\,s.
+R2's delayed dial is already at its maximum (TMS 1.0, the highest that keeps R2 below R1), so the delayed trip
+cannot be made slower. It is a limit of the real device's dial range, on the delayed side.}
 
 \Q{Explain your single vs dual example (three-phase fault near 632).}{R2 carries 1777\,A in reverse (DG only). Single
 setting: forward curve, trips at 0.121\,s, but F633 starts to melt at 0.100\,s --- lost. Dual setting: reverse group,
@@ -227,7 +228,8 @@ stated in the limitations, and an explicit directional element is the first item
 
 \T{The paper gets 39 of 39 with the DSDR, you get 38. Did your method fail?}{Invites you to admit a mistake.}
 {No. The paper does not publish R2's settings or all fuse sizes. With the real CDG34 dial range, the LG fault at 692
-needs a faster curve than TMS 0.1 gives. That is a finding about real hardware. The central finding --- the DSDR
+would need a slower delayed curve than TMS 1.0 gives, so that the 400E fuse F671-1 can clear first (7.6\,s
+against R2's 4.0\,s). That is a finding about real hardware. The central finding --- the DSDR
 restores coordination between the grid and the DG --- is reproduced.}
 
 \T{Your fault currents are lower than the paper's. Is your model wrong?}{Questions model validity.}

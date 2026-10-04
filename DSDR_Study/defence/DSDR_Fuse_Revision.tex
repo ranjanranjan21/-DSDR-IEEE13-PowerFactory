@@ -1,0 +1,156 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\definecolor{navy}{HTML}{1B3755}
+\definecolor{blue}{HTML}{2F6FB3}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.25}
+\newcommand{\sect}[1]{\bigskip{\Large\color{navy}\bfseries #1}\par\smallskip{\color{navy}\hrule height 0.8pt}\smallskip}
+\newcommand{\say}[1]{\par\smallskip\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\textbf{How to say it:} #1}}\par}
+
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{navy} Fuse Revision in the DSDR Study}\\[4pt]
+{\large What was changed, when, why and how}\\[2pt]
+IEEE 13-node feeder, DIgSILENT PowerFactory --- Jhala Nath Kafle (081MSPSE009)
+\end{center}
+
+\sect{1. What --- the fuse sizes before and after}
+All fuses are A055C (E-rated) library fuses, except F634 (gL-800A, 0.48\,kV side). Only the fuses below were
+changed; the other eight kept their starting size.
+
+\begin{center}
+\begin{tabular}{|l|l|c|c|c|}
+\hline
+\textbf{Fuse} & \textbf{Location} & \textbf{Start} & \textbf{Stage A (no DG)} & \textbf{Stage C (DG + DSDR)} \\ \hline
+F692-R & cable 692--675, at 692 & 250E & \textbf{200E} & \textbf{250E} \\ \hline
+F-DL & distributed-load lateral on 632--671 & 250E & 250E & \textbf{400E} \\ \hline
+F633 & lateral 632--633, at 632 & 250E & 250E & \textbf{400E} \\ \hline
+F671-1 & 671--692 (switch), at 671 & 300E & 300E & \textbf{400E} \\ \hline
+F646 & line 645--646, at 645 & 300E & 300E & \textbf{400E} \\ \hline
+F632 & lateral 632--645, at 632 & 400E & 400E & \textbf{500E} \\ \hline
+\end{tabular}
+\end{center}
+
+\sect{2. When --- two moments in the method}
+The fuse size is the \emph{last} thing the method changes. The order is always: settings first, then the
+time dials (step 8), and only when a dial is at its limit, the fuse size (step 9) and the series check (step 10).
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Stage A, design without DG (step 10, series fuses).} One change: F692-R 250E $\rightarrow$ 200E.
+\item \textbf{Stage C, DG connected and R2 as a DSDR (step 9 and 10).} After the dial revision (step 8) could not
+  improve any lost case. Six fuses changed.
+\end{enumerate}
+Stage B (DG connected, conventional R2) only \emph{evaluates} the old design; nothing is changed there.
+
+\sect{3. Why --- what was failing}
+\textbf{Stage A (no DG).} With the starting sizes 35 of 39 cells were held. The four lost cells were all at 675,
+and the reason was the series-fuse condition between F692-R (250E) and its upstream fuse F671-1 (300E): F692-R did
+not clear early enough. Example, LLL at 675: F692-R clears in 0.293\,s, but the limit set by F671-1's melting
+curve is 0.198\,s. A smaller F692-R (200E) clears faster $\rightarrow$ 39 of 39.
+
+\textbf{Stage C (DG + DSDR).} With the DG the fuse carries the grid current \emph{plus} the DG current, while the
+recloser carries only the grid share. The fuse therefore melts before the recloser's fast trip. Examples from the
+evaluation with DG (old fuses):
+
+\begin{center}
+\begin{tabular}{|l|l|c|c|}
+\hline
+\textbf{Fault} & \textbf{Fuse} & \textbf{Fuse starts to melt} & \textbf{Recloser fast trip} \\ \hline
+633, LLL & F633 (250E) & 0.055\,s & R1: 0.106\,s \\ \hline
+DL, LLL & F-DL (250E) & 0.046\,s & R1: 0.106\,s \\ \hline
+646, LL (b--c) & F646 (300E) & 0.178\,s & R1: 0.189\,s \\ \hline
+675, LLL & F692-R (200E) & 0.038\,s & R2: 0.059\,s \\ \hline
+\end{tabular}
+\end{center}
+
+\textbf{Why the dials could not fix it (step 8).} To win against the fuse the recloser's fast curve would have to
+be faster. But R1's fast dial is already at the bottom of the IAC range (TDS 0.5) and R2's at the bottom of the CDG
+range (TMS 0.1). The delayed dials are at their tops (TDS 10, TMS 1.0). So the only remaining step of the method
+is a \emph{slower fuse}, i.e.\ a larger size.
+
+\textbf{Why some backup fuses had to grow as well.} When a fuse grows, the fuse upstream of it (the backup) must
+still be slower, otherwise the series-fuse condition (eq.~8) fails. So F692-R up needs F671-1 up, and F646 up needs
+F632 up.
+
+\sect{4. How --- the procedure}
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item Classify all 39 cells (every fault type and phase combination) with the current settings, with the DG
+  connected \emph{and} disconnected, and list the lost fault cases with their reason.
+\item From each lost case build candidate changes:
+  \begin{itemize}[itemsep=1pt]
+  \item fuse melts before a fast trip $\rightarrow$ that fuse 1, 2 or 3 A055C sizes \emph{up}, alone or together
+    with its backup fuses;
+  \item fuse clears after a delayed trip $\rightarrow$ that fuse 1--3 sizes \emph{down};
+  \item series condition fails $\rightarrow$ backup fuse up, or primary fuse down.
+  \end{itemize}
+\item Try every candidate on the whole feeder (all cells, DG in and out) and keep the one that removes the most
+  lost cases with the smallest change.
+\item Apply it and repeat from step 1 until no candidate improves the result.
+\end{enumerate}
+Only real A055C sizes were used, so every result is a fuse that can be bought.
+
+\textbf{The changes in the order they were applied (stage C).} The count is of lost fault \emph{cases} (each phase
+combination counts once, with the DG in and out), not of cells.
+
+\begin{center}
+\begin{tabular}{|c|>{\raggedright}p{4.3cm}|c|>{\raggedright\arraybackslash}p{7.0cm}|}
+\hline
+\textbf{Order} & \textbf{Change} & \textbf{Lost cases} & \textbf{Reason} \\ \hline
+1 & F-DL 250E $\rightarrow$ 400E & 30 $\rightarrow$ 20 & F-DL melted before R1's fast trip for every fault at DL \\ \hline
+2 & F633 250E $\rightarrow$ 400E & 20 $\rightarrow$ 10 & F633 melted before R1's fast trip for faults at 633 \\ \hline
+3 & F692-R 200E $\rightarrow$ 250E \emph{and} F671-1 300E $\rightarrow$ 400E & 10 $\rightarrow$ 9 &
+  F692-R melted before R2's fast trip at 675; its backup F671-1 grows with it (series condition) \\ \hline
+4 & F646 300E $\rightarrow$ 400E \emph{and} F632 400E $\rightarrow$ 500E & 9 $\rightarrow$ 8 &
+  F646 melted before R1's fast trip at 646; its backup F632 grows with it \\ \hline
+\end{tabular}
+\end{center}
+F692-R returns to 250E in stage C: with the DG it must be slower than R2's fast trip, and the larger F671-1
+(400E) now leaves room for it in the series condition.
+
+\sect{5. Result --- how much the revision gives}
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{DG connected} & \textbf{Fuses of the no-DG design} & \textbf{Revised fuses} \\ \hline
+R2 conventional (single setting) & 24 & 31 \\ \hline
+R2 as DSDR (dual setting) & 25 & \textbf{38} \\ \hline
+\end{tabular}
+\end{center}
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item The DSDR alone: 24 $\rightarrow$ 25. The fuse revision alone: 24 $\rightarrow$ 31. Both: 24 $\rightarrow$ 38.
+\item So the two measures work together: seven of the fourteen restored cells need the dual setting
+  (633 all types; LG at 645, 646 and DL), the others need the larger fuses.
+\item With the final settings and the DG \emph{disconnected}, 37 of 39 cells are held.
+\end{itemize}
+
+\textbf{What the revision could not fix --- LG fault at 692.} F671-1 must be 400E to stay selective with F692-R.
+For the small LG current at 692 the 400E fuse is slow: it clears in about 7.6\,s, while R2's delayed curve trips at
+about 4.0\,s. R2's delayed dial is already at its maximum (TMS 1.0, the highest that keeps R2 below R1), so the
+cell stays lost.
+
+\sect{6. Side effects that were checked}
+\begin{itemize}[leftmargin=*,itemsep=3pt]
+\item \textbf{Slower clearing of weak faults.} A larger fuse is slower at small currents. That is why two of the
+  nine selected faults (cases 3 and 4, faults through impedance) are lost with both settings.
+\item \textbf{Sympathetic operation of F671-1.} With the DG, F671-1 carries DG current for faults outside its zone.
+  For every such fault R2's reverse fast trip comes first, e.g.\ fault at 671 (LLL): F671-1 would melt at 2.467\,s,
+  R2 trips at 0.054\,s.
+\item \textbf{Load.} Every revised fuse is larger than before, so it still carries its load current.
+\end{itemize}
+
+\sect{7. Short answers for the defence}
+\say{``The fuse revision is step 9 of the method. It is used only after the dial revision fails, and here the dials
+were already at their limits: R1 at TDS 0.5 and R2 at TMS 0.1. With the DG the fuse carries grid plus DG current
+and melts before the fast trip, so the fuse had to be made slower, which means one or two sizes larger.''}
+\say{``Six fuses changed: F-DL, F633, F646 and F671-1 to 400E, F632 to 500E and F692-R back to 250E. Each change
+was chosen by trying every candidate on the whole feeder and keeping the one that removed the most lost cases.''}
+\say{``Is it cheating? No: the revision alone gives 31 cells; the dual setting is still needed for seven more,
+giving 38.''}
+\end{document}
