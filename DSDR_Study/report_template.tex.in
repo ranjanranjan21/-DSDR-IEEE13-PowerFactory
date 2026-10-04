@@ -285,76 +285,39 @@ comparison with the reference paper is in Appendix~C.
 % =====================================================================================================
 \chapterhead{TWO}{LITERATURE REVIEW}
 
-\subsection{Overview of Overcurrent Protection}
-An overcurrent device operates when the current exceeds its pickup. With an inverse-time characteristic the
-operating time falls as the multiple of pickup rises, so a device close to the fault clears it quickly while
-upstream devices act later as backup~\cite{benmouyal1999}.
+\subsection{Recloser--Fuse Protection of Distribution Feeders}
+Distribution feeders are protected by reclosers and fuses with inverse-time characteristics: the operating
+time falls as the multiple of the pickup current rises, so the device nearest the fault acts first and the
+upstream devices act as backup~\cite{benmouyal1999}. The pickup fixes where the characteristic starts and the
+time dial scales the operating time; real relays offer only discrete taps and a limited dial range. In the
+fuse-saving scheme the recloser's fast curve must lie below the minimum-melting curve of the fuse, so that a
+temporary fault is cleared without blowing the fuse, and its delayed curve above the total-clearing curve, so
+that the fuse isolates a permanent fault. Fuses in series must be selective: the fuse nearer the fault clears
+before the upstream fuse starts to melt.
 
-\subsection{Distribution Network Protection}
-Distribution feeders combine reclosers and fuses. A recloser distinguishes temporary from permanent faults by
-its fast and delayed operations; a fuse isolates a permanent fault on a lateral.
+\subsection{Impact of Distributed Generation and Directional Adaptive Protection}
+A DG raises the current through the fuses and can reverse the current through a recloser. The recloser and the
+fuse then no longer carry the same current, and a scheme that was coordinated without DG may let the fuse melt
+before the fast trip~\cite{naiem2012}. A directional element distinguishes the direction of the fault current,
+and adaptive protection changes the settings with the state of the network. The dual-setting directional
+recloser (DSDR) combines both: it holds a forward and a reverse setting group and selects one from the
+direction of the current, without communication~\cite{yousaf2022}.
 
-\subsection{Overcurrent Relays}
-The pickup setting fixes the current above which the inverse-time characteristic is active. The time dial
-scales the operating time without changing the shape of the curve. Real relays offer discrete taps and a
-limited dial range, which is decisive in this study.
+\subsection{Related Research and Data Used}
+A classification technique decides for each fault whether recloser--fuse coordination with DG
+exists~\cite{naiem2012}. A benchmark overcurrent protection scheme for the IEEE 13-node feeder~\cite{kersting1991},
+with device types and fuse sizes, is given in~\cite{yousaf2020}; the published short-circuit currents of the
+IEEE test feeders~\cite{kersting2012} are used here to validate the fault levels, and the relay curves are those
+of the manufacturers' manuals~\cite{gemultilin}. Because the feeder is unbalanced, all calculations are made per
+phase and keep only the phases that exist at each node.
 
-\subsection{Directional Overcurrent Relays}
-A directional element compares the current with a polarising voltage and so distinguishes the direction of
-the fault. It becomes necessary when a DG makes the fault current flow from the feeder towards the
-substation.
-
-\subsection{Fuse--Recloser Coordination}
-For fuse saving the fast recloser curve must lie below the minimum-melting curve of the fuse, and the delayed
-curve above its total-clearing curve. Where two fuses are in series, the fuse nearer the fault must clear
-the fault before the upstream fuse starts to melt, so that only the faulted section is disconnected.
-Figure~\ref{fig:f1} shows the principle with the curves of the model.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.72\textwidth]{fig01.png}
-\caption{Conventional recloser--fuse coordination: fast and delayed curve of R1 around the band of fuse F646.
-Coordination holds between the two crossing currents.}
-\label{fig:f1}
-\end{figure}
-
-\subsection{Impact of Distributed Generation on Protection Coordination}
-A DG raises the current through the fuses and can reverse the current through a recloser. The recloser and
-the fuse then no longer carry the same current, and a setting that was coordinated without DG may let the fuse
-melt before the fast trip~\cite{naiem2012}.
-
-\subsection{Adaptive Protection}
-Adaptive protection changes the settings with the state of the network. In the DSDR the device holds two
-setting groups and selects one from the direction of the fault current, so no communication is needed.
-
-\subsection{Protection of Unbalanced Distribution Networks}
-The IEEE 13-node feeder~\cite{kersting1991} has single-phase, two-phase and three-phase sections and
-unbalanced loads. The calculations must therefore keep the phases that really exist at each node and be made
-per phase.
-
-\subsection{Review of Related Research}
-A classification technique for recloser--fuse coordination with DG decides for each fault whether the
-coordination exists~\cite{naiem2012}. A benchmark overcurrent protection scheme for the IEEE 13-node feeder,
-with device types and fuse sizes, is given in~\cite{yousaf2020}; the present work takes from it the fuse sizes
-that the reference method does not show. The short-circuit currents of the IEEE test feeders are published
-in~\cite{kersting2012} and are used here to validate the fault levels. The time--current characteristics of
-the recloser relays are those of the manufacturers' instruction manuals~\cite{gemultilin}.
-
-\subsection{Method Followed in this Study}
-The study follows the adaptive overcurrent protection scheme with a dual-setting directional recloser
-of~\cite{yousaf2022}. The project uses its equations for the forward and reverse operating times, the pickup currents, the fuse characteristic and coefficients, the series-fuse rule and the setting
-constraints, and its flowchart for the design sequence.
-
-\subsection{Research Gap}
-The reference method reports that the DSDR restores coordination in every case, but it does not publish the settings of
-the DSDR, and its figures use fuse curves that differ from its own fuse equation. The gap addressed here is
-an independent implementation in \PF{} that uses the real dial ranges and fuse sizes, shows which part of the
-improvement comes from the dual setting, and states where the method reaches the limits of the devices.
-
-\subsection{Summary of Literature Review}
-The literature establishes that a DG creates bidirectional fault currents and degrades conventional
-coordination, and the DSDR is a structured way to assign independent forward and reverse settings. The
-project adopts the method and validates it stage by stage, starting from the feeder without DG.
+\subsection{Method Followed and Research Gap}
+The study follows the adaptive overcurrent protection scheme with a DSDR of~\cite{yousaf2022}: its equations for
+the forward and reverse operating times, pickups, fuse coefficients and setting constraints, and its flowchart
+for the design sequence. The reference reports that the DSDR restores coordination in every case, but it does
+not publish the DSDR settings, and its fuse curves differ from its own fuse equation. The gap addressed here is
+an independent implementation in \PF{} with the real relay curves, dial ranges and fuse sizes, which shows how
+much of the improvement comes from the dual setting and where the method reaches the limits of the devices.
 
 % =====================================================================================================
 \chapterhead{THREE}{METHODOLOGY}
