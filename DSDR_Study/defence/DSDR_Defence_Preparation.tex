@@ -1,0 +1,264 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\definecolor{navy}{HTML}{1B3755}
+\definecolor{blue}{HTML}{2F6FB3}
+\definecolor{red}{HTML}{C62828}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newcounter{qn}
+% \Q{question}{answer}
+\newcommand{\Q}[2]{\refstepcounter{qn}\par\medskip
+  {\color{navy}\bfseries Q\theqn.\ #1}\par\nopagebreak
+  \hspace*{1.2em}\begin{minipage}[t]{\dimexpr\linewidth-1.2em}#2\end{minipage}\par}
+% tricky question with a "trap" note
+\newcommand{\T}[3]{\refstepcounter{qn}\par\medskip
+  {\color{red}\bfseries Q\theqn.\ #1}\par\nopagebreak
+  \hspace*{1.2em}\begin{minipage}[t]{\dimexpr\linewidth-1.2em}{\color{red}\itshape Why it is tricky: #2}\par #3\end{minipage}\par}
+\newcommand{\sect}[1]{\bigskip{\Large\color{navy}\bfseries #1}\par\smallskip{\color{navy}\hrule height 0.8pt}\smallskip}
+
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{navy} Presentation Defence Preparation}\\[4pt]
+{\large Dual-Setting Directional Recloser and Fuse Coordination with DG --- IEEE 13-Node Feeder, DIgSILENT PowerFactory}\\[2pt]
+Jhala Nath Kafle (081MSPSE009)
+\end{center}
+
+\sect{1. Numbers to Remember}
+\begin{tabular}{|>{\raggedright}p{6.3cm}|>{\raggedright\arraybackslash}p{9.6cm}|}
+\hline
+Feeder & IEEE 13-node, 4.16\,kV, unbalanced; 115\,kV grid, 5\,MVA substation transformer \\ \hline
+DG & 4.05\,MVA synchronous machine at node 692, 0.69/4.16\,kV transformer ($u_k$ 15\,\%), 3.24\,MW \\ \hline
+R1 (feeder head, RG60--632) & GE IAC77B801A, extremely inverse, pickup 720\,A, TDS 0.5 (fast) / 10 (delayed) \\ \hline
+R2 forward (line 632--671) & CDG34, plugs 300 / 600\,A, TMS 0.1 / 1.0 \\ \hline
+R2 reverse & CT 500/5, plugs 150 / 300\,A, TMS 0.1 / 1.0; reverse pickup $1.25\times252$\,A $\approx 315$\,A \\ \hline
+Study grid & 4 fault types at 12 locations = 39 cells \\ \hline
+Coordination held & no DG 39 (35 before F692-R $\rightarrow$ 200E); DG + conventional R2 24; DG + DSDR + revised fuses 38; same fuses, single setting 31 \\ \hline
+Fuse revision & F632 500E; F633, F646, F-DL, F671-1 400E; F692-R 250E \\ \hline
+Still lost & LG fault at 692 (dial limit of R2) \\ \hline
+Fault level check & IEEE benchmark within about 2\,\%; feeder head 4.73\,kA \\ \hline
+PowerFactory relay check & 1896 operating times, largest deviation 1.22\,\% \\ \hline
+EMT (LL a--c at 684, 0.2\,$\Omega$) & no DG: fuse melts 1.248\,s, clears 1.613\,s (fast shots use 45\,\% of melting heat); with DG: melts 0.752\,s, clears 1.253\,s \\ \hline
+DG penetration (fixed settings) & CTI 633: $+4 \rightarrow -51$\,ms; 671: $+403 \rightarrow +75$\,ms; fault level up to +64\,\% \\ \hline
+Margins & breaker time 3 cycles: 31 cells; plus fuse safety margin: 26 cells \\ \hline
+\end{tabular}
+
+\sect{2. Limitations (and how to present them)}
+Say the limitation first, then why it does not invalidate the result. Never hide one; a panel trusts a
+candidate who names the weak points before being asked.
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+\item \textbf{Unpublished data.} The paper does not give R2's settings, the exact fuse sizes or the source
+  impedance. \emph{Answer:} they were chosen by the paper's own equations and every choice is documented in the
+  report, so the work is reproducible.
+\item \textbf{CDG34 is not directional in the PowerFactory library.} The two setting groups are two relay units,
+  and the direction is assigned from the fault location (topology). \emph{Answer:} for a radial feeder with one DG
+  the direction of the current through R2 is fixed by which side the fault is on, so this is exact for the
+  study; a real relay would use a directional element (67), listed as future work.
+\item \textbf{Zero-margin criterion.} The fuse must not start to melt before the fast trip. \emph{Answer:} this is
+  the paper's rule; the sensitivity was checked: with a 3-cycle breaker time 31 cells, with a fuse margin 26.
+\item \textbf{Dial ranges are fixed by the real devices.} The IAC and CDG curves cannot be made faster or slower
+  beyond their ranges, which is why one cell (LG at 692) stays lost. \emph{Answer:} this is a property of real
+  hardware that an idealised curve would hide --- a finding, not an error.
+\item \textbf{One DG location and one DG type.} Only a synchronous DG at 692. Inverter-based DG gives much
+  less fault current (about 1.1--1.5 p.u.) and is future work.
+\item \textbf{Faults downstream of R2.} The DG feeds them directly with no recloser in its path, so no setting of
+  R2 can save those fuses. \emph{Answer:} this is a limit of the DSDR concept itself, shown by the time-sequence check.
+\item \textbf{Fixed settings in the penetration study.} The settings of the design without DG were kept at every
+  level to show the degradation; an adaptive scheme would re-set at each level.
+\item \textbf{Fault levels lower than the paper.} The model was validated against the IEEE benchmark instead
+  of the paper's Table II (whose values are internally inconsistent, see Q26).
+\item \textbf{IEEE 34-node feeder not modelled} (in the paper it is a second test system).
+\item \textbf{Single EMT case.} Only one time-domain case (LL at 684); the rest are curve-based calculations,
+  confirmed by PowerFactory's own relay models within 1.22\,\%.
+\end{enumerate}
+
+\sect{3. Basic Questions}
+\Q{What is fuse saving?}{The recloser trips on its fast curve before the lateral fuse melts, recloses, and a
+temporary fault (most faults on overhead lines) is cleared without blowing the fuse. If the fault is permanent,
+the delayed curve gives the fuse time to clear, so only the faulted lateral is lost.}
+
+\Q{What exactly does the DG change?}{Two things. (1) Magnitude: the fuse carries grid current plus DG current,
+the recloser only the grid current, so the fuse becomes relatively faster. (2) Direction: for a fault between the
+grid and the DG, the DG current flows backwards through R2 (from 671 to 632).}
+
+\Q{What is a DSDR?}{A recloser with two independent setting groups, forward and reverse, each with its own pickup
+and time dial; the group is chosen by the direction of the current. R2 can then be fast enough for the small
+reverse DG current and still coordinate with the fuses downstream for forward faults.}
+
+\Q{Why is R2 placed on line 632--671?}{It separates the grid side (632, 633, 645, 646) from the DG side (671,
+692, 675, 680, 684). It is the only recloser that sees current in both directions.}
+
+\Q{Why IEEE 13-node feeder?}{Short, highly loaded, unbalanced, with single-, two- and three-phase laterals,
+a regulator and a transformer --- a hard test for protection, and the system used in the reference paper.}
+
+\Q{How did you calculate the pickup current?}{$I_p = \mathrm{OLF}\times I_{nom}$ with OLF = 1.25 and $I_{nom}$ the
+load current from the load flow. The pickup must also be below the smallest fault current of the zone (LG through
+3\,$\Omega$ at the farthest node) --- 1074\,A for R1 and 879\,A for R2 without DG.}
+
+\Q{Why is the reverse pickup lower than the forward one?}{The reverse current is only the DG's contribution, much
+smaller than the grid's. The reverse load current through R2 with the DG is 252\,A, so $1.25\times252 \approx
+315$\,A. A forward setting of 300/600\,A plugs would be too slow or would not even start for this current.}
+
+\Q{What does ``cell'' mean in your results?}{One combination of fault location and fault type. Four types at twelve
+locations, minus combinations that cannot exist on single- and two-phase laterals, gives 39 cells.}
+
+\Q{What is the CTI and why does it matter?}{The coordination time interval, $t_{MMT}(\text{fuse}) - t_{fast}
+(\text{recloser})$. Positive: the recloser trips before the fuse starts to melt (fuse saved). Negative: the fuse
+melts first (fuse saving lost).}
+
+\Q{What is the series-fuse condition, eq.\ (8)?}{When two fuses are in series, the fuse nearer the fault must clear
+before the upstream fuse starts to melt; the usual rule is: total clearing time of the downstream fuse $\le 0.75
+\times$ minimum melting time of the upstream fuse. The 0.75 leaves room for preheating and tolerances.}
+
+\Q{Why DIgSILENT PowerFactory?}{It has the library curves of the real relays (IAC77, CDG34) and fuses (A055C),
+unbalanced load flow and short circuit, and EMT simulation in one tool, and its own relay models were used to
+check the calculated times (1896 times, within 1.22\,\%).}
+
+\sect{4. Method and Result Questions}
+\Q{Walk me through the method.}{Stage A: conventional design without DG (pickups, dials, fuse sizes) --- 39 of 39
+after one fuse change. Stage B: same settings, DG connected --- 24 of 39. Stage C: R2 as DSDR; dials could not
+help (both relays at their limits), so the fuses were revised --- 38 of 39.}
+
+\Q{How much of the improvement is the DSDR and how much the fuse revision?}{Separated on purpose: DSDR with the old
+fuses 25 (+1); revised fuses with a single-setting R2 31 (+7); both together 38 (+14). So seven of the fourteen
+restored cells need the dual setting; the two measures work together.}
+
+\Q{Which cells does the dual setting restore?}{All four fault types at 633 and the LG faults at 645, 646 and the
+distributed load --- all in the zone between the grid and the DG, where R2 sees reverse current.}
+
+\Q{Why is the LG fault at 692 still lost?}{F671-1 must be 400E to stay selective with F692-R, and then for the LG
+fault at 692 the fast curve of R2 would have to be faster than its smallest dial (TMS 0.1) allows. It is a limit
+of the real device's dial range.}
+
+\Q{Explain your single vs dual example (three-phase fault near 632).}{R2 carries 1777\,A in reverse (DG only). Single
+setting: forward curve, trips at 0.121\,s, but F633 starts to melt at 0.100\,s --- lost. Dual setting: reverse group,
+trips at 0.052\,s --- held. Same fault, same fuse; only the setting group changed.}
+
+\Q{What does the time-sequence check add?}{The classification uses a strict instant rule. The time-sequence check
+follows each fault in time and lets the fuse heat accumulate while current flows after each recloser opens. Above
+R2: 15 of 18 held with a single setting, 18 of 18 with the DSDR. Below R2 the DG keeps feeding the fault while R2
+is open, so the setting of R2 does not matter there.}
+
+\Q{What does the EMT simulation show?}{LL (a--c) fault at 684 through 0.2\,$\Omega$, conventional settings. Without DG
+the two fast shots use 45\,\% of the fuse's melting heat; the fuse survives and clears the permanent fault at
+1.61\,s. With DG the DG keeps feeding the fault during the dead time; the fuse melts at 0.75\,s, during the second fast
+shot --- fuse saving lost.}
+
+\Q{In the EMT figure the fault is at 684. Why is the current plotted at node 632?}{Node 632 is on the path of the
+fault current (substation, 632, line 632--671 with R2, 671, F671-2, 684) and shows the whole sequence: each fast shot
+of R2, the reclosures, the fuse clearing, and the healthy feeder supplied again afterwards. At 684 the current simply
+stops when the fuse opens, so the restoration would not be visible. The paper uses the same point.}
+
+\Q{Why a fault at 684 and not on the line 671--684?}{PowerFactory refused the line-fault event on that two-phase
+section, so the fault was applied at node 684, at the end of the same line; the fuse F671-2 and R2 see the same
+path.}
+
+\Q{Line 671--684 is two-phase (a, c). Why is the fault called ``a--b'' in PowerFactory?}{PowerFactory names the phases
+of a two-phase element locally (first and second conductor). On this line the first is IEEE phase a and the second
+IEEE phase c, so ``a--b'' in PowerFactory is the a--c fault of the study.}
+
+\Q{Why does the CTI fall as DG penetration rises?}{The fuse is between the fault and both sources, so it carries
+grid plus DG current; the recloser carries only the grid share, which even falls slightly because the DG holds the
+voltage up. The fuse curve is steep, so its melting time drops much faster than the recloser time rises. 633: $+4
+\rightarrow -51$\,ms; 671: $+403 \rightarrow +75$\,ms.}
+
+\Q{How did you verify that your calculated operating times are right?}{The settings were entered into PowerFactory's
+relay and fuse elements and PowerFactory calculated the tripping time of every device for every fault: 1896 times,
+largest deviation 1.22\,\%. Also the R1 worked example of the paper is reproduced (0.096 / 1.926\,s vs 0.097 /
+1.932\,s).}
+
+\sect{5. Tricky Questions}
+\T{Your DSDR is not really directional --- the library relay has no directional element. Is this a DSDR at all?}
+{It attacks the core claim.}
+{The setting groups and their coordination are what the study tests; the direction decision is a separate, simple
+function. In a radial feeder with one DG the direction of the current in R2 is determined by the side of the fault,
+so assigning the group by fault location gives exactly what an ideal directional element would. The weakness is
+stated in the limitations, and an explicit directional element is the first item of future work.}
+
+\T{The paper gets 39 of 39 with the DSDR, you get 38. Did your method fail?}{Invites you to admit a mistake.}
+{No. The paper does not publish R2's settings or all fuse sizes. With the real CDG34 dial range, the LG fault at 692
+needs a faster curve than TMS 0.1 gives. That is a finding about real hardware. The central finding --- the DSDR
+restores coordination between the grid and the DG --- is reproduced.}
+
+\T{Your fault currents are lower than the paper's. Is your model wrong?}{Questions model validity.}
+{The model was validated against the IEEE short-circuit benchmark and agrees within about 2\,\% (4.73\,kA at the head).
+The paper's Table II cannot be fully right: it gives 6.73\,kA on 632--633 and 7.83\,kA on 692--675, both above its own
+5.41\,kA at the feeder head, which is impossible for a radial feeder. The rated load currents agree within 2\,\%.}
+
+\T{You changed the fuse sizes. Isn't that cheating --- any coordination can be fixed with bigger fuses?}
+{Suggests the result is artificial.}
+{Fuse upgrade is step 9 of the paper's own method, used only after the dial revision cannot help. And bigger fuses
+alone are not enough: with the revised fuses and a single-setting R2 only 31 cells are held; the dual setting is
+needed for the other seven. Bigger fuses also have a cost (slower clearing of impedance faults), which is why cases
+3 and 4 of the nine-fault set are lost with both settings.}
+
+\T{With a zero margin your 38 cells are optimistic. What happens with a realistic margin?}{Tests honesty.}
+{Correct, and it was checked: adding a 3-cycle breaker time gives 31 cells, adding also a fuse safety margin gives 26.
+The relative benefit of the DSDR remains; the absolute numbers depend on the margin, which the paper does not state.}
+
+\T{Your progress report said the CTI increases with DG; now it decreases. Which is right?}{Exposes an earlier
+inconsistency.}
+{The decreasing trend is right and it is physically explained (fuse carries grid + DG, recloser only grid). The
+progress-stage model was built in MATLAB with a static Thevenin DG and recalibrated fuse coefficients. The final model
+in PowerFactory uses a dynamic synchronous machine and library fuse curves, and agrees with the paper's trend. The
+change of tool was made exactly because the earlier result could not be explained.}
+
+\T{The reverse pickup is 315\,A, but the reverse fast plug is 150\,A. Which one is the pickup?}{Looks like a
+contradiction.}
+{The CDG34 time curve is defined from a plug-setting multiplier of 2, so the curve starts at twice the plug: 150\,A
+fast plug $\rightarrow$ 300\,A start, 300\,A delayed plug $\rightarrow$ 600\,A start. 300\,A is the closest available
+setting to the calculated 315\,A pickup.}
+
+\T{With more DG, couldn't the reverse load current exceed the reverse pickup and trip R2 on load?}{Probes a hidden
+assumption.}
+{Yes, that is why the method's last box says the settings are valid for the DG capacity they were designed for. At
+4.05\,MVA the reverse load is 252\,A, below the pickup. A larger DG would need new reverse settings --- which is
+exactly what an adaptive, setting-group scheme allows.}
+
+\T{During the reclosing dead time, wouldn't the DG trip by anti-islanding protection anyway?}{Challenges the
+EMT scenario.}
+{Anti-islanding standards (e.g.\ IEEE 1547) allow up to 2\,s to cease energising; the dead time here is 0.2\,s, so the
+DG is still connected during the fast reclosing shots --- that is the dangerous case shown. DG disconnection logic
+during the dead time is listed as future work.}
+
+\T{Why not just disconnect the DG for every fault instead of a DSDR?}{Asks whether the work is needed at all.}
+{Disconnecting the DG for every temporary fault loses its generation and reliability benefit and needs fast transfer
+trip communication. The DSDR uses only local measurements at R2 and keeps the DG in service.}
+
+\T{Would the same work for solar inverters?}{Extrapolation beyond the study.}
+{Not directly. Inverters limit fault current to about 1.1--1.5 times rated, so the fuse--recloser mismatch is
+smaller, but detecting the direction becomes harder. That is future work; this study is for a synchronous DG.}
+
+\T{The paper's fuse equation with its Table III doesn't give the times in its own figures. How do you know your
+fuse curves are right?}{Tests whether you checked the source.}
+{The library A055C curves were used, not the equation. For F646 at 3.6\,kA the paper's figure shows about 0.18\,s,
+while its equation with Table III gives 1.85\,s; the figures match the A055C library curves. Table III could only be
+reproduced with the series index reversed.}
+
+\T{Your CTI at node 633 is negative already without much DG. Was the design bad from the start?}{Suggests a poor
+base design.}
+{Without DG the margin at 633 is only +4\,ms, so it turns negative from about 4\,\% penetration. That small margin
+comes from the fuse size of the design without DG. It shows how sensitive a tight design is --- the reason the method
+revises the fuses (F633 to 400E).}
+
+\T{What is new in your work compared with the paper?}{Asks for your contribution.}
+{(1) An independent implementation in PowerFactory with real relay and fuse library curves and a dynamic DG.
+(2) Separation of the DSDR effect from the fuse-revision effect (25 / 31 / 38 cells). (3) A time-sequence check of
+all cells and an EMT check. (4) A margin sensitivity study. (5) Verification of every operating time with
+PowerFactory's own relay models. (6) A documented check of the paper's tables.}
+
+\sect{6. Tips for the Defence}
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item Answer with a number from your results whenever possible (24, 31, 38; 0.121 vs 0.052\,s).
+\item If you do not know: ``I did not study that; I would expect \dots\ because \dots'' --- never guess a number.
+\item When a weakness is raised, agree, then give the check you made (margin study, PowerFactory relay check).
+\item Keep the comparison with the paper for the appendix slide unless the panel asks earlier.
+\item Have the report open at the results summary table and the comparison table.
+\end{itemize}
+\end{document}
