@@ -322,6 +322,32 @@ and adaptive protection changes the settings with the state of the network. The 
 recloser (DSDR) combines both: it holds a forward and a reverse setting group and selects one from the
 direction of the current, without communication~\cite{yousaf2022}.
 
+\subsection{Relay and Fuse Characteristics}
+Inverse-time relay curves are given by standard equations~\cite{benmouyal1999} or by the manufacturer's own
+equation or table; the GE IAC and the CDG series follow their manufacturer's curves, in which the time is the time
+dial multiplied by a function of $M = I_f/I_p$~\cite{gemultilin}. A fuse is described by its minimum-melting time
+(MMT), when the element starts to melt, and its total-clearing time (TCT), when the arc is extinguished.
+
+\subsection{Approaches to Protection Coordination with DG}
+The remedies proposed for the loss of coordination caused by DG differ in what they change and what they
+require (Table~\ref{tab:approaches}). The DSDR is chosen here because it needs neither communication nor a change
+of the DG and handles the reverse current that a single-setting recloser cannot~\cite{naiem2012, yousaf2022}.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{|p{4.6cm}|L|L|}
+\hline
+\textbf{Approach} & \textbf{Principle} & \textbf{Main limitation} \\ \hline
+Limiting the DG fault current & a fault-current limiter reduces the DG share & extra equipment and cost \\ \hline
+Disconnecting the DG & the DG trips before the fast operation & generation lost for every temporary fault \\ \hline
+Revised conventional settings & new pickups, dials and fuse sizes & valid for one DG size and one direction \\ \hline
+Communication-based adaptive protection & settings changed centrally & needs communication \\ \hline
+Dual-setting directional recloser~\cite{yousaf2022} & forward and reverse groups, selected locally & dial range; faults fed directly by the DG remain \\ \hline
+\end{tabularx}
+\caption{Approaches to recloser--fuse coordination with DG.}
+\label{tab:approaches}
+\end{table}
+
 \subsection{Related Research and Data Used}
 A classification technique decides for each fault whether recloser--fuse coordination with DG
 exists~\cite{naiem2012}. A benchmark overcurrent protection scheme for the IEEE 13-node feeder~\cite{kersting1991},
