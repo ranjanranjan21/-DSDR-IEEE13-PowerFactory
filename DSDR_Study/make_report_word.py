@@ -509,7 +509,7 @@ def approval_page(doc):
                 r.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
     q = para(WD_ALIGN_PARAGRAPH.CENTER, before=74)
     run(q, "DATE OF APPROVAL: ", bold=True)
-    run(q, "Day/Month/Year", italic=True)
+    run(q, "6 October 2026")
 
 
 def polish(path, tex):
