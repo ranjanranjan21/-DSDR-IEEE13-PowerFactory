@@ -213,17 +213,15 @@ NOTES = [
     """I will cover the introduction, objectives, scope, methodology, results, conclusions and references.
     The comparison with the reference paper is in the appendix.""",
     # 3 background
-    """In a fuse-saving scheme the recloser trips first on its fast curve, so a temporary fault clears and
-    the fuse is saved. For a permanent fault the delayed curve lets the fuse blow and isolate only its lateral.
-    In the graph the fast curve lies below the green fuse band and the delayed curve above it. This works only
-    while the recloser and the fuse carry the same current, and a DG changes both the size and the direction
-    of the fault current.""",
+    """In a fuse-saving scheme the recloser trips first on its fast curve, so a temporary fault clears
+    and the fuse is saved; for a permanent fault the delayed curve lets the fuse clear its lateral. This works
+    only while the recloser and the fuse carry the same current, and a DG changes both the size and the
+    direction of the fault current.""",
     # 4 problem
-    """Without DG, recloser and fuse see the same current. With a DG, the fuse carries grid plus DG current,
-    while the recloser sees only the grid part, and a mid-line recloser can even see reverse current. The fuse
-    may then melt before the fast trip. The solution studied is the dual-setting directional recloser, or
-    DSDR: the mid-line recloser R2 gets separate forward and reverse settings, chosen by the current
-    direction. I implemented this in PowerFactory with real relay and fuse curves.""",
+    """With a DG the fuse carries grid plus DG current, while the recloser sees only the grid part, and a
+    mid-line recloser can even see reverse current. The fuse may then melt before the fast trip. The solution
+    studied is the dual-setting directional recloser, or DSDR: R2 gets separate forward and reverse settings,
+    chosen by the current direction.""",
     # 5 objectives
     """The general objective was to build and validate a PowerFactory implementation of the DSDR method on
     the IEEE 13-node feeder, with and without DG. To reach it there are seven specific
@@ -243,16 +241,26 @@ NOTES = [
     """This is the PowerFactory model: a 4.16 kV feeder fed from a 115 kV grid, a 4.05 MVA synchronous
     generator at node 692, R1 a GE IAC77 relay at the feeder head, R2 a CDG34 relay on line 632 to 671, and
     A055C fuses on the laterals.""",
+    # 8b DG parameters
+    """These are the parameters of the synchronous DG used in the model, 4.05 MVA at 0.69 kilovolts, connected at
+    node 692 through a 0.69 to 4.16 kilovolt transformer.""",
     # 9 settings
     """R1 has a pickup of 720 amperes and dials 0.5 and 10. R2 forward uses plugs of 300 and 600 amperes,
     the new reverse group 150 and 300 amperes. With the DG, the load current through R2 reverses to 252
     amperes, giving a reverse pickup of about 315 amperes. The dials were already at their limits, so the
     fuse sizes were revised as shown.""",
+    # 9b branch currents and fault levels
+    """The first result is the base case without DG: the rated current of each protected branch from the
+    load flow, the minimum fault current, an LG fault through 3 ohm at the farthest node, and the maximum, a
+    bolted fault at the nearest node. The feeder head sees 4.73 kiloamperes.""",
+    # 9c fuse coefficients
+    """With the method's fuse equation, slope a equal to minus 1.8, the coefficient b of every fuse follows from
+    the recloser times at the largest fault current below that fuse. The last columns give the installed fuse
+    and its melting time.""",
     # 10 without DG
-    """The fault levels agree with the IEEE benchmark within about 2 percent. Without DG, 35 of 39 cells were
-    coordinated, and all 39 after one fuse change. Two examples: an LG fault at 611 and an LLG fault between
-    692 and 675. In both, R2's fast curve is below the fuses and its delayed curve above them, so the fuses
-    are saved.""",
+    """Without DG, 35 of 39 cells were coordinated, and all 39 after one fuse change. In both examples,
+    an LG fault at 611 and an LLG fault between 692 and 675, R2's fast curve is below the fuses and its
+    delayed curve above them.""",
     # 11 conventional
     """With the DG and unchanged settings, coordination holds in only 24 of 39 cells. Losses are at 633,
     645, 646, the distributed load and 675: the fuse melts before the fast trip, and for some LG faults R2
@@ -269,6 +277,10 @@ NOTES = [
     """A bolted line-to-line fault at 646 with the DSDR. The fuses carry 3.67 kiloamperes. R2 sees the DG share,
     1114 amperes in reverse, and its reverse group trips in 0.086 seconds; R1 sees the grid share and trips in
     0.189 seconds. Both are before F646 starts to melt at 0.415 seconds, so the fuse is saved.""",
+    # 12c operating times
+    """This table gives the operating times with the DSDR and the DG connected. R2 works in reverse for the
+    nodes above it and forward for those below. In every row the fuse starts to melt after the last fast trip;
+    the smallest margins are 6 milliseconds at 675 and 15 at the distributed load.""",
     # 13 case
     """One case in detail: a three-phase fault near 632, with 1777 amperes in reverse through R2. With the
     single setting R2 trips in 0.121 seconds but the fuse starts melting at 0.100 seconds: lost. With the
@@ -301,15 +313,25 @@ NOTES = [
     """Compared with the reference paper, load currents agree within 2 percent and the R1 worked example
     almost exactly. My fault levels are lower because I validated against the IEEE benchmark. The paper
     reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced.""",
+    # 20b fault levels vs benchmark
+    """My fault levels are lower than the paper's, so I checked them against the IEEE short-circuit benchmark,
+    the source the same authors used in their 2020 paper. My model agrees within 2 percent at ten of eleven
+    nodes. The paper's values are up to 151 percent higher, and two of them exceed its own feeder-head value of
+    5.41 kiloamperes, which is not possible in a radial feeder without DG.""",
     # 21 appendix penetration
     """Both studies show the margin decreasing with DG penetration; where it turns negative depends on
     settings the paper does not publish.""",
     # 21b figure map
-    """For reference, this table shows where each figure of the reference method, from Figure 5 to Figure 17,
-    appears in this presentation.""",
+    """For reference, this table shows where each figure and table of the reference method appears in this
+    presentation.""",
     # 22 close
     """Thank you for your attention. I am happy to take your questions.""",
 ]
+
+
+def read_csv(name):
+    import csv
+    return list(csv.DictReader(open(os.path.join(HERE, "results", name))))
 
 
 def objectives_slide(prs):
@@ -459,6 +481,23 @@ def build():
         "Unbalanced load flow, short-circuit and EMT studies in DIgSILENT PowerFactory 2021."],
         size=15, space=6)
 
+    s = new_slide(prs, "4. Methodology: Parameters of the Synchronous DG")
+    left = [["Parameter", "Symbol", "Value"],
+            ["Leakage reactance", "Xl", "0.05 pu"], ["Stator resistance", "Ra", "0.0014 pu"],
+            ["d-axis synchronous reactance", "Xd", "1.4 pu"], ["d-axis transient reactance", "X'd", "0.231 pu"],
+            ["d-axis subtransient reactance", "X''d", "0.118 pu"], ["d-axis transient OC time const.", "T'd0", "5.5 s"],
+            ["d-axis subtransient OC time const.", "T''d0", "0.05 s"], ["q-axis synchronous reactance", "Xq", "1.372 pu"],
+            ["q-axis transient reactance", "X'q", "0.8 pu"]]
+    right = [["Parameter", "Symbol", "Value"],
+             ["q-axis subtransient reactance", "X''q", "0.118 pu"], ["q-axis transient OC time const.", "T'q0", "1.25 s"],
+             ["q-axis subtransient OC time const.", "T''q0", "0.19 s"], ["Mechanical starting time", "M = 2H", "1.5 s"],
+             ["DG rating", "Sn", "4.05 MVA"], ["DG voltage", "Un", "0.69 kV"],
+             ["Step-up transformer", "", "0.69 / 4.16 kV"], ["Transformer leakage reactance", "xT", "0.15 pu"],
+             ["Connection node", "", "692"]]
+    table(s, left, 0.5, 1.25, 6.0, [3.4, 1.1, 1.5], size=12, row_h=0.42)
+    table(s, right, 6.85, 1.25, 6.0, [3.4, 1.1, 1.5], size=12, row_h=0.42)
+    caption(s, 0.5, 5.6, 12.35, "Dynamic synchronous machine in PowerFactory, operating point 3.24 MW, voltage control at 1.0 pu")
+
     s = new_slide(prs, "4. Methodology: Protection Settings")
     table(s, [["Device", "Characteristic", "Pickup / plug (fast / delayed)", "Dial (fast / delayed)"],
               ["R1 (feeder head)", "GE IAC extremely inverse", "720 A", "TDS 0.5 / 10"],
@@ -472,6 +511,24 @@ def build():
         size=16, space=8)
 
     # ---- results ---------------------------------------------------------------------------
+    s = new_slide(prs, "5. Results: Branch Currents and Fault Levels (DG out)")
+    t2 = [["Branch", "Rated current Inom (A)", "If,min (kA)  LG 3 Ω, farthest node", "If,max (kA)  bolted, nearest node"]]
+    for r in read_csv("Table_II.csv"):
+        br = ("%s %s" % (r["From"], r["To"])).replace("XFM1-HV side", "XFM-1 HV side").replace("XFM1-LV side", "XFM-1 LV side") \
+            if r["From"].startswith("XFM") else "%s–%s" % (r["From"], r["To"])
+        t2.append([br, r["Inom (A)"], r["If,min (kA)"], r["If,max (kA)"]])
+    table(s, t2, 1.4, 1.1, 10.5, [2.6, 2.6, 2.7, 2.6], size=12, row_h=0.345, first_col_left=True)
+    caption(s, 1.4, 6.25, 10.5, "Unbalanced load flow (largest phase) and short circuit, complete method; XFM-1 LV side at 0.48 kV")
+
+    s = new_slide(prs, "5. Results: Fuse Coefficients (eq. 9, a = −1.8)")
+    t3 = [["Fuse", "If (A)", "i / z", "t fast (s)", "t delayed (s)", "t fuse (s)", "b i", "Installed fuse", "t MMT (s)"]]
+    for r in read_csv("Table_III.csv"):
+        t3.append([r["Fuse"], r["If (A)"], r["i/z"], "%.3f" % float(r["t_fast (s)"]), "%.3f" % float(r["t_delayed (s)"]),
+                   "%.3f" % float(r["t_fuse eq.(9) (s)"]), r["b_i (eq. 9, i=1 closest to fault)"],
+                   r["installed fuse"].replace("A055C", ""), r["t_MMT of installed fuse at If (s)"]])
+    table(s, t3, 0.6, 1.1, 12.1, [1.3, 1.1, 0.9, 1.3, 1.4, 1.3, 1.0, 1.7, 1.3], size=11.5, row_h=0.305)
+    caption(s, 0.6, 6.05, 12.1, "If: largest fault current below the fuse, DG out. i / z: position in a series of z fuses (1 = closest to the fault)")
+
     s = new_slide(prs, "5. Results: Coordination Without DG")
     picture(s, "fig08.png", 0.45, 1.05, 6.1, 4.45)
     picture(s, "fig09.png", 6.75, 1.05, 6.1, 4.45)
@@ -530,6 +587,18 @@ def build():
     text(s, 0.75, 5.85, 11.8, 0.6, [
         "The fuses carry 3.67 kA (grid + DG). Both reclosers trip before F646 (400E) starts to melt at **0.415 s**: "
         "R2 removes the DG share, R1 the grid share – fuse saved."], bullet=False, size=14)
+
+    s = new_slide(prs, "5. Results: Operating Times with the DSDR (DG in)")
+    t4 = [["Node", "Fault", "I R1 (A)", "R1 fast / delayed (s)", "I R2 (A)", "R2 fast / delayed (s)", "Fuse",
+           "I fuse (A)", "Fuse MMT / TCT (s)"]]
+    for r in read_csv("Table_IV.csv"):
+        t4.append([r["node"], r["fault"], r["I R1 (A)"], "%s / %s" % (r["R1 fast (s)"], r["R1 delayed (s)"]),
+                   "%s %s" % (r["I R2 (A)"], "rev" if r["R2 unit"] == "rev" else "fwd"),
+                   "%s / %s" % (r["R2 fast (s)"], r["R2 delayed (s)"]), r["fuse"].replace("---", "–"),
+                   r["I fuse (A)"] or "–", "–" if r["fuse MMT (s)"] == "---" else "%s / %s" % (r["fuse MMT (s)"], r["fuse TCT (s)"])])
+    table(s, t4, 0.45, 1.1, 12.4, [0.9, 0.9, 1.1, 1.9, 1.3, 1.9, 1.2, 1.1, 1.9], size=11.5, row_h=0.355)
+    caption(s, 0.45, 5.85, 12.4, "Bolted LLL (LL at two-phase, LG at one-phase nodes). Every fuse starts to melt after the last fast trip; "
+            "smallest margins 6 ms (675) and 15 ms (DL)")
 
     s = new_slide(prs, "5. Results: Single vs Dual Setting (3-phase fault near 632)")
     picture(s, "case05.png", 0.4, 1.1, 11.4, 3.55)
@@ -639,6 +708,17 @@ def build():
               ["DG model", "Dynamic synchronous machine", "Synchronous machine", "Same"]],
           0.5, 1.2, 11.2, [3.2, 2.9, 2.8, 2.6], size=12, row_h=0.47)
 
+    s = new_slide(prs, "Appendix: Fault Levels – IEEE Benchmark, This Study and the Paper")
+    picture(s, os.path.join(HERE, "results", "figures", "Fault_level_benchmark.png"), 0.3, 1.1, 8.3, 4.6)
+    caption(s, 0.3, 5.75, 8.3, "Maximum fault current, DG out. Benchmark: Kersting & Shirek [6], values as quoted in [5]")
+    text(s, 8.75, 1.25, 3.9, 5.2, [
+        "**This study vs IEEE benchmark:** within 2 % at 10 of 11 nodes; largest difference 4.7 % (652, LG).",
+        "**Paper vs benchmark:** 4 % to 151 % higher.",
+        "The paper's 6.73 kA (632–633) and 7.83 kA (692–675) exceed its own **5.41 kA at the feeder head** – "
+        "not possible in a radial feeder without DG.",
+        "So the model was validated against the benchmark, not tuned to the paper's Table II."],
+        size=14, space=8)
+
     s = new_slide(prs, "Appendix: CTI with DG Penetration – Study and Paper")
     picture(s, "pen_ring_vs_paper.png", 0.4, 1.1, 7.6, 5.2)
     text(s, 8.2, 1.3, 4.0, 4.9, [
@@ -656,7 +736,7 @@ def build():
                     return str(k)
         return "-"
 
-    s = new_slide(prs, "Appendix: Figures of the Reference Method in This Study")
+    s = new_slide(prs, "Appendix: Figures and Tables of the Reference Method in This Study")
     fmap = [("5", "Coordination method (flowchart)", "4. Methodology: Coordination Method"),
             ("6", "IEEE 13-node feeder with the protective devices", "4. Methodology: Test System"),
             ("7", "CTI against DG penetration (633, 671)", "5. Results: Effect of the DG Penetration"),
@@ -669,10 +749,14 @@ def build():
             ("14", "Coordination status without the DSDR", "5. Results: DG Connected, Conventional R2"),
             ("15", "Bolted LL fault at 646, R2 (DSDR)", "5. Results: Bolted LL Fault at 646"),
             ("16", "Bolted LL fault at 646, R1", "5. Results: Bolted LL Fault at 646"),
-            ("17", "Coordination status with the DSDR", "5. Results: With the DSDR")]
-    table(s, [["Fig. in [1]", "Content", "Slide in this presentation"]] +
-          [[a, b, slide_of(c)] for a, b, c in fmap],
-          1.5, 1.15, 10.0, [1.6, 5.8, 2.6], size=13, row_h=0.36, first_col_left=False)
+            ("17", "Coordination status with the DSDR", "5. Results: With the DSDR"),
+            ("Table I", "Parameters of the synchronous DG", "4. Methodology: Parameters of the Synchronous DG"),
+            ("Table II", "Branch currents and fault levels", "5. Results: Branch Currents"),
+            ("Table III", "Fuse coefficients", "5. Results: Fuse Coefficients"),
+            ("Table IV", "Operating times with the DSDR", "5. Results: Operating Times with the DSDR")]
+    table(s, [["Item in [1]", "Content", "Slide"]] + [["Fig. " + a if a.isdigit() else a, b, slide_of(c)]
+                                                        for a, b, c in fmap],
+          1.5, 1.05, 10.0, [1.8, 6.4, 1.8], size=11.5, row_h=0.29, first_col_left=False)
 
     # ---- close -----------------------------------------------------------------------------
     s = new_slide(prs, "Thank You")
