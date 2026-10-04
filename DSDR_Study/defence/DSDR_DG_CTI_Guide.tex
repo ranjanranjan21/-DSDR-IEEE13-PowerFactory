@@ -4,6 +4,7 @@
 \usepackage{mathptmx}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
+\usepackage{tikz}
 \usepackage{xcolor}
 \usepackage{enumitem}
 \usepackage{array}
@@ -53,23 +54,98 @@ shape of the two curves. With DG this is no longer true --- that is the whole pr
 \end{itemize}
 
 \sect{3. How DG degrades the CTI}
-\sub{3.1 The mechanism in three steps}
-\begin{enumerate}[leftmargin=*,itemsep=3pt]
-\item \textbf{The fuse sees more current.} For a fault at 633 the fuse F633 lies between the fault and \emph{both}
-  sources. It carries the grid current \emph{plus} the DG current:
-  $I_{fuse} = I_{grid} + I_{DG}$.
-\item \textbf{The recloser sees the same or less.} R1 carries only the grid share. The DG even holds the network
-  voltage up during the fault, so the grid share \emph{falls} slightly as the DG grows.
-\item \textbf{The fuse curve is steep.} A fuse follows roughly $t \propto I^{a}$ with $a \approx -1.8$
-  (eq.~9 of the method), much steeper than the recloser curve in this range. A small rise of the fuse current
-  shortens its melting time a lot, while the small fall of the recloser current lengthens its time only a little.
-  The CTI shrinks and changes sign.
+\sub{3.1 The mechanism, step by step}
+The internal fault at 633 is used; the numbers are PowerFactory's, DG at 0\,\% and 100\,\%.
+
+\textbf{Step 1 --- Where the currents flow.} Picture the feeder as two sources feeding one fault:
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, thick, font=\small]
+  \draw (0,0) circle (0.45) node {Grid};
+  \draw (0.45,0) -- (1.4,0);
+  \draw[fill=white] (1.4,-0.3) rectangle (2.2,0.3) node[midway] {R1};
+  \draw (2.2,0) -- (5,0);
+  \fill (5,0) circle (2.5pt) node[above=3pt] {632};
+  \draw (5,0) -- (5,-1.0);
+  \draw[fill=white] (4.6,-1.0) rectangle (5.4,-1.6) node[midway] {F633};
+  \draw (5,-1.6) -- (5,-2.5);
+  \fill (5,-2.5) circle (2.5pt) node[left=3pt] {633};
+  \draw[red, very thick] (4.75,-2.75) -- (5.25,-3.25) (4.75,-3.25) -- (5.25,-2.75);
+  \node[red, right] at (5.3,-3.0) {fault};
+  \draw (5,0) -- (7.6,0);
+  \draw[fill=white] (7.6,-0.3) rectangle (8.4,0.3) node[midway] {R2};
+  \draw (8.4,0) -- (10.2,0);
+  \fill (9.3,0) circle (2.5pt) node[above=3pt] {671};
+  \draw (10.65,0) circle (0.45) node {DG};
+  \node[above] at (10.65,0.45) {at 692};
+  \draw[->, blue] (2.4,0.45) -- (4.4,0.45) node[midway, above] {$I_{grid}$};
+  \draw[->, blue] (7.4,0.45) -- (5.6,0.45) node[midway, above] {$I_{DG}$ (reverse)};
+  \draw[->, red] (5.6,-0.6) -- (5.6,-2.2) node[midway, right] {$I_{fuse} = I_{grid} + I_{DG}$};
+\end{tikzpicture}
+\end{center}
+
+By Kirchhoff's current law at node 632, everything that flows to the fault must pass F633. R1 carries only what the
+grid sends; R2 (in reverse) carries only what the DG sends. So the fuse carries the \emph{sum}, each recloser only its
+\emph{own part}. At 100\,\%: $I_{R1}$ = 3970\,A, $I_{R2}$ = 1500\,A (reverse), $I_{F633}$ = 5426\,A. (The sum is not
+exactly 3970 + 1500 because the two currents are phasors with slightly different angles and the loads also take
+current.) Without DG the fuse and R1 carry almost the same current (4102 and 4162\,A; R1 also feeds the loads of the
+rest of the feeder).
+
+\textbf{Step 2 --- Why the grid share even falls.} The grid pushes current through its own impedance $Z_g$ (source,
+substation transformer, regulator and the line to 632):
+\[
+I_{grid} = \frac{E_{grid} - V_{632}}{Z_g}.
+\]
+During the fault the voltage at 632 collapses. The DG injects current into the same node and holds $V_{632}$ a little
+higher, so the voltage across $Z_g$ is smaller and the grid sends less: $I_{R1}$ falls from 4162 to 3970\,A
+($-4.6\,\%$). In addition the DG supplies part of the load before the fault (R1's load current falls from 588 to
+285\,A), which also lowers R1's current.
+
+\textbf{Step 3 --- How each device's time reacts.} Both curves are inverse (more current, less time), but the two
+devices see very different current changes:
+
+\begin{center}\small
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Device} & \textbf{Current 0\,\%} & \textbf{Current 100\,\%} & \textbf{Change} & \textbf{Time 0\,\% $\rightarrow$ 100\,\%} &
+\textbf{Time change} \\ \hline
+F633 (melting) & 4102\,A & 5426\,A & $+32\,\%$ & 0.1018 $\rightarrow$ 0.0548\,s & $-46\,\%$ \\ \hline
+R1 (fast) & 4162\,A & 3970\,A & $-4.6\,\%$ & 0.0982 $\rightarrow$ 0.1055\,s & $+7\,\%$ \\ \hline
+\end{tabular}
+\end{center}
+
+Two reasons combine:
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{The fuse current changes far more.} +32\,\% for the fuse against $-5$\,\% for R1 (Step 1 and 2).
+\item \textbf{The fuse curve is steeper.} On a log--log plot the slope tells how many per cent the time changes for
+  one per cent of current. Here the fuse's local slope is about $-2.2$ (melting is a heating process, close to
+  $I^2t$ = constant, i.e.\ slope $-2$), while R1's extremely inverse curve at about 5.5 times pickup is flatter,
+  about $-1.5$, because it is approaching its definite-time end. (This is also why the method's fuse equation with
+  $a = -1.8$ predicts $1.32^{-1.8} = 0.61$, a little less change than PowerFactory's 0.54: at these currents the real
+  curve is steeper.)
 \end{enumerate}
 
-\textbf{Check with the numbers (0 $\rightarrow$ 100\,\%, fault at 633):} the fuse current rises by a factor
-$5426/4102 = 1.32$, so $t_{MMT}$ should fall by about $1.32^{-1.8} = 0.61$; PowerFactory gives
-$0.0548/0.1018 = 0.54$. The R1 current falls from 4162 to 3970\,A (-4.6\,\%) and its fast time rises only from
-0.098 to 0.106\,s (+8\,\%).
+\textbf{Step 4 --- Add it up.} The change of the CTI is the change of the fuse time minus the change of the recloser
+time:
+\[
+\Delta \mathrm{CTI} = \Delta t_{MMT} - \Delta t_{fast} = (-47.0\,\text{ms}) - (+7.3\,\text{ms}) = -54.3\,\text{ms}.
+\]
+About 87\,\% of the loss comes from the fuse becoming faster and 13\,\% from the recloser becoming slower. The CTI
+goes from +3.6 to $-50.7$\,ms.
+
+\textbf{Step 5 --- Why it turns negative so early at 633.} The design without DG left only +4\,ms. Already 10\,\% DG
+(0.41\,MVA) adds 154\,A to the fuse current; the melting time drops by 8\,ms and the CTI becomes $-5$\,ms. The zero
+crossing is at about 4\,\% penetration. A design with a larger starting margin survives longer --- which is what
+the fuse revision does (Section 4).
+
+\textbf{Step 6 --- The same at 684.} For the fault at 684 the DG at 692 feeds through F671-2 but not through R2:
+the fuse current rises by 54\,\% (2574 $\rightarrow$ 3963\,A) and its melting time falls by 69\,\% (0.470
+$\rightarrow$ 0.148\,s), while R2's current falls by 6\,\% and its fast time rises only from 0.067 to 0.072\,s. The
+CTI falls from +403 to +75\,ms --- the same mechanism, but the large starting margin keeps it positive.
+
+\textbf{In short:} DG makes the fuse and the recloser carry \emph{different} currents. The fuse, nearer the fault,
+gets more; the recloser gets the same or less. The fuse therefore speeds up while the recloser does not, and the gap
+between them --- the CTI --- closes.
 
 \sub{3.2 Internal fault at 633, conventional protection}
 \begin{center}\small
@@ -106,7 +182,7 @@ Same mechanism (the DG at 692 feeds the fault at 684 through F671-2 but not thro
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.95\textwidth]{pen_currents.png}
-\caption*{\small Fuse current (grid + DG), recloser current (grid only), DG current and resulting CTI against DG penetration.}
+\par\smallskip{\small Fuse current (grid + DG), recloser current (grid only), DG current and resulting CTI against DG penetration.}
 \end{figure}
 
 \sub{3.4 The other effects of rising penetration}
@@ -122,9 +198,7 @@ Same mechanism (the DG at 692 feeds the fault at 684 through F671-2 but not thro
   368\,A, below R2's 600\,A start from about 75\,\%: R2 no longer sees it.
 \end{itemize}
 
-\say{The fuse carries grid plus DG current while the recloser carries only the grid share; because the fuse
-curve is much steeper, the fuse becomes faster far more quickly than the recloser, and the CTI falls with every
-step of DG penetration.}
+\say{The fuse carries grid plus DG current while the recloser carries only the grid share; the fuse current therefore rises much more than the recloser current changes, the fuse curve is also steeper, so the fuse becomes faster far more quickly than the recloser and the CTI falls with every step of DG penetration.}
 
 \sect{4. How the DSDR mitigates it}
 \sub{4.1 Two actions that work together}
@@ -172,7 +246,7 @@ step of DG penetration.}
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{CTI_conventional_vs_DSDR.png}
-\caption*{\small Left: CTI at 633 against R1. Middle: margin to the last fast trip at 633 (R1 and R2). Right: CTI
+\par\smallskip{\small Left: CTI at 633 against R1. Middle: margin to the last fast trip at 633 (R1 and R2). Right: CTI
 for the fault at 684 --- identical for both schemes.}
 \end{figure}
 
