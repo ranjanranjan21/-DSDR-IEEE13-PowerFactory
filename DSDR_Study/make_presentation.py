@@ -238,12 +238,16 @@ NOTES = [
     time dial is revised first, and at the dial limit the fuse is made larger. The fuse must not melt before
     the fast trip, and must clear before the delayed trip.""",
     # 7b equations
-    """The method gives a general inverse-time equation, but here the real curves of the two relays are used.
-    R1 is a GE IAC77 extremely inverse relay, with the GE Multilin equation shown, a pickup of 720 amperes and
-    dials 0.5 and 10. R2, the DSDR, is a CDG34 extremely inverse relay, evaluated from its PowerFactory table
-    by log-log interpolation, with forward and reverse plug settings and multipliers 0.1 and 1.0. The pickup is
-    1.25 times the load current in each direction, the fuses use the A055C library curves, and coordination
-    holds when the fuse melts after the fast trip and clears before the delayed trip.""",
+    """These are the equations of the method: one inverse-time curve with a fast and a delayed time dial,
+    for the forward and the reverse direction; the pickup from the load current; the fuse line on log-log axes;
+    and the coordination conditions.""",
+    # 7c real curves
+    """The method writes the operating time as TDS times a function of M, the fault current over the pickup.
+    A, B and n describe only a generic curve, so I kept the structure and used the real curve of each relay:
+    the GE Multilin equation for R1 and the manufacturer's table for the CDG34. The pickups, dials, limits and
+    coordination rules of the method are unchanged. This is checked twice: R1 reproduces the paper's worked
+    example within one millisecond, and PowerFactory's own relay models confirm all 1896 times within 1.22
+    percent.""",
     # 8 system
     """This is the PowerFactory model: a 4.16 kV feeder fed from a 115 kV grid, a 4.05 MVA synchronous
     generator at node 692, R1 a GE IAC77 relay at the feeder head, R2 a CDG34 relay on line 632 to 671, and
@@ -474,8 +478,21 @@ def build():
         size=16, space=7)
     picture(s, "flowchart.png", 6.3, 1.1, 6.0, 5.3)
 
-    s = new_slide(prs, "4. Methodology: Mathematical Formulation")
-    picture(s, os.path.join(HERE, "results", "figures", "DSDR_equations.png"), 0.35, 1.0, 12.6, 6.0)
+    s = new_slide(prs, "4. Methodology: Mathematical Formulation of the Method")
+    picture(s, os.path.join(HERE, "results", "figures", "DSDR_equations_method.png"), 0.35, 1.0, 12.6, 6.0)
+
+    s = new_slide(prs, "4. Methodology: Operating Times from the Real Relay Curves")
+    picture(s, os.path.join(HERE, "results", "figures", "DSDR_equations_impl.png"), 0.6, 0.95, 12.1, 4.0)
+    text(s, 0.75, 5.0, 5.9, 0.4, ["Why the real curves"], bullet=False, size=16, color=NAVY)
+    text(s, 0.75, 5.4, 5.9, 1.3, [
+        "The method fixes the structure t = TDS × g(M); A, B and n only describe a generic curve.",
+        "R1 and R2 are real relays with curves given by their manufacturers, so every time is one a "
+        "device in the field would give."], size=13, space=3)
+    text(s, 6.85, 5.0, 5.9, 0.4, ["How we know it is right"], bullet=False, size=16, color=NAVY)
+    text(s, 6.85, 5.4, 5.9, 1.3, [
+        "R1 reproduces the paper's worked example: **0.096 / 1.926 s** against 0.097 / 1.932 s (4219 A).",
+        "PowerFactory's own relay models confirm all **1896** operating times within **1.22 %**."],
+        size=13, space=3)
 
     s = new_slide(prs, "4. Methodology: Test System in PowerFactory")
     picture(s, "sld.png", 0.4, 1.1, 6.6, 5.3)
@@ -753,12 +770,14 @@ def build():
     assert len(NOTES) == len(prs.slides), (len(NOTES), len(prs.slides))
     for s, n in zip(prs.slides, NOTES):                   # speaker notes: seen only in Presenter View
         s.notes_slide.notes_text_frame.text = " ".join(n.split())
-    try:
-        prs.save(OUT)
-        out = OUT
-    except PermissionError:
-        out = OUT.replace(".pptx", "_new.pptx")
-        prs.save(out)
+    out = None
+    for suffix in ("", "_new", "_v2", "_v3", "_v4"):          # a file open in PowerPoint is locked
+        try:
+            prs.save(OUT.replace(".pptx", suffix + ".pptx"))
+            out = OUT.replace(".pptx", suffix + ".pptx")
+            break
+        except PermissionError:
+            continue
     print("PRESENTATION:", out, "(%d slides)" % len(prs.slides))
     return out
 
