@@ -4,7 +4,7 @@ fonts) and fills it with the results of this study, in the order asked by the de
 Title, Introduction, Objectives, Scope, Methodology, Results, Conclusions, References, Appendix
 (comparison with the reference paper).
 
-Input : Presentation and report/DSDR_Final_Project_Presentation final.pptx  (design and title slide)
+Input : presentation_template.pptx (design and title slide)
         report/figures/*.png                                                (figures of the report)
 Output: Presentation and report/DSDR_Final_Presentation.pptx
 """
@@ -23,7 +23,7 @@ from pptx.util import Emu, Pt
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 FOLDER = os.path.join(ROOT, "Presentation and report")
-SRC = os.path.join(FOLDER, "DSDR_Final_Project_Presentation final.pptx")
+SRC = os.path.join(HERE, "presentation_template.pptx")      # title slide and design (copy of the deck)
 OUT = os.path.join(FOLDER, "DSDR_Final_Presentation.pptx")
 FIGS = os.path.join(HERE, "report", "figures")
 
