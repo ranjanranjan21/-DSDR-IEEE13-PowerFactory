@@ -250,17 +250,25 @@ NOTES = [
     fuse sizes were revised as shown.""",
     # 10 without DG
     """The fault levels agree with the IEEE benchmark within about 2 percent. Without DG, 35 of 39 cells were
-    coordinated, and all 39 after one fuse change. The figure shows R2's fast curve below both fuses and its
-    delayed curve above them. With the DG, R2 carries 1.1 to 2 kiloamperes in reverse for faults upstream of
-    it.""",
+    coordinated, and all 39 after one fuse change. Two examples: an LG fault at 611 and an LLG fault between
+    692 and 675. In both, R2's fast curve is below the fuses and its delayed curve above them, so the fuses
+    are saved.""",
     # 11 conventional
     """With the DG and unchanged settings, coordination holds in only 24 of 39 cells. Losses are at 633,
     645, 646, the distributed load and 675: the fuse melts before the fast trip, and for some LG faults R2
     does not even pick up the reverse current.""",
+    # 11b three selected faults
+    """Three faults with the DG and the conventional settings. At 646 and 645 through a fault impedance the
+    recloser still trips first. For the three-phase fault close to 632, R2 carries 1777 amperes in reverse and
+    trips in 0.121 seconds, but fuse F633 melts in 0.039 seconds: coordination is lost.""",
     # 12 dsdr
     """With R2 as a DSDR and revised fuses, 38 of 39 cells are held. With the same fuses and a single
     setting only 31, so the dual setting itself restores seven cells, at 633, 645, 646 and the distributed
     load. Only the LG fault at 692 stays lost, at the limit of R2's dial range.""",
+    # 12b bolted LL at 646
+    """A bolted line-to-line fault at 646 with the DSDR. The fuses carry 3.67 kiloamperes. R2 sees the DG share,
+    1114 amperes in reverse, and its reverse group trips in 0.086 seconds; R1 sees the grid share and trips in
+    0.189 seconds. Both are before F646 starts to melt at 0.415 seconds, so the fuse is saved.""",
     # 13 case
     """One case in detail: a three-phase fault near 632, with 1777 amperes in reverse through R2. With the
     single setting R2 trips in 0.121 seconds but the fuse starts melting at 0.100 seconds: lost. With the
@@ -296,6 +304,9 @@ NOTES = [
     # 21 appendix penetration
     """Both studies show the margin decreasing with DG penetration; where it turns negative depends on
     settings the paper does not publish.""",
+    # 21b figure map
+    """For reference, this table shows where each figure of the reference method, from Figure 5 to Figure 17,
+    appears in this presentation.""",
     # 22 close
     """Thank you for your attention. I am happy to take your questions.""",
 ]
@@ -461,15 +472,14 @@ def build():
         size=16, space=8)
 
     # ---- results ---------------------------------------------------------------------------
-    s = new_slide(prs, "5. Results: Without DG and the Effect of the DG")
-    text(s, 0.75, 1.3, 5.6, 4.9, [
-        "Fault levels agree with the IEEE short-circuit benchmark within about 2 % (feeder head 4.73 kA).",
-        "**Without DG:** 35 of 39 cells coordinated with the starting fuses, **39 of 39** after F692-R → 200E.",
-        "**With the DG:** the load current at R2 reverses (252 A).",
-        "For faults upstream of R2 it carries **1.1 to 2.0 kA in reverse**, and the fuses carry grid + DG current."],
-        size=16, space=8)
-    picture(s, "fig08.png", 6.6, 1.1, 5.6, 4.95)
-    caption(s, 6.6, 6.0, 5.6, "LG fault at 611 without DG: R2 forward with F684 and F671-2")
+    s = new_slide(prs, "5. Results: Coordination Without DG")
+    picture(s, "fig08.png", 0.45, 1.05, 6.1, 4.45)
+    picture(s, "fig09.png", 6.75, 1.05, 6.1, 4.45)
+    caption(s, 0.45, 5.45, 6.1, "LG fault at 611: R2 fast 0.128 s < F684 melts 0.271 s – held")
+    caption(s, 6.75, 5.45, 6.1, "LLG fault mid 692–675, 1 Ω: R2 fast 0.204 s < F692-R melts 0.331 s – held")
+    text(s, 0.75, 5.85, 11.8, 0.6, [
+        "Fault levels within about 2 % of the IEEE benchmark. **35 of 39** cells held with the starting fuses, "
+        "**39 of 39** after F692-R → 200E. R2 fast below the fuses, delayed above them."], bullet=False, size=14)
 
     s = new_slide(prs, "5. Results: DG Connected, Conventional R2")
     picture(s, "fig14.png", 0.4, 1.15, 7.3, 4.9)
@@ -480,6 +490,29 @@ def build():
         "For some LG faults the single-setting R2 does not pick up the reverse DG current at all."],
         size=16, space=8)
 
+    s = new_slide(prs, "5. Results: Conventional R2 with DG – Three Faults")
+    for k, (pic, head, lines, ok) in enumerate((
+            ("fig11.png", "LL fault at 646, 1 Ω",
+             ["R1 1899 A: fast 0.395 s", "F646 300E melts 0.595 s", "R1 trips first"], True),
+            ("fig12.png", "LL fault at 645, 1.5 Ω",
+             ["R2 783 A (reverse): fast 0.605 s", "F632 400E melts 2.649 s", "R2 trips first"], True),
+            ("fig13.png", "3-phase fault at 10 % of 632–633",
+             ["R2 1777 A (reverse): fast 0.121 s", "F633 250E melts 0.039 s", "the fuse melts first"], False))):
+        x = 0.35 + k * 4.25
+        picture(s, pic, x, 1.05, 4.15, 3.05)
+        tb = s.shapes.add_textbox(emu(x + 0.1), emu(4.2), emu(3.95), emu(2.1))
+        tf = tb.text_frame
+        tf.word_wrap = True
+        for j, t in enumerate([head] + lines + ["coordination HELD" if ok else "coordination LOST"]):
+            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
+            p.alignment = PP_ALIGN.CENTER
+            r = p.add_run()
+            r.text = t
+            r.font.name = "Aptos"
+            r.font.size = Pt(15 if j == 0 else 13)
+            r.font.bold = j in (0, 4)
+            r.font.color.rgb = NAVY if j == 0 else (GREEN if ok else RED) if j == 4 else INK
+
     s = new_slide(prs, "5. Results: With the DSDR")
     picture(s, "fig17.png", 0.4, 1.15, 7.3, 4.9)
     text(s, 7.9, 1.3, 4.3, 4.9, [
@@ -488,6 +521,15 @@ def build():
         "The dual setting restores **7 cells**: all faults at 633 and the LG faults at 645, 646 and DL.",
         "Still lost: LG fault at 692 – the 400E fuse F671-1 clears after R2's delayed trip (7.6 s vs 4.0 s); the delayed dial is already at its maximum."],
         size=16, space=8)
+
+    s = new_slide(prs, "5. Results: Bolted LL Fault at 646 with the DSDR")
+    picture(s, "fig15.png", 0.45, 1.05, 6.1, 4.45)
+    picture(s, "fig16.png", 6.75, 1.05, 6.1, 4.45)
+    caption(s, 0.45, 5.45, 6.1, "R2 reverse (DG share, 1114 A): fast 0.086 s")
+    caption(s, 6.75, 5.45, 6.1, "R1 (grid share, 2785 A): fast 0.189 s")
+    text(s, 0.75, 5.85, 11.8, 0.6, [
+        "The fuses carry 3.67 kA (grid + DG). Both reclosers trip before F646 (400E) starts to melt at **0.415 s**: "
+        "R2 removes the DG share, R1 the grid share – fuse saved."], bullet=False, size=14)
 
     s = new_slide(prs, "5. Results: Single vs Dual Setting (3-phase fault near 632)")
     picture(s, "case05.png", 0.4, 1.1, 11.4, 3.55)
@@ -606,6 +648,31 @@ def build():
         "does not publish.",
         "Central finding reproduced: the DSDR restores coordination between the grid and the DG."],
         size=15, space=8)
+
+    def slide_of(title):
+        for k, sl in enumerate(prs.slides, 1):
+            for sh in sl.shapes:
+                if sh.has_text_frame and sh.text_frame.text.startswith(title):
+                    return str(k)
+        return "-"
+
+    s = new_slide(prs, "Appendix: Figures of the Reference Method in This Study")
+    fmap = [("5", "Coordination method (flowchart)", "4. Methodology: Coordination Method"),
+            ("6", "IEEE 13-node feeder with the protective devices", "4. Methodology: Test System"),
+            ("7", "CTI against DG penetration (633, 671)", "5. Results: Effect of the DG Penetration"),
+            ("8", "LG fault at 611", "5. Results: Coordination Without DG"),
+            ("9", "LLG fault mid 692–675, 1 Ω", "5. Results: Coordination Without DG"),
+            ("10", "Time-domain current at 632, LL fault at 684", "5. Results: Time-Domain"),
+            ("11", "LL fault at 646, 1 Ω", "5. Results: Conventional R2 with DG – Three"),
+            ("12", "LL fault at 645, 1.5 Ω", "5. Results: Conventional R2 with DG – Three"),
+            ("13", "3-phase fault at 10 % of 632–633", "5. Results: Conventional R2 with DG – Three"),
+            ("14", "Coordination status without the DSDR", "5. Results: DG Connected, Conventional R2"),
+            ("15", "Bolted LL fault at 646, R2 (DSDR)", "5. Results: Bolted LL Fault at 646"),
+            ("16", "Bolted LL fault at 646, R1", "5. Results: Bolted LL Fault at 646"),
+            ("17", "Coordination status with the DSDR", "5. Results: With the DSDR")]
+    table(s, [["Fig. in [1]", "Content", "Slide in this presentation"]] +
+          [[a, b, slide_of(c)] for a, b, c in fmap],
+          1.5, 1.15, 10.0, [1.6, 5.8, 2.6], size=13, row_h=0.36, first_col_left=False)
 
     # ---- close -----------------------------------------------------------------------------
     s = new_slide(prs, "Thank You")
