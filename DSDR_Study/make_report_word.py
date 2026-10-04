@@ -417,6 +417,102 @@ def table_number(tbl):
     return None
 
 
+def approval_page(doc):
+    """page of approval laid out as in the PDF: institution lines centred, the certificate text, the four
+    signature blocks in a two-by-two grid, the date of approval centred"""
+    heads = [p for p in doc.paragraphs if p.style.name == "Heading 1"]
+    head = next((p for p in heads if p.text.strip() == "PAGE OF APPROVAL"), None)
+    if head is None:
+        return
+    nxt = heads[heads.index(head) + 1]
+    el = head._p.getnext()
+    while el is not None and el is not nxt._p:           # drop what pandoc made of the minipages
+        following = el.getnext()
+        el.getparent().remove(el)
+        el = following
+
+    def para(align, before=0, after=0):
+        q = nxt.insert_paragraph_before()
+        f = q.paragraph_format
+        f.alignment, f.first_line_indent, f.left_indent = align, Cm(0), Cm(0)
+        f.space_before, f.space_after = Pt(before), Pt(after)
+        f.line_spacing, f.line_spacing_rule = Pt(17.9), WD_LINE_SPACING.AT_LEAST
+        return q
+
+    def run(q, text, bold=False, italic=False):
+        r = q.add_run(text)
+        r.font.size, r.bold, r.italic = Pt(12), bold, italic
+        return r
+
+    q = para(WD_ALIGN_PARAGRAPH.CENTER, after=14)
+    lines = ("TRIBHUVAN UNIVERSITY", "INSTITUTE OF ENGINEERING", "PULCHOWK CAMPUS", "DEPARTMENT OF ELECTRICAL ENGINEERING")
+    for k, t in enumerate(lines):
+        r = run(q, t)
+        if k < len(lines) - 1:
+            r.add_break()
+    q = para(WD_ALIGN_PARAGRAPH.JUSTIFY, after=36)
+    run(q, "The undersigned certify that they have read, and recommended to the Institute of Engineering for "
+           "acceptance, a project report entitled \u201c")
+    run(q, "An Adaptive Overcurrent Protection Scheme for Dual-Setting Directional Recloser and Fuse Coordination "
+           "in Unbalanced Distribution Networks With Distributed Generation", italic=True)
+    run(q, "\u201d submitted by ")
+    run(q, "Jhala Nath Kafle", italic=True)
+    run(q, " in partial fulfilment of the requirements for the Master\u2019s degree in Power System Engineering.")
+
+    ext = [("[Name of External Examiner]", True), ("(External Examiner)", False), ("[Title]", True),
+           ("[Name of the Organization]", True)]
+    blocks = [[("[Name of Supervisor]", True), ("Supervisor", False), ("Department of Electrical Engineering", False)],
+              [("[Name of the Head of Department]", True), ("Head of the Department", False),
+               ("Department of Electrical Engineering", False)], ext, ext]
+    table = doc.add_table(rows=2, cols=2)
+    nxt._p.addprevious(table._tbl)
+    pr = table._tbl.tblPr
+    for tag in ("w:tblStyle", "w:tblBorders", "w:tblLayout", "w:tblW", "w:tblLook"):
+        old = pr.find(qn(tag))
+        if old is not None:
+            pr.remove(old)
+    b = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        e = OxmlElement("w:%s" % edge)
+        e.set(qn("w:val"), "nil")
+        b.append(e)
+    pr.append(b)
+    lay = OxmlElement("w:tblLayout")
+    lay.set(qn("w:type"), "fixed")
+    pr.append(lay)
+    look = OxmlElement("w:tblLook")                      # no header-row formatting of the default table style
+    for a_, v_ in (("w:val", "0000"), ("w:firstRow", "0"), ("w:lastRow", "0"), ("w:firstColumn", "0"),
+                   ("w:lastColumn", "0"), ("w:noHBand", "1"), ("w:noVBand", "1")):
+        look.set(qn(a_), v_)
+    pr.append(look)
+    for tc in table._tbl.iter(qn("w:tc")):               # and no borders on the cells themselves
+        tcpr = tc.get_or_add_tcPr()
+        tb = OxmlElement("w:tcBorders")
+        for edge in ("top", "left", "bottom", "right"):
+            e = OxmlElement("w:%s" % edge)
+            e.set(qn("w:val"), "nil")
+            tb.append(e)
+        tcpr.append(tb)
+    for k, items in enumerate(blocks):
+        cell = table.rows[k // 2].cells[k % 2]
+        cell.width = Cm(7.75)
+        q = cell.paragraphs[0]
+        for j, (text, ital) in enumerate([("\u2500" * 22, False)] + items):
+            if j:
+                q = cell.add_paragraph()
+            f = q.paragraph_format
+            f.alignment, f.first_line_indent = WD_ALIGN_PARAGRAPH.LEFT, Cm(0)
+            f.space_before = Pt(0)
+            f.space_after = Pt(42 if (j == len(items) and k < 2) else 0)
+            f.line_spacing, f.line_spacing_rule = Pt(17.9), WD_LINE_SPACING.AT_LEAST
+            r = run(q, text, italic=ital)
+            if j == 0:
+                r.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
+    q = para(WD_ALIGN_PARAGRAPH.CENTER, before=60)
+    run(q, "DATE OF APPROVAL: ", bold=True)
+    run(q, "Day/Month/Year", italic=True)
+
+
 def polish(path, tex):
     doc = Document(path)
     for sec in doc.sections:
@@ -576,6 +672,7 @@ def polish(path, tex):
                 toc_field(nxt.insert_paragraph_before(), 'TOC '+chr(92)+'h '+chr(92)+'z '+chr(92)+'t "%s,9"' % style)    # level 9: own style
         if any(r._r.find(qn("w:drawing")) is not None for r in p.runs):
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    approval_page(doc)
     # ---- three sections: title page (no number), front matter (i, ii, ...), chapters (1, 2, ...)
     end_title = title_page(doc, tex)
     section_break(doc, end_title)

@@ -135,6 +135,40 @@ DEPARTMENT OF ELECTRICAL ENGINEERING\par
 \setcounter{page}{2}
 
 % =====================================================================================================
+\fronthead{PAGE OF APPROVAL}
+\begin{center}
+TRIBHUVAN UNIVERSITY\\ INSTITUTE OF ENGINEERING\\ PULCHOWK CAMPUS\\ DEPARTMENT OF ELECTRICAL ENGINEERING
+\end{center}
+\noindent The undersigned certify that they have read, and recommended to the Institute of Engineering for
+acceptance, a project report entitled ``\textit{An Adaptive Overcurrent Protection Scheme for Dual-Setting
+Directional Recloser and Fuse Coordination in Unbalanced Distribution Networks With Distributed Generation}''
+submitted by \textit{Jhala Nath Kafle} in partial fulfilment of the requirements for the Master's degree in
+Power System Engineering.
+
+\vspace{1.6cm}
+\noindent\begin{minipage}[t]{0.47\textwidth}
+\rule{0.9\linewidth}{0.4pt}\\
+\textit{[Name of Supervisor]}\\ Supervisor\\ Department of Electrical Engineering
+\end{minipage}\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\rule{0.9\linewidth}{0.4pt}\\
+\textit{[Name of the Head of Department]}\\ Head of the Department\\ Department of Electrical Engineering
+\end{minipage}
+
+\vspace{1.8cm}
+\noindent\begin{minipage}[t]{0.47\textwidth}
+\rule{0.9\linewidth}{0.4pt}\\
+\textit{[Name of External Examiner]}\\ (External Examiner)\\ \textit{[Title]}\\ \textit{[Name of the Organization]}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\rule{0.9\linewidth}{0.4pt}\\
+\textit{[Name of External Examiner]}\\ (External Examiner)\\ \textit{[Title]}\\ \textit{[Name of the Organization]}
+\end{minipage}
+
+\vspace{1.8cm}
+\begin{center}\textbf{DATE OF APPROVAL:} \textit{Day/Month/Year}\end{center}
+
+% =====================================================================================================
 \fronthead{COPYRIGHT}
 The author has agreed that the Library, Department of Electrical Engineering, Pulchowk Campus, Institute of
 Engineering may make this report freely available for inspection. Moreover, the author has agreed that
@@ -173,6 +207,20 @@ times within <<PF_MAX>> per cent.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
 coordination, IEEE 13-node feeder, DIgSILENT \PF.
+
+% =====================================================================================================
+\fronthead{ACKNOWLEDGEMENT}
+I express my sincere gratitude to my project supervisor for the guidance, the regular review of the work and
+the comments that shaped this report. I am grateful to the Head of the Department and to the faculty of the
+Department of Electrical Engineering, Pulchowk Campus, Institute of Engineering, for the facilities and the
+support that made this project possible, and to the coordinator of the M.Sc.\ programme in Power System
+Engineering for the encouragement throughout the work.
+
+I also thank my colleagues of the M.Sc.\ Power System Engineering programme for the discussions on distribution
+protection and on the use of DIgSILENT \PF, and my family for their patience and support.
+
+\vspace{1cm}
+\noindent Jhala Nath Kafle\\ 081MSPSE009
 
 % =====================================================================================================
 \clearpage
