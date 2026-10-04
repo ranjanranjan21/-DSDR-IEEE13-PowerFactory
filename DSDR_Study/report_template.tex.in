@@ -739,19 +739,22 @@ at 675, where the series fuses F692-R (250E) and F671-1 (300E) are not selective
 clear the fault early enough before F671-1 starts to melt. The fuse revision of
 the method changes F692-R to 200E, after which all <<N_CELLS>> cells are coordinated. Figures~\ref{fig:f8}
 and \ref{fig:f9} show two cases: R2's fast curve lies below the fuses and its delayed curve
-above them.
+above them. In every time--current plot of this chapter the dotted lines carry each operating point to the time axis
+with its operating time. The arrow at the fuse current gives the coordination time interval
+$\mathrm{CTI} = t_{MMT} - t_F$ (green when positive, red when the fuse melts first) and the margin
+$t_D - t_{TCT}$ by which the fuse clears before the delayed trip.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig08.png}
-\caption{LG fault at 611: R2 forward, fuses F684 and F671-2.}
+\caption{LG fault at 611: R2 forward, fuses F684 and F671-2; CTI = +143\,ms.}
 \label{fig:f8}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig09.png}
-\caption{LLG fault at the middle of 692--675 through 1\ohm{}.}
+\caption{LLG fault at the middle of 692--675 through 1\ohm{}; CTI = +127\,ms.}
 \label{fig:f9}
 \end{figure}
 
@@ -789,7 +792,7 @@ Figures~\ref{fig:f11} to \ref{fig:f13} show three cases with the conventional R2
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig11.png}
-\caption{LL fault at 646 through 1\ohm: R1 with F646 and F632.}
+\caption{LL fault at 646 through 1\ohm: R1 with F646 and F632; CTI = +200\,ms.}
 \label{fig:f11}
 \end{figure}
 
@@ -803,7 +806,7 @@ Figures~\ref{fig:f11} to \ref{fig:f13} show three cases with the conventional R2
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig13.png}
-\caption{Three-phase fault at 10\,\% of line 632--633, conventional R2.}
+\caption{Three-phase fault at 10\,\% of line 632--633, conventional R2; CTI = $-83$\,ms, the fuse melts first.}
 \label{fig:f13}
 \end{figure}
 
@@ -859,14 +862,14 @@ Figures~\ref{fig:f15} and \ref{fig:f16} show a bolted LL fault at 646. The fuses
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig15.png}
-\caption{Bolted LL fault at 646: R2 reverse setting with F646 and F632.}
+\caption{Bolted LL fault at 646: R2 reverse setting with F646 and F632; CTI = +328\,ms.}
 \label{fig:f15}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.68\textwidth]{fig16.png}
-\caption{Bolted LL fault at 646: R1 with F646 and F632.}
+\caption{Bolted LL fault at 646: R1 with F646 and F632; CTI = +226\,ms.}
 \label{fig:f16}
 \end{figure}
 
@@ -938,7 +941,8 @@ Tables~\ref{tab:case5} and \ref{tab:case7} list their currents, settings and ope
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{case05.png}
-\caption{Three-phase fault at 10\,\% of line 632--633: single setting (left) and dual setting (right).}
+\caption{Three-phase fault at 10\,\% of line 632--633: single setting (left, CTI = $-22$\,ms) and dual setting
+(right, CTI = +16\,ms).}
 \label{fig:case5}
 \end{figure}
 
@@ -960,7 +964,8 @@ Tables~\ref{tab:case5} and \ref{tab:case7} list their currents, settings and ope
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{case07.png}
-\caption{LG fault at 646: the single-setting R2 does not pick up the reverse current; the reverse group does.}
+\caption{LG fault at 646: the single-setting R2 does not pick up the reverse current (left); the reverse group
+does (right, CTI = +661\,ms).}
 \label{fig:case7}
 \end{figure}
 
