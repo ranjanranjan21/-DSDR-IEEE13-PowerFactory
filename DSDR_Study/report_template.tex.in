@@ -489,19 +489,18 @@ combination of that fault type is held. The fuse and each recloser are evaluated
 because with DG they differ.
 
 \subsection{Design Procedure}
-The steps of Figure~\ref{fig:flow} are applied as follows.
-\begin{enumerate}
-\item Load flow without DG: rated currents (Table~II) and pickups, eq.~\eqref{eq:ipfw}.
-\item Short-circuit study: minimum and maximum fault currents (Table~II).
-\item Recloser dials: R1 at TDS 0.5 (fast) and 10 (delayed); R2 fast at the lowest dial, R2 delayed at the highest dial that
-      stays 10~cycles below R1.
-\item Fuse coefficients, eqs.~\eqref{eq:bi} and \eqref{eq:biseries} (Table~III), and check of the installed fuses.
-\item Classification without DG; fuse revision until every cell is held.
-\item DG connected, settings unchanged: classification (Fig.~14).
-\item Reverse pickup of R2, eq.~\eqref{eq:iprv}, and reverse dials.
-\item Revision of the dials (step~8 of the method) and of the fuse sizes (step~9) until the cells are held.
-\item Classification with the DSDR (Fig.~17) and operating times (Table~IV).
-\item Verification: \PF's own relay and fuse models, and the EMT simulation.
+The flowchart of Figure~\ref{fig:flow} is applied in these steps.
+\begin{enumerate}[itemsep=1pt]
+\item Run the load flow without DG and set the recloser pickups from the rated currents.
+\item Run the short-circuit study for the minimum and maximum fault currents of each section.
+\item Set the dials: R1 at TDS 0.5 and 10; R2 fast at its lowest dial, delayed 10~cycles below R1.
+\item Calculate the fuse coefficients and check the installed fuses, including the series fuses.
+\item Classify the coordination without DG and revise the fuses until every case is held.
+\item Connect the DG with the settings unchanged and classify again.
+\item Set the reverse pickup and the reverse dials of R2 as a DSDR.
+\item Revise the dials and, where a dial limit is reached, the fuse sizes until the cases are held.
+\item Classify the coordination with the DSDR and determine the operating times.
+\item Verify with \PF's own relay and fuse models and the EMT simulation.
 \end{enumerate}
 
 % =====================================================================================================
