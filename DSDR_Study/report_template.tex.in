@@ -148,16 +148,16 @@ Power System Engineering.
 \vspace{2.2cm}
 \noindent\begin{minipage}[t]{0.47\textwidth}
 \rule{0.9\linewidth}{0.4pt}\\
-Jeetendra Chaudhary\\ Head of Department \&\\ M.Sc.\ Program Coordinator (MSPDE)\\
+\itshape Jeetendra Chaudhary\\ Head of Department \&\\ M.Sc.\ Program Coordinator (MSPDE)\\
 Department of Electrical Engineering
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\textwidth}
 \rule{0.9\linewidth}{0.4pt}\\
-Akhileshwar Mishra\\ M.Sc.\ Program Coordinator (MSPSE)\\ Department of Electrical Engineering
+\itshape Akhileshwar Mishra\\ M.Sc.\ Program Coordinator (MSPSE)\\ Department of Electrical Engineering
 \end{minipage}
 
 \vspace{2.6cm}
-\begin{center}\textbf{DATE OF APPROVAL:} 6 October 2026\end{center}
+\begin{center}\textbf{DATE OF APPROVAL:} \textit{6 October 2026}\end{center}
 
 % =====================================================================================================
 \fronthead{COPYRIGHT}

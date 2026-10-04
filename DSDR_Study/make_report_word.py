@@ -459,10 +459,10 @@ def approval_page(doc):
     run(q, "Jhala Nath Kafle", italic=True)
     run(q, " in partial fulfilment of the requirements for the Master\u2019s degree in Power System Engineering.")
 
-    blocks = [[("Jeetendra Chaudhary", False), ("Head of Department &", False),
-               ("M.Sc. Program Coordinator (MSPDE)", False), ("Department of Electrical Engineering", False)],
-              [("Akhileshwar Mishra", False), ("M.Sc. Program Coordinator (MSPSE)", False),
-               ("Department of Electrical Engineering", False)]]
+    blocks = [[("Jeetendra Chaudhary", True), ("Head of Department &", True),
+               ("M.Sc. Program Coordinator (MSPDE)", True), ("Department of Electrical Engineering", True)],
+              [("Akhileshwar Mishra", True), ("M.Sc. Program Coordinator (MSPSE)", True),
+               ("Department of Electrical Engineering", True)]]
     table = doc.add_table(rows=1, cols=2)
     nxt._p.addprevious(table._tbl)
     pr = table._tbl.tblPr
@@ -509,7 +509,7 @@ def approval_page(doc):
                 r.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
     q = para(WD_ALIGN_PARAGRAPH.CENTER, before=74)
     run(q, "DATE OF APPROVAL: ", bold=True)
-    run(q, "6 October 2026")
+    run(q, "6 October 2026", italic=True)
 
 
 def polish(path, tex):
