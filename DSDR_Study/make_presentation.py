@@ -233,9 +233,10 @@ NOTES = [
     with the DG, the dual setting of R2, a time-domain check, and the effect of DG penetration.""",
     # 6 scope
     """The study covers four fault types at twelve locations, which gives 39 node and fault-type cells,
-    plus one EMT simulation and a penetration study. The limitations: some settings are not published and
-    were chosen and documented; the CDG34 relay model is not directional, so two relay units are used; a zero
-    margin is used; and only one DG location is studied.""",
+    plus one EMT simulation and a penetration study. The limitations: the method does not uniquely specify some
+    settings, so they were defined in this study and documented; the CDG34 relay model is not directional, so two
+    relay units are used; the coordination is classified with a zero margin, and practical margins are evaluated
+    separately; and only one DG location is studied.""",
     # 7 method
     """The method has three stages: A, the conventional design without DG, with pickup equal to 1.25 times
     the rated current; B, the same settings with the DG; and C, R2 as a DSDR. If coordination is lost, the
@@ -247,8 +248,9 @@ NOTES = [
     and the coordination conditions.""",
     # 7c real curves
     """The method writes the operating time as TDS times a function of M, the fault current over the pickup.
-    A, B and n describe only a generic curve, so I kept the structure and used the real curve of each relay:
-    the GE Multilin equation for R1 and the manufacturer's table for the CDG34. The pickups, dials, limits and
+    A, B and n describe only a generic curve, so I kept the structure and used the manufacturer's curve of
+    each relay: the GE Multilin equation for R1 and the manufacturer's table for the CDG34. The dial is called TDS
+    for the IAC relay and TMS for the CDG34; both scale the curve in the same way. The pickups, dials, limits and
     coordination rules of the method are unchanged. This is checked twice: R1 reproduces the paper's worked
     example within one millisecond, and PowerFactory's own relay models confirm all 1896 times within 1.22
     percent.""",
@@ -285,9 +287,10 @@ NOTES = [
     recloser still trips first. For the three-phase fault close to 632, R2 carries 1777 amperes in reverse and
     trips in 0.121 seconds, but fuse F633 melts in 0.039 seconds: coordination is lost.""",
     # 12 dsdr
-    """With R2 as a DSDR and revised fuses, 38 of 39 cells are held. With the same fuses and a single
-    setting only 31, so the dual setting itself restores seven cells, at 633, 645, 646 and the distributed
-    load. Only the LG fault at 692 stays lost, at the limit of R2's dial range.""",
+    """With R2 as a DSDR and revised fuses, 38 of 39 cells are held under the zero-margin criterion. With the
+    same revised fuses but a single-setting R2 only 31, so the dual setting itself restores seven cells, at 633,
+    645, 646 and the distributed load. The DSDR with the old fuses gives only 25, so it needs the fuse revision.
+    Only the LG fault at 692 stays lost, limited by the maximum delayed dial of R2.""",
     # 12b bolted LL at 646
     """A bolted line-to-line fault at 646 with the DSDR. The fuses carry 3.67 kiloamperes. R2 sees the DG share,
     1114 amperes in reverse, and its reverse group trips in 0.086 seconds; R1 sees the grid share and trips in
@@ -315,19 +318,24 @@ NOTES = [
     to 75 milliseconds. The fuse carries grid plus DG current, the recloser only the grid share, so the fuse
     speeds up much faster.""",
     # 17 summary
-    """In summary: 39 cells without DG, 24 with the DG, and 38 with the DSDR. PowerFactory's own relay and
-    fuse models reproduced all 1896 operating times within 1.22 percent.""",
+    """In summary: without DG 35 of 39 cells with the starting fuses and 39 after the fuse revision; 24 with
+    the DG and a conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both.
+    These counts use a zero margin; with a three-cycle breaker time they become 31, and 26 with a fuse safety
+    margin as well. PowerFactory's own relay and fuse models reproduced all 1896 operating times within 1.22
+    percent.""",
     # 18 conclusions
-    """To conclude: the DG reduces coordination from 39 to 24 cells, and a dual-setting R2 with the fuse
-    revision restores it to 38. The DSDR works in the zone between the grid and the DG, but needs the fuse
-    revision, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional
+    """To conclude: with the DG a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse
+    revision raises this to 38 of 39 under the zero-margin criterion, and the last cell, the LG fault at 692,
+    is limited by R2's maximum delayed dial. The DSDR alone gives only 25, so it is necessary but not
+    sufficient; with practical margins the result is 31 and 26 cells, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional
     element, practical margins and inverter-based DG.""",
     # 19 references
     """These are the main references; the method is from Yousaf and co-authors, 2022.""",
     # 20 appendix
     """Compared with the reference paper, load currents agree within 2 percent and the R1 worked example
     almost exactly. My fault levels are lower because I validated against the IEEE benchmark. The paper
-    reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced.""",
+    reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced: the DSDR with the
+    fuse revision restores the coordination between the grid and the DG.""",
     # 20b fault levels vs benchmark
     """My fault levels are lower than the paper's, so I checked them against the IEEE short-circuit benchmark,
     the source the same authors used in their 2020 paper. My model agrees within 2 percent at ten of eleven
@@ -377,7 +385,7 @@ def objectives_slide(prs):
              "Perform unbalanced load-flow and short-circuit studies for LG, LL, LLG and LLL faults.",
              "Calculate the recloser pickups, time dials and fuse coefficients.",
              "Establish the coordination without DG, then with a 4.05 MVA synchronous DG at node 692.",
-             "Design the forward and reverse settings of R2 as a DSDR and check the coordination again.",
+             "Design the DSDR settings of R2, classify the resulting coordination, find the operating times.",
              "Verify the reclosing sequence in the time domain (EMT simulation).",
              "Study the effect of DG penetration from 0 to 100 %."]
     tb = s.shapes.add_textbox(emu(1.0), emu(3.35), emu(11.2), emu(3.1))
@@ -462,7 +470,7 @@ def build():
         "**Proposed solution:** a **Dual-Setting Directional Recloser (DSDR)** – the mid-line recloser R2 gets "
         "independent forward and reverse settings, selected by the direction of the current.",
         "**This project:** implements and tests the DSDR method on the IEEE 13-node feeder in DIgSILENT "
-        "PowerFactory with the real characteristics of commercial relays and fuses."])
+        "PowerFactory with the manufacturer-based time–current characteristics of commercial relays and fuses."])
 
     # ---- objectives ------------------------------------------------------------------------
     objectives_slide(prs)
@@ -478,10 +486,10 @@ def build():
         "One EMT simulation of the reclosing sequence; DG penetration 0–100 %."], size=16, space=6)
     text(s, 6.55, 1.25, 5.6, 0.5, ["Limitations"], bullet=False, size=20, color=NAVY)
     text(s, 6.55, 1.8, 5.6, 4.4, [
-        "R2 settings, fuse sizes and fault type of each operating-time case are not published; they were chosen "
-        "and documented.",
+        "The method does not uniquely specify the R2 settings, fuse sizes or fault type of each operating-time "
+        "case; they were defined in this study and documented.",
         "The CDG34 library relay is not directional: two relay units, direction from the fault location.",
-        "Zero-margin criterion (fuse must not start to melt before the fast trip).",
+        "Zero-margin criterion: CTI = t_MMT − t_F > 0; practical margins evaluated separately.",
         "One DG location (692); IEEE 34-node feeder not modelled."], size=16, space=6)
 
     # ---- methodology -----------------------------------------------------------------------
@@ -498,13 +506,13 @@ def build():
     s = new_slide(prs, "4. Methodology: Mathematical Formulation of the Method")
     picture(s, os.path.join(HERE, "results", "figures", "DSDR_equations_method.png"), 0.35, 1.0, 12.6, 6.0)
 
-    s = new_slide(prs, "4. Methodology: Operating Times from the Real Relay Curves")
+    s = new_slide(prs, "4. Methodology: Operating Times from the Manufacturers' Curves")
     picture(s, os.path.join(HERE, "results", "figures", "DSDR_equations_impl.png"), 0.6, 0.95, 12.1, 4.0)
-    text(s, 0.75, 5.0, 5.9, 0.4, ["Why the real curves"], bullet=False, size=16, color=NAVY)
+    text(s, 0.75, 5.0, 5.9, 0.4, ["Why the manufacturers' curves"], bullet=False, size=16, color=NAVY)
     text(s, 0.75, 5.4, 5.9, 1.3, [
         "The method fixes the structure t = TDS × g(M); A, B and n only describe a generic curve.",
-        "R1 and R2 are real relays with curves given by their manufacturers, so every time is one a "
-        "device in the field would give."], size=13, space=3)
+        "R1 (GE IAC, dial called TDS) and R2 (CDG34, dial called TMS) use the curves of their manufacturers; "
+        "both dials scale the curve in the same way."], size=13, space=3)
     text(s, 6.85, 5.0, 5.9, 0.4, ["How we know it is right"], bullet=False, size=16, color=NAVY)
     text(s, 6.85, 5.4, 5.9, 1.3, [
         "R1 reproduces the paper's worked example: **0.096 / 1.926 s** against 0.097 / 1.932 s (4219 A).",
@@ -594,7 +602,7 @@ def build():
              ["R1 1899 A: fast 0.395 s", "F646 300E melts 0.595 s", "R1 trips first"], True),
             ("fig12.png", "LL fault at 645, 1.5 Ω",
              ["R2 783 A (reverse): fast 0.605 s", "F632 400E melts 2.649 s", "R2 trips first"], True),
-            ("fig13.png", "3-phase fault at 10 % of 632–633",
+            ("fig13.png", "Three-phase fault at 10 % of 632–633",
              ["R2 1777 A (reverse): fast 0.121 s", "F633 250E melts 0.039 s", "the fuse melts first"], False))):
         x = 0.35 + k * 4.25
         picture(s, pic, x, 1.05, 4.15, 3.05)
@@ -614,8 +622,8 @@ def build():
     s = new_slide(prs, "5. Results: With the DSDR")
     picture(s, "fig17.png", 0.4, 1.15, 7.3, 4.9)
     text(s, 7.9, 1.3, 4.3, 4.9, [
-        "Coordination held in **38 of 39** cells.",
-        "Same fuses with a single-setting R2: 31 cells.",
+        "Coordination held in **38 of 39** cells (zero margin).",
+        "Same revised fuses, single-setting R2: 31 cells; DSDR with the no-DG fuses: 25.",
         "The dual setting restores **7 cells**: all faults at 633 and the LG faults at 645, 646 and DL.",
         "Still lost: LG fault at 692 – the 400E fuse F671-1 clears after R2's delayed trip (7.6 s vs 4.0 s); the delayed dial is already at its maximum."],
         size=16, space=8)
@@ -641,7 +649,7 @@ def build():
     caption(s, 0.45, 5.85, 12.4, "Bolted LLL (LL at two-phase, LG at one-phase nodes). Every fuse starts to melt after the last fast trip; "
             "smallest margins 6 ms (675) and 15 ms (DL)")
 
-    s = new_slide(prs, "5. Results: Single vs Dual Setting (3-phase fault near 632)")
+    s = new_slide(prs, "5. Results: Single vs Dual Setting (Three-Phase Fault near 632)")
     picture(s, "case05.png", 0.4, 1.1, 11.4, 3.55)
     table(s, [["Quantity", "Single setting", "Dual setting (DSDR)"],
               ["Current through R2", "1777 A, reverse (DG contribution)", "1777 A, reverse"],
@@ -698,19 +706,22 @@ def build():
     text(s, 8.05, 1.3, 4.2, 4.9, [
         "PowerFactory's own relay and fuse models reproduce the calculated operating times within **1.22 %** "
         "(1896 operating times).",
-        "With a breaker time of 3 cycles: 31 cells held; with a fuse safety margin as well: 26."],
+        "These counts use the zero-margin criterion, CTI = t_MMT − t_F > 0.",
+        "With a three-cycle breaker interrupting time: **31** cells held; with a fuse safety margin as well: **26**."],
         size=15, space=10)
 
     # ---- conclusions -----------------------------------------------------------------------
     s = new_slide(prs, "6. Conclusions and Future Work")
-    text(s, 0.75, 1.25, 11.4, 3.5, [
-        "The DSDR method was implemented on the IEEE 13-node feeder in DIgSILENT PowerFactory with real relay "
-        "and fuse characteristics; the model meets the IEEE benchmark within about 2 %.",
-        "The DG breaks coordination: **39 → 24 of 39** cells with a conventional R2.",
-        "R2 as a DSDR with the fuse revision restores it: **38 of 39** cells (31 with a single setting).",
-        "The DSDR works in the zone between the grid and the DG; it needs the fuse revision, and faults "
-        "below R2 (fed directly by the DG) remain a limit.",
-        "With fixed settings the CTI falls steadily as the DG penetration rises."], size=16, space=7)
+    text(s, 0.75, 1.2, 11.4, 3.55, [
+        "The DSDR method was implemented on the IEEE 13-node feeder in DIgSILENT PowerFactory with "
+        "manufacturer-based relay and fuse characteristics; the model meets the IEEE benchmark within about 2 %.",
+        "Without DG: **35 of 39** cells with the starting fuses, **39 of 39** after the fuse revision.",
+        "With the DG and a conventional R2: **24**. DSDR alone: 25; fuse revision alone: 31; combined DSDR and "
+        "fuse revision: **38 of 39** (zero margin). The remaining LG fault at 692 is limited by R2's maximum "
+        "delayed dial.",
+        "With a three-cycle breaker time the 38 cells become 31, and 26 with a fuse safety margin as well.",
+        "The DSDR is necessary but not sufficient: it needs the fuse revision, and faults below R2 remain a limit. "
+        "PowerFactory's relay and fuse models confirm the times within 1.22 %."], size=15, space=5)
     text(s, 0.75, 4.75, 11.4, 0.45, ["Future work"], bullet=False, size=18, color=NAVY)
     text(s, 0.75, 5.2, 11.4, 1.2, [
         "IEEE 34-node feeder; explicit directional element for R2; practical margins; setting-group change "
@@ -791,7 +802,8 @@ def build():
         "The paper's values are read from its Fig. 7.",
         "Where the sign changes depends on the starting margin, i.e. on fuse sizes and settings that the paper "
         "does not publish.",
-        "Central finding reproduced: the DSDR restores coordination between the grid and the DG."],
+        "Central finding reproduced: the DSDR with the fuse revision restores coordination between the grid "
+        "and the DG (38 of 39 cells)."],
         size=15, space=8)
 
     # ---- close -----------------------------------------------------------------------------

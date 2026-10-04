@@ -3,7 +3,7 @@ Equation pictures for the presentation (matplotlib mathtext, no LaTeX):
 
   results/figures/DSDR_equations_method.png  the equations of the coordination method
   results/figures/DSDR_equations_impl.png    how the operating-time equation is implemented with the
-                                             real relay curves (t = TDS x g(M))
+                                             manufacturers' relay curves (t = TDS x g(M))
 """
 
 import os
@@ -69,7 +69,7 @@ def impl():
     ax.text(0.45, 3.6, r"Method:  $t = TDS\,\left[\dfrac{A}{M^{n}-1}+B\right]$", fontsize=15, color=INK, va="center")
     ax.text(5.55, 3.6, r"$\Longrightarrow$", fontsize=20, color=NAVY, va="center")
     ax.text(6.35, 3.6, r"in general:  $t = TDS \times g(M),\quad M = I_f / I_p$", fontsize=15, color=INK, va="center")
-    ax.text(10.75, 3.6, "g(M) = the curve\nof the real relay", fontsize=12, color=GREY, va="center", style="italic")
+    ax.text(10.75, 3.6, "g(M) = curve of\nthe specific relay", fontsize=12, color=GREY, va="center", style="italic")
     box(ax, 0.15, 0.1, 6.25, 2.75, "R1: GE IAC77B801A, extremely inverse",
         [r"$g(M) = A+\dfrac{B}{M-C}+\dfrac{D}{(M-C)^2}+\dfrac{E}{(M-C)^3}$",
          r"$A=0.004,\ B=0.6379,\ C=0.62,\ D=1.7872,\ E=0.2461$",
