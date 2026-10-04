@@ -450,7 +450,7 @@ def approval_page(doc):
         r = run(q, t)
         if k < len(lines) - 1:
             r.add_break()
-    q = para(WD_ALIGN_PARAGRAPH.JUSTIFY, after=36)
+    q = para(WD_ALIGN_PARAGRAPH.JUSTIFY, after=56)
     run(q, "The undersigned certify that they have read, and recommended to the Institute of Engineering for "
            "acceptance, a project report entitled \u201c")
     run(q, "An Adaptive Overcurrent Protection Scheme for Dual-Setting Directional Recloser and Fuse Coordination "
@@ -459,12 +459,11 @@ def approval_page(doc):
     run(q, "Jhala Nath Kafle", italic=True)
     run(q, " in partial fulfilment of the requirements for the Master\u2019s degree in Power System Engineering.")
 
-    ext = [("[Name of External Examiner]", True), ("(External Examiner)", False), ("[Title]", True),
-           ("[Name of the Organization]", True)]
-    blocks = [[("[Name of Supervisor]", True), ("Supervisor", False), ("Department of Electrical Engineering", False)],
+    blocks = [[("[Name of the Program Coordinator]", True), ("Program Coordinator", False),
+               ("M.Sc. in Power System Engineering", False), ("Department of Electrical Engineering", False)],
               [("[Name of the Head of Department]", True), ("Head of the Department", False),
-               ("Department of Electrical Engineering", False)], ext, ext]
-    table = doc.add_table(rows=2, cols=2)
+               ("Department of Electrical Engineering", False)]]
+    table = doc.add_table(rows=1, cols=2)
     nxt._p.addprevious(table._tbl)
     pr = table._tbl.tblPr
     for tag in ("w:tblStyle", "w:tblBorders", "w:tblLayout", "w:tblW", "w:tblLook"):
@@ -503,12 +502,12 @@ def approval_page(doc):
             f = q.paragraph_format
             f.alignment, f.first_line_indent = WD_ALIGN_PARAGRAPH.LEFT, Cm(0)
             f.space_before = Pt(0)
-            f.space_after = Pt(42 if (j == len(items) and k < 2) else 0)
+            f.space_after = Pt(0)
             f.line_spacing, f.line_spacing_rule = Pt(17.9), WD_LINE_SPACING.AT_LEAST
             r = run(q, text, italic=ital)
             if j == 0:
                 r.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
-    q = para(WD_ALIGN_PARAGRAPH.CENTER, before=60)
+    q = para(WD_ALIGN_PARAGRAPH.CENTER, before=74)
     run(q, "DATE OF APPROVAL: ", bold=True)
     run(q, "Day/Month/Year", italic=True)
 
@@ -683,7 +682,7 @@ def polish(path, tex):
     section_break(doc, ch1.insert_paragraph_before())
     secs = doc.sections
     no_page_number(secs[0])
-    page_numbers(secs[1], "lowerRoman", start=2)      # the title page counts as page i
+    page_numbers(secs[1], "upperRoman", start=2)      # the title page counts as page i
     page_numbers(secs[2], "decimal")
     s = doc.settings.element
     compat = s.find(qn("w:compat"))

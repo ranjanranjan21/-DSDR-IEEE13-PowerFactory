@@ -131,7 +131,7 @@ DEPARTMENT OF ELECTRICAL ENGINEERING\par
 \vspace{1.2cm}
 {\itshape OCTOBER, 2026\par}
 \end{titlepage}
-\pagenumbering{roman}                       % the title page counts as page i, its number is not shown
+\pagenumbering{Roman}                       % the title page counts as page i, its number is not shown
 \setcounter{page}{2}
 
 % =====================================================================================================
@@ -145,36 +145,26 @@ Directional Recloser and Fuse Coordination in Unbalanced Distribution Networks W
 submitted by \textit{Jhala Nath Kafle} in partial fulfilment of the requirements for the Master's degree in
 Power System Engineering.
 
-\vspace{1.6cm}
+\vspace{2.2cm}
 \noindent\begin{minipage}[t]{0.47\textwidth}
 \rule{0.9\linewidth}{0.4pt}\\
-\textit{[Name of Supervisor]}\\ Supervisor\\ Department of Electrical Engineering
+\textit{[Name of the Program Coordinator]}\\ Program Coordinator\\ M.Sc.\ in Power System Engineering\\
+Department of Electrical Engineering
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\textwidth}
 \rule{0.9\linewidth}{0.4pt}\\
 \textit{[Name of the Head of Department]}\\ Head of the Department\\ Department of Electrical Engineering
 \end{minipage}
 
-\vspace{1.8cm}
-\noindent\begin{minipage}[t]{0.47\textwidth}
-\rule{0.9\linewidth}{0.4pt}\\
-\textit{[Name of External Examiner]}\\ (External Examiner)\\ \textit{[Title]}\\ \textit{[Name of the Organization]}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.47\textwidth}
-\rule{0.9\linewidth}{0.4pt}\\
-\textit{[Name of External Examiner]}\\ (External Examiner)\\ \textit{[Title]}\\ \textit{[Name of the Organization]}
-\end{minipage}
-
-\vspace{1.8cm}
+\vspace{2.6cm}
 \begin{center}\textbf{DATE OF APPROVAL:} \textit{Day/Month/Year}\end{center}
 
 % =====================================================================================================
 \fronthead{COPYRIGHT}
 The author has agreed that the Library, Department of Electrical Engineering, Pulchowk Campus, Institute of
 Engineering may make this report freely available for inspection. Moreover, the author has agreed that
-permission for extensive copying of this project report for scholarly purpose may be granted by the supervisor
-who supervised the project work recorded herein or, in his or her absence, by the Head of the Department wherein
-the project report was done. It is understood that recognition will be given to the author of this report and to
+permission for extensive copying of this project report for scholarly purpose may be granted by the Head of
+the Department wherein the project report was done. It is understood that recognition will be given to the author of this report and to
 the Department of Electrical Engineering, Pulchowk Campus, Institute of Engineering in any use of the material of
 this project report. Copying or publication or the other use of this report for financial gain without approval
 of the Department of Electrical Engineering, Pulchowk Campus, Institute of Engineering and the author's written
@@ -185,6 +175,19 @@ should be addressed to:
 
 \noindent Head\\ Department of Electrical Engineering\\ Pulchowk Campus, Institute of Engineering\\ Lalitpur, Nepal
 
+
+% =====================================================================================================
+\fronthead{ACKNOWLEDGEMENTS}
+I express my sincere gratitude to the Head of the Department and to the faculty of the Department of Electrical
+Engineering, Pulchowk Campus, Institute of Engineering, for the guidance, the review comments and the
+facilities that made this project possible, and to the coordinator of the M.Sc.\ programme in Power System
+Engineering for the encouragement throughout the work.
+
+I also thank my colleagues of the M.Sc.\ Power System Engineering programme for the discussions on distribution
+protection and on the use of DIgSILENT \PF, and my family for their patience and support.
+
+\vspace{1cm}
+\noindent Jhala Nath Kafle\\ 081MSPSE009
 
 % =====================================================================================================
 \fronthead{ABSTRACT}
@@ -207,20 +210,6 @@ times within <<PF_MAX>> per cent.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
 coordination, IEEE 13-node feeder, DIgSILENT \PF.
-
-% =====================================================================================================
-\fronthead{ACKNOWLEDGEMENT}
-I express my sincere gratitude to my project supervisor for the guidance, the regular review of the work and
-the comments that shaped this report. I am grateful to the Head of the Department and to the faculty of the
-Department of Electrical Engineering, Pulchowk Campus, Institute of Engineering, for the facilities and the
-support that made this project possible, and to the coordinator of the M.Sc.\ programme in Power System
-Engineering for the encouragement throughout the work.
-
-I also thank my colleagues of the M.Sc.\ Power System Engineering programme for the discussions on distribution
-protection and on the use of DIgSILENT \PF, and my family for their patience and support.
-
-\vspace{1cm}
-\noindent Jhala Nath Kafle\\ 081MSPSE009
 
 % =====================================================================================================
 \clearpage

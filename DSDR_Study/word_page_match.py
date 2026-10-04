@@ -21,7 +21,7 @@ from docx.oxml.ns import qn
 W_P, W_TBL = qn("w:p"), qn("w:tbl")
 
 
-PAGE_NO = re.compile(r"^\s*(\d+|[ivxlc]+)\s*$")
+PAGE_NO = re.compile(r"^\s*(\d+|[ivxlcIVXLC]+)\s*$")
 
 
 def page_text(page):
