@@ -459,9 +459,9 @@ def approval_page(doc):
     run(q, "Jhala Nath Kafle", italic=True)
     run(q, " in partial fulfilment of the requirements for the Master\u2019s degree in Power System Engineering.")
 
-    blocks = [[("[Name of the Program Coordinator]", True), ("Program Coordinator", False),
-               ("M.Sc. in Power System Engineering", False), ("Department of Electrical Engineering", False)],
-              [("[Name of the Head of Department]", True), ("Head of the Department", False),
+    blocks = [[("Jeetendra Chaudhary", False), ("Head of Department &", False),
+               ("M.Sc. Program Coordinator (MSPDE)", False), ("Department of Electrical Engineering", False)],
+              [("Akhileshwar Mishra", False), ("M.Sc. Program Coordinator (MSPSE)", False),
                ("Department of Electrical Engineering", False)]]
     table = doc.add_table(rows=1, cols=2)
     nxt._p.addprevious(table._tbl)
