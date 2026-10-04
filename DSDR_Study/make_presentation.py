@@ -50,6 +50,9 @@ def new_slide(prs, title):
     bar.fill.solid()
     bar.fill.fore_color.rgb = NAVY
     bar.line.fill.background()
+    logo = os.path.join(FIGS, "tu_logo.png")                   # TU logo, small, top right
+    if os.path.exists(logo):
+        s.shapes.add_picture(logo, W - emu(0.42) - emu(0.35), emu(0.2), width=emu(0.42))
     tb = s.shapes.add_textbox(Emu(594360), Emu(274320), Emu(10972800), Emu(566928))
     r = tb.text_frame.paragraphs[0].add_run()
     r.text = title
@@ -418,13 +421,6 @@ def title_slide(prs):
             for extra in runs[1:]:
                 new_p.remove(extra)
             runs[0].find(qn("a:t")).text = "Roll No. 081MSPSE009"
-    # TU logo: small, top right
-    for sh in s.shapes:
-        if sh.shape_type == 13 and sh.top < emu(1.0):
-            w = emu(0.42)
-            h = int(sh.height * w / sh.width)
-            sh.width, sh.height = w, h
-            sh.left, sh.top = W - w - emu(0.35), emu(0.22)
 
 
 def build():
