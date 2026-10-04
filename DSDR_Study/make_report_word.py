@@ -89,9 +89,9 @@ def body_for_pandoc(tex, labels, cites):
         s = re.sub(pat, "", s)
     s = s.replace(BS + "tableofcontents", "\n\nTOCMARKER\n\n")
     # ---- macros
-    s = s.replace("$\\checkmark$", "\u2713").replace("$\\times$", "\u2717")
+    s = s.replace("$\\checkmark$", "\u2713").replace("$\\times$", "×")
     s = re.sub(r"\\ok\b", "\u2713", s)
-    s = re.sub(r"\\no\b", "\u2717", s)
+    s = re.sub(r"\\no\b", "×", s)
     s = re.sub(r"\\ohm(\{\})?", "\u2009\u03a9", s)
     s = re.sub(r"\\PF(\{\})?", "PowerFactory", s)
     s = re.sub(r"\$([+-]?)(\d[\d.,]*)\$", lambda m: m.group(1).replace("-", "\u2212") + m.group(2), s)
@@ -110,9 +110,9 @@ def body_for_pandoc(tex, labels, cites):
             return BS + "section*{APPENDIX %s: %s}" % (m.group(2), m.group(3))
         if kind == "subsection":
             chap[1], chap[2] = chap[1] + 1, 0
-            return BS + "subsection*{%d.%d %s}" % (chap[0], chap[1], m.group(2))
+            return BS + "subsection*{%d.%d\u2002\u2009%s}" % (chap[0], chap[1], m.group(2))
         chap[2] += 1
-        return BS + "subsubsection*{%d.%d.%d %s}" % (chap[0], chap[1], chap[2], m.group(2))
+        return BS + "subsubsection*{%d.%d.%d  %s}" % (chap[0], chap[1], chap[2], m.group(2))
 
     s = re.sub(r"\\(chapterhead|appendixhead)\{([^}]*)\}\{([^}]*)\}|\\(fronthead)\{([^}]*)\}|\\(subsection|subsubsection)\{([^}]*)\}",
                lambda m: head(_Groups(m)), s)
@@ -465,6 +465,20 @@ def polish(path, tex):
             continue
         borders(t)
         tsize, wide = tsizes.get(table_number(t._tbl), (10, False))
+        for row in t.rows:
+            for c in row.cells:
+                mark = c._tc.xpath("string(.)").strip()
+                if mark in ("\u2713", "×"):
+                    pr_ = c._tc.get_or_add_tcPr()
+                    shd = pr_.find(qn("w:shd"))
+                    if shd is None:
+                        shd = OxmlElement("w:shd")
+                        pr_.append(shd)
+                    shd.set(qn("w:val"), "clear")
+                    shd.set(qn("w:color"), "auto")
+                    shd.set(qn("w:fill"), "DFF3DF" if mark == "\u2713" else "FBE0E0")
+                    for cp in c.paragraphs:
+                        cp.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
         for row in t.rows:                                   # short labels of the first column on one line
             tc = row.cells[0]._tc
             if len(tc.xpath("string(.)")) <= 32:
@@ -521,6 +535,20 @@ def polish(path, tex):
             e.set(qn("w:type"), "dxa")
             mar.append(e)
         pr.append(mar)
+    # references as in the PDF: label hanging in front, single spacing, a gap between entries
+    for p in doc.paragraphs:
+        if re.match(r"^\[\d+\] ", p.text):
+            pf = p.paragraph_format
+            pf.left_indent, pf.first_line_indent = Cm(0.75), Cm(-0.75)
+            pf.line_spacing, pf.space_before, pf.space_after = 1.0, Pt(0), Pt(10)
+            pf.tab_stops.add_tab_stop(Cm(0.75))
+            for r in p.runs:
+                if "] " in r.text:
+                    r.text = r.text.replace("] ", "]\t", 1)
+                    break
+    for p in doc.paragraphs:
+        if p.text.strip() in ("Symbols", "Abbreviations"):
+            p.paragraph_format.first_line_indent = Cm(1)
     # list items close together, as in the PDF (2 pt between items)
     paras = doc.paragraphs
     for k, p in enumerate(paras):
@@ -561,6 +589,15 @@ def polish(path, tex):
     page_numbers(secs[1], "lowerRoman", start=2)      # the title page counts as page i
     page_numbers(secs[2], "decimal")
     s = doc.settings.element
+    compat = s.find(qn("w:compat"))
+    if compat is None:
+        compat = OxmlElement("w:compat")
+        s.append(compat)
+    if compat.find(qn("w:doNotExpandShiftReturn")) is None:
+        compat.insert(0, OxmlElement("w:doNotExpandShiftReturn"))
+    if s.find(qn("w:autoHyphenation")) is None:              # words hyphenated at line ends, as in LaTeX
+        hy = OxmlElement("w:autoHyphenation")
+        compat.addprevious(hy)
     u = OxmlElement("w:updateFields")
     u.set(qn("w:val"), "true")
     s.append(u)
@@ -620,6 +657,9 @@ def update_in_word(path, front=()):
           "foreach ($t in $d.TablesOfContents) { $e = $t.Range.End; $q = $d.Range($e, $e).Paragraphs.Item(1); "
           "$q.Range.Font.Size = 1; $q.SpaceAfter = 0; $q.SpaceBefore = 0; $q.LineSpacingRule = 4; $q.LineSpacing = 1 }; "
           # page breaks inside the lists where the PDF starts a new page, then refresh the page numbers
+          "$rt = $d.PageSetup.PageWidth - $d.PageSetup.LeftMargin - $d.PageSetup.RightMargin; "
+          "foreach ($q in $d.TablesOfContents.Item(1).Range.Paragraphs) { if ($q.Style.NameLocal -eq $d.Styles.Item(-20).NameLocal) "
+          "{ $q.TabStops.ClearAll(); $null = $q.TabStops.Add($rt, 2, 0) } }; "
           "BREAKS"
           "foreach ($t in $d.TablesOfContents) { $t.UpdatePageNumbers() }; "
           "$d.Save(); $d.Close() } finally { $w.Quit() }")
