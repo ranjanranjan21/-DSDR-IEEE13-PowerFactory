@@ -52,6 +52,77 @@ def grid(ws, r0, rows, widths=None, header=True):
             ws.column_dimensions[get_column_letter(j + 1)].width = w
 
 
+def hand_check(wb):
+    """Sheet 5: hand calculation of the If,min case (LG through 3 ohm at 680, phase B, DG out) with symmetrical
+    components and superposition, against PowerFactory.  Data: results/database/Ifmin_validation.json
+    (written by validate_ifmin.py)."""
+    import cmath
+    import json
+    import math
+    path = os.path.join(DB, "Ifmin_validation.json")
+    if not os.path.exists(path):
+        return
+    d = json.load(open(path))
+    rad = math.radians
+    P = lambda m, a: cmath.rect(m, rad(a))
+    fmt = lambda z: "%.1f A at %.1f deg" % (abs(z), math.degrees(cmath.phase(z)))
+    zc = d["Z_at_680_candidates"]
+    z1, z2, z0 = complex(zc["m:R1"], zc["m:X1"]), complex(zc["m:R2"], zc["m:X2"]), complex(zc["m:R0"], zc["m:X0"])
+    vb = P(1000 * d["V_pre_680"]["B"][0], d["V_pre_680"]["B"][1])
+    ztot = z1 + z2 + z0 + 3 * 3.0
+    i_f = 3 * vb / ztot
+    i_f_pf = d["I_fault_680"]["B"]
+    l1 = P(d["I_load_R1"]["B"][0] / 1000, d["I_load_R1"]["B"][1])
+    l2 = P(d["I_load_R2"]["B"][0] / 1000, d["I_load_R2"]["B"][1])
+    f1, f2 = d["I_fault_R1"]["B"], d["I_fault_R2"]["B"]
+    if_pf = P(i_f_pf, d["I_fault_680_angle_candidates"].get("m:phii:B", 0.0))
+    r1, r2 = l1 + if_pf, l2 + if_pf
+    pct = lambda a, b: "%+.1f %%" % (100 * (a - b) / b)
+
+    ws = wb.create_sheet("Hand_check")
+    ws["A1"] = "Hand calculation of If,min: LG fault through Rf = 3 ohm at node 680, phase B, DG out of service"
+    ws["A1"].font = Font(bold=True, size=13)
+    rows = [["Step", "Formula", "Values", "Result (hand)", "PowerFactory", "Difference"],
+            ["1  Thevenin sequence impedances at 680", "Z1, Z2, Z0 seen from the fault (PowerFactory, DG out)",
+             "Z1 = Z2 = %.4f + j%.4f ohm;  Z0 = %.4f + j%.4f ohm" % (z1.real, z1.imag, z0.real, z0.imag), "", "", ""],
+            ["2  Pre-fault voltage, phase B at 680", "V_B from the load flow (complete method keeps it)",
+             "%.1f V at %.2f deg (%.3f pu; regulator boost)" % (abs(vb), d["V_pre_680"]["B"][1], d["V_pre_680"]["B"][2]),
+             "", "", ""],
+            ["3  Total loop impedance", "Z = Z1 + Z2 + Z0 + 3 Rf",
+             "%.4f + j%.4f + 9" % ((z1 + z2 + z0).real, (z1 + z2 + z0).imag),
+             "%.3f + j%.3f = %.3f ohm at %.1f deg" % (ztot.real, ztot.imag, abs(ztot), math.degrees(cmath.phase(ztot))),
+             "", ""],
+            ["4  Fault current at 680 (LG)", "I_f = 3 V_B / (Z1 + Z2 + Z0 + 3 Rf)",
+             "3 x %.1f / %.3f" % (abs(vb), abs(ztot)), fmt(i_f), "%.1f A at %.1f deg" % (abs(if_pf), math.degrees(cmath.phase(if_pf))),
+             pct(abs(i_f), abs(if_pf))],
+            ["5  Load current through R2, phase B", "from the load flow (before the fault)", "", fmt(l2), "", ""],
+            ["6  Current through R2, phase B, during the fault", "I_R2 = I_load,R2 + I_f   (superposition; the "
+             "feeder is radial, so all of I_f passes R2)", "%s + %s" % (fmt(l2), fmt(if_pf)), fmt(r2), "%.1f A" % f2[0],
+             pct(abs(r2), f2[0])],
+            ["7  Load current through R1, phase B", "from the load flow (before the fault)", "", fmt(l1), "", ""],
+            ["8  Current through R1, phase B, during the fault", "I_R1 = I_load,R1 + I_f   (all of I_f also passes R1)",
+             "%s + %s" % (fmt(l1), fmt(if_pf)), fmt(r1), "%.1f A" % f1[0], pct(abs(r1), f1[0])]]
+    grid(ws, 3, rows, [34, 44, 48, 30, 18, 12])
+    notes = [
+        "Why phase B gives the minimum: phase B carries the smallest load current at R1 (411 A, against 558 A on phase A "
+        "and 588 A on phase C), so load + fault current is smallest on phase B.",
+        "Why the R1 hand value is about 3.5 % high: superposition with the PRE-FAULT load current assumes the loads keep "
+        "drawing the same current. During the fault the phase-B voltage sags, the loads supplied through R1 draw less, "
+        "and PowerFactory's complete method includes that. R1 feeds more load (632, 633, 645, 646, DL and the R2 zone) "
+        "than R2, so the effect is larger at R1; at R2 the hand value is within 0.5 %.",
+        "Result: the hand calculation confirms the PowerFactory values If,min(R1) = 1074 A and If,min(R2) = 879 A "
+        "within the accuracy of superposition.",
+        "Note: the R2 value is 878.5 A (rounded 879 A).",
+    ]
+    for k, t in enumerate(notes):
+        c = ws.cell(row=3 + len(rows) + 1 + k, column=1, value=t)
+        c.alignment = Alignment(wrap_text=True, vertical="top")
+        ws.merge_cells(start_row=c.row, start_column=1, end_row=c.row, end_column=6)
+        ws.row_dimensions[c.row].height = 32
+    for r in range(4, 3 + len(rows)):
+        ws.row_dimensions[r].height = 45
+
+
 def main():
     sc = [r for r in csv.DictReader(open(os.path.join(DB, "5_ShortCircuit_DG_out.csv")))
           if r["Fault type"] == "LG" and float(r["Zf (ohm)"]) == 3.0]
@@ -167,6 +238,7 @@ def main():
     grid(ws, 1, src, [16, 10, 12, 8, 9, 8, 14, 20, 34])
     ws.freeze_panes = "A2"
 
+    hand_check(wb)
     try:
         wb.save(OUT)
         out = OUT
