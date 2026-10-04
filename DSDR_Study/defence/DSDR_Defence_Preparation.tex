@@ -2,7 +2,7 @@
 \usepackage[margin=2cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{mathptmx}
-\usepackage{amsmath}
+\usepackage{amsmath,amssymb}
 \usepackage{xcolor}
 \usepackage{enumitem}
 \usepackage{array}
@@ -98,8 +98,29 @@ reverse DG current and still coordinate with the fuses downstream for forward fa
 a regulator and a transformer --- a hard test for protection, and the system used in the reference paper.}
 
 \Q{How did you calculate the pickup current?}{$I_p = \mathrm{OLF}\times I_{nom}$ with OLF = 1.25 and $I_{nom}$ the
-load current from the load flow. The pickup must also be below the smallest fault current of the zone (LG through
-3\,$\Omega$ at the farthest node) --- 1074\,A for R1 and 879\,A for R2 without DG.}
+load current (largest phase) from the load flow. The pickup must also be below the smallest fault current of the zone
+(LG through 3\,$\Omega$ at the farthest node), so that the recloser still sees the weakest fault.
+
+\smallskip
+{\footnotesize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|l|c|c|c|>{\centering}p{3.0cm}|c|c|}
+\hline
+\textbf{Device} & \textbf{$I_{nom}$ (A)} & \textbf{OLF} & \textbf{$I_p=1.25\,I_{nom}$} & \textbf{Setting applied} &
+\textbf{$I_{f,min}$ (A)} & \textbf{Check} \\ \hline
+R1 & 587.7 (no DG) & 1.25 & $1.25\times587.7=734.6$\,A & CT 900/5, tap 4\,A $\rightarrow$ \textbf{720\,A} & 1074 &
+720 $<$ 1074 \checkmark \\ \hline
+R2 forward & 470.0 (no DG) & 1.25 & $1.25\times470.0=587.5$\,A & CT 1000/5, plug 300\,A $\rightarrow$ curve starts at
+\textbf{600\,A} & 879 & 600 $<$ 879 \checkmark \\ \hline
+R2 reverse & 252.2 (DG, rev.) & 1.25 & $1.25\times252.2=315.3$\,A & CT 500/5, plug 150\,A $\rightarrow$ curve
+starts at \textbf{300\,A} & -- & closest setting \\ \hline
+\end{tabular}}
+
+\smallskip
+How to say it: ``R1: 1.25 times 587.7 gives 734.6\,A; the nearest tap on the 900/5 CT is 4\,A, which is 720\,A, still
+below the smallest fault of 1074\,A. The CDG curve starts at twice the plug, so R2's 300\,A plug starts at 600\,A, close
+to the 587.5\,A calculated.''
+If asked further: at 100\,\% DG the weakest fault (LG through 3\,$\Omega$) falls to 577\,A at R1 and 368\,A at R2, below
+the pickups --- the reclosers no longer see it (DG penetration study).}
 
 \Q{Why is the reverse pickup lower than the forward one?}{The reverse current is only the DG's contribution, much
 smaller than the grid's. The reverse load current through R2 with the DG is 252\,A, so $1.25\times252 \approx
