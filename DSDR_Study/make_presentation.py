@@ -238,12 +238,12 @@ NOTES = [
     time dial is revised first, and at the dial limit the fuse is made larger. The fuse must not melt before
     the fast trip, and must clear before the delayed trip.""",
     # 7b equations
-    """These are the equations of the method. Each recloser has the same inverse-time curve with a fast and a
-    delayed time dial, in the forward and, for the DSDR, the reverse direction. The pickup is 1.25 times the
-    load current in that direction and must stay below the smallest fault current. Each fuse follows a straight
-    line on log-log axes with slope minus 1.8; its coefficient b places it between the fast and delayed
-    recloser times. Coordination holds when the fuse melts after the fast trip and clears before the delayed
-    trip.""",
+    """The method gives a general inverse-time equation, but here the real curves of the two relays are used.
+    R1 is a GE IAC77 extremely inverse relay, with the GE Multilin equation shown, a pickup of 720 amperes and
+    dials 0.5 and 10. R2, the DSDR, is a CDG34 extremely inverse relay, evaluated from its PowerFactory table
+    by log-log interpolation, with forward and reverse plug settings and multipliers 0.1 and 1.0. The pickup is
+    1.25 times the load current in each direction, the fuses use the A055C library curves, and coordination
+    holds when the fuse melts after the fast trip and clears before the delayed trip.""",
     # 8 system
     """This is the PowerFactory model: a 4.16 kV feeder fed from a 115 kV grid, a 4.05 MVA synchronous
     generator at node 692, R1 a GE IAC77 relay at the feeder head, R2 a CDG34 relay on line 632 to 671, and
