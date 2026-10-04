@@ -237,6 +237,13 @@ NOTES = [
     the rated current; B, the same settings with the DG; and C, R2 as a DSDR. If coordination is lost, the
     time dial is revised first, and at the dial limit the fuse is made larger. The fuse must not melt before
     the fast trip, and must clear before the delayed trip.""",
+    # 7b equations
+    """These are the equations of the method. Each recloser has the same inverse-time curve with a fast and a
+    delayed time dial, in the forward and, for the DSDR, the reverse direction. The pickup is 1.25 times the
+    load current in that direction and must stay below the smallest fault current. Each fuse follows a straight
+    line on log-log axes with slope minus 1.8; its coefficient b places it between the fast and delayed
+    recloser times. Coordination holds when the fuse melts after the fast trip and clears before the delayed
+    trip.""",
     # 8 system
     """This is the PowerFactory model: a 4.16 kV feeder fed from a 115 kV grid, a 4.05 MVA synchronous
     generator at node 692, R1 a GE IAC77 relay at the feeder head, R2 a CDG34 relay on line 632 to 671, and
@@ -321,9 +328,6 @@ NOTES = [
     # 21 appendix penetration
     """Both studies show the margin decreasing with DG penetration; where it turns negative depends on
     settings the paper does not publish.""",
-    # 21b figure map
-    """For reference, this table shows where each figure and table of the reference method appears in this
-    presentation.""",
     # 22 close
     """Thank you for your attention. I am happy to take your questions.""",
 ]
@@ -469,6 +473,9 @@ def build():
         "Check: fuse melting time must exceed the recloser fast time, fuse clearing time below the delayed time."],
         size=16, space=7)
     picture(s, "flowchart.png", 6.3, 1.1, 6.0, 5.3)
+
+    s = new_slide(prs, "4. Methodology: Mathematical Formulation")
+    picture(s, os.path.join(HERE, "results", "figures", "DSDR_equations.png"), 0.35, 1.0, 12.6, 6.0)
 
     s = new_slide(prs, "4. Methodology: Test System in PowerFactory")
     picture(s, "sld.png", 0.4, 1.1, 6.6, 5.3)
@@ -728,35 +735,6 @@ def build():
         "does not publish.",
         "Central finding reproduced: the DSDR restores coordination between the grid and the DG."],
         size=15, space=8)
-
-    def slide_of(title):
-        for k, sl in enumerate(prs.slides, 1):
-            for sh in sl.shapes:
-                if sh.has_text_frame and sh.text_frame.text.startswith(title):
-                    return str(k)
-        return "-"
-
-    s = new_slide(prs, "Appendix: Figures and Tables of the Reference Method in This Study")
-    fmap = [("5", "Coordination method (flowchart)", "4. Methodology: Coordination Method"),
-            ("6", "IEEE 13-node feeder with the protective devices", "4. Methodology: Test System"),
-            ("7", "CTI against DG penetration (633, 671)", "5. Results: Effect of the DG Penetration"),
-            ("8", "LG fault at 611", "5. Results: Coordination Without DG"),
-            ("9", "LLG fault mid 692–675, 1 Ω", "5. Results: Coordination Without DG"),
-            ("10", "Time-domain current at 632, LL fault at 684", "5. Results: Time-Domain"),
-            ("11", "LL fault at 646, 1 Ω", "5. Results: Conventional R2 with DG – Three"),
-            ("12", "LL fault at 645, 1.5 Ω", "5. Results: Conventional R2 with DG – Three"),
-            ("13", "3-phase fault at 10 % of 632–633", "5. Results: Conventional R2 with DG – Three"),
-            ("14", "Coordination status without the DSDR", "5. Results: DG Connected, Conventional R2"),
-            ("15", "Bolted LL fault at 646, R2 (DSDR)", "5. Results: Bolted LL Fault at 646"),
-            ("16", "Bolted LL fault at 646, R1", "5. Results: Bolted LL Fault at 646"),
-            ("17", "Coordination status with the DSDR", "5. Results: With the DSDR"),
-            ("Table I", "Parameters of the synchronous DG", "4. Methodology: Parameters of the Synchronous DG"),
-            ("Table II", "Branch currents and fault levels", "5. Results: Branch Currents"),
-            ("Table III", "Fuse coefficients", "5. Results: Fuse Coefficients"),
-            ("Table IV", "Operating times with the DSDR", "5. Results: Operating Times with the DSDR")]
-    table(s, [["Item in [1]", "Content", "Slide"]] + [["Fig. " + a if a.isdigit() else a, b, slide_of(c)]
-                                                        for a, b, c in fmap],
-          1.5, 1.05, 10.0, [1.8, 6.4, 1.8], size=11.5, row_h=0.29, first_col_left=False)
 
     # ---- close -----------------------------------------------------------------------------
     s = new_slide(prs, "Thank You")
