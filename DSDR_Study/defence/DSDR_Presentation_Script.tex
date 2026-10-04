@@ -1,220 +1,87 @@
-\documentclass[12pt,a4paper]{article}
-\usepackage[left=1.6cm,right=1.6cm,top=1.6cm,bottom=1.8cm]{geometry}
+\documentclass[11pt,a4paper]{article}
+\usepackage[left=1.5cm,right=1.5cm,top=1.3cm,bottom=1.3cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{mathptmx}
-\usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{needspace}
-\usepackage{fancyhdr}
-\graphicspath{{slides/}}
 \definecolor{navy}{HTML}{1B3755}
-\definecolor{cue}{HTML}{8A4B08}
-\definecolor{rule}{HTML}{C9CED6}
-\definecolor{optc}{HTML}{5F6670}
 \setlength{\parindent}{0pt}
-\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\small\color{gray} Presentation script --- page \thepage}
-% one slide: number, title, time, picture
-\newenvironment{slideblock}[4]{\par\needspace{7.5cm}\vspace{4pt}
-  {\color{navy}\rule{\linewidth}{1.2pt}}\par\vspace{3pt}
-  \noindent\begin{minipage}[c]{0.60\linewidth}
-    {\fontsize{22}{24}\selectfont\bfseries\color{navy} SLIDE #1}\par\vspace{3pt}
-    {\large\bfseries #2}\par\vspace{3pt}
-    {\small\color{gray} about #3 to read}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.38\linewidth}\raggedleft
-    \fcolorbox{rule}{white}{\includegraphics[width=0.94\linewidth]{#4}}
-  \end{minipage}\par\vspace{8pt}}{\par\vspace{6pt}}
-\newcommand{\say}[2]{\par\vspace{10pt}\noindent
-  \begin{minipage}[t]{1.5cm}\fontsize{13.5}{19.5}\selectfont{\small\bfseries\color{navy} Para #1}\end{minipage}%
-  \begin{minipage}[t]{\dimexpr\linewidth-1.5cm}\fontsize{13.5}{19.5}\selectfont\raggedright #2\end{minipage}\par}
-\newcommand{\opt}[2]{\par\vspace{10pt}\noindent
-  \begin{minipage}[t]{1.5cm}\fontsize{13.5}{19.5}\selectfont{\small\bfseries\color{gray} Para #1}\\[-6pt]{\scriptsize\color{gray} optional}\end{minipage}%
-  \begin{minipage}[t]{\dimexpr\linewidth-1.5cm}\fontsize{13.5}{19.5}\selectfont\raggedright\color{optc} #2\end{minipage}\par}
-\newcommand{\point}[1]{\par\vspace{10pt}\noindent\hspace{1.5cm}%
-  \begin{minipage}[t]{\dimexpr\linewidth-1.5cm}\small\itshape\color{cue}$\triangleright$ Point to: #1\end{minipage}\par}
+\pagestyle{empty}
+% slide number in the margin column, the text to read beside it
+\newcommand{\slide}[2]{\par\vspace{6pt}\noindent
+  \makebox[0.95cm][r]{\fontsize{13}{15}\selectfont\bfseries\color{navy}#1}\hspace{0.3cm}%
+  \parbox[t]{\dimexpr\linewidth-1.25cm}{\fontsize{11.5}{15}\selectfont\raggedright #2}\par}
 
 \begin{document}
-\begin{center}
-{\LARGE\bfseries\color{navy} Presentation Script}\\[4pt]
-{\large Read-aloud text for every slide of \emph{DSDR\_Final\_Presentation.pptx}}\\[2pt]
-Jhala Nath Kafle (081MSPSE009)
-\end{center}
-\vspace{2pt}
-\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\textbf{How to use this.}
-Each block is one slide: the slide number, a small picture of the slide, and the paragraphs to read, numbered
-\textbf{Para 1, Para 2, \dots} Read them in order, at a normal pace, and change the slide when the block ends.
-The brown lines (\textit{\color{cue}$\triangleright$ Point to}) are not read: they say where to point on the
-screen before the next paragraph.\par\smallskip
-\textbf{Timing.} Slides 1 to 27 and the closing slide take about \textbf{9 minutes} to read at a
-calm speed (1132 words). The text is based on the speaker notes of the presentation, shortened a little
-to fit 8 to 10 minutes.
-\par\smallskip
-\textbf{Numbers.} Read ``0.121'' as ``zero point one two one'', ``4.16 kV'' as ``four point one six
-kilovolts'', ``400E'' as ``four hundred E'', and ``CTI'' as the three letters.}}
-\vspace{4pt}
+{\large\bfseries\color{navy} Presentation script}\hfill{\small Jhala Nath Kafle (081MSPSE009) \quad
+number = slide \quad about 9 minutes}\par\vspace{2pt}
+{\color{navy}\hrule height 0.8pt}
 
-\begin{slideblock}{1}{Title}{20 s}{s01.png}
-\say{1}{Good afternoon. I am Jhala Nath Kafle, roll number 081 MSPSE 009. My project is an adaptive overcurrent protection scheme for dual-setting directional recloser and fuse coordination in distribution networks with distributed generation, on the IEEE 13-node feeder in PowerFactory.}
-\end{slideblock}
+\slide{1}{Good afternoon. I am Jhala Nath Kafle, roll number 081 MSPSE 009. My project is an adaptive overcurrent protection scheme for dual-setting directional recloser and fuse coordination in distribution networks with distributed generation, on the IEEE 13-node feeder in PowerFactory.}
 
-\begin{slideblock}{2}{Presentation Outline}{5 s}{s02.png}
-\say{1}{I will cover the introduction, objectives, scope, methodology, results and conclusions.}
-\end{slideblock}
+\slide{2}{I will cover the introduction, objectives, scope, methodology, results and conclusions.}
 
-\begin{slideblock}{3}{1. Introduction: Recloser-Fuse Coordination}{30 s}{s03.png}
-\point{the graph on the right: fast curve below the green fuse band, dashed delayed curve above it}
-\say{1}{In a fuse-saving scheme the recloser trips first on its fast curve, so a temporary fault clears and the fuse is saved. For a permanent fault, the delayed curve lets the fuse clear its lateral.}
-\say{2}{This works only while the recloser and the fuse carry the same current, and a DG changes both the size and the direction of the fault current.}
-\end{slideblock}
+\slide{3}{In a fuse-saving scheme the recloser trips first on its fast curve, so a temporary fault clears and the fuse is saved. For a permanent fault, the delayed curve lets the fuse clear its lateral. This works only while the recloser and the fuse carry the same current, and a DG changes both the size and the direction of the fault current.}
 
-\begin{slideblock}{4}{1. Introduction: Problem Statement}{30 s}{s04.png}
-\point{the three boxes, left to right}
-\say{1}{With a DG, the fuse carries grid plus DG current, while the recloser sees only the grid part, and a mid-line recloser can even see reverse current. The fuse may then melt before the fast trip.}
-\say{2}{The solution studied is the dual-setting directional recloser, or DSDR: the mid-line recloser R2 gets separate forward and reverse settings, chosen by the direction of the current.}
-\end{slideblock}
+\slide{4}{With a DG, the fuse carries grid plus DG current, while the recloser sees only the grid part, and a mid-line recloser can even see reverse current. The fuse may then melt before the fast trip. The solution studied is the dual-setting directional recloser, or DSDR: the mid-line recloser R2 gets separate forward and reverse settings, chosen by the direction of the current.}
 
-\begin{slideblock}{5}{2. Objectives}{30 s}{s05.png}
-\say{1}{The general objective was to build and validate a PowerFactory implementation of the DSDR method on the IEEE 13-node feeder, with and without DG.}
-\say{2}{The seven specific objectives are: the model, load flow and short circuit, the settings, coordination without and with the DG, the dual setting of R2, a time-domain check, and the effect of DG penetration.}
-\end{slideblock}
+\slide{5}{The general objective was to build and validate a PowerFactory implementation of the DSDR method on the IEEE 13-node feeder, with and without DG. The seven specific objectives are: the model, load flow and short circuit, the settings, coordination without and with the DG, the dual setting of R2, a time-domain check, and the effect of DG penetration.}
 
-\begin{slideblock}{6}{3. Scope and Limitations}{30 s}{s06.png}
-\say{1}{The study covers four fault types at twelve locations, which gives 39 node and fault-type cells, plus one EMT simulation and a penetration study.}
-\point{the right column, Limitations}
-\say{2}{The limitations: some settings are not specified by the method and were defined here; the CDG34 relay model is not directional, so two relay units are used; a zero margin is used; and only one DG location is studied.}
-\end{slideblock}
+\slide{6}{The study covers four fault types at twelve locations, which gives 39 node and fault-type cells, plus one EMT simulation and a penetration study. The limitations: some settings are not specified by the method and were defined here; the CDG34 relay model is not directional, so two relay units are used; a zero margin is used; and only one DG location is studied.}
 
-\begin{slideblock}{7}{4. Methodology: Coordination Method}{20 s}{s07.png}
-\point{the flowchart on the right}
-\say{1}{The method has three stages: A, the conventional design without DG; B, the same settings with the DG; and C, R2 as a DSDR. If coordination is lost, the time dial is revised first, and at the dial limit the fuse is made larger.}
-\end{slideblock}
+\slide{7}{The method has three stages: A, the conventional design without DG; B, the same settings with the DG; and C, R2 as a DSDR. If coordination is lost, the time dial is revised first, and at the dial limit the fuse is made larger.}
 
-\begin{slideblock}{8}{4. Methodology: Mathematical Formulation}{15 s}{s08.png}
-\point{the four boxes, 1 to 4}
-\say{1}{These are the equations of the method: the recloser curve with a fast and a delayed time dial, the pickup from the load current, the fuse line on log-log axes, and the coordination conditions.}
-\end{slideblock}
+\slide{8}{These are the equations of the method: the recloser curve with a fast and a delayed time dial, the pickup from the load current, the fuse line on log-log axes, and the coordination conditions.}
 
-\begin{slideblock}{9}{4. Methodology: Operating Times from the Manufacturers' Curves}{25 s}{s09.png}
-\say{1}{The method writes the operating time as the time dial times a function of the current. I kept this structure and used the manufacturer's curve of each relay.}
-\point{bottom right, How we know it is right}
-\say{2}{It is checked twice: R1 reproduces the paper's worked example, and PowerFactory's own relay models confirm all 1896 times within 1.22 per cent.}
-\end{slideblock}
+\slide{9}{The method writes the operating time as the time dial times a function of the current. I kept this structure and used the manufacturer's curve of each relay. It is checked twice: R1 reproduces the paper's worked example, and PowerFactory's own relay models confirm all 1896 times within 1.22 per cent.}
 
-\begin{slideblock}{10}{4. Methodology: Test System in PowerFactory}{15 s}{s10.png}
-\point{the single-line diagram}
-\say{1}{This is the PowerFactory model: a 4.16 kV feeder, a 4.05 MVA synchronous generator at node 692, R1 at the feeder head, R2 on line 632 to 671, and fuses on the laterals.}
-\end{slideblock}
+\slide{10}{This is the PowerFactory model: a 4.16 kV feeder, a 4.05 MVA synchronous generator at node 692, R1 at the feeder head, R2 on line 632 to 671, and fuses on the laterals.}
 
-\begin{slideblock}{11}{4. Methodology: Parameters of the Synchronous DG}{5 s}{s11.png}
-\say{1}{These are the parameters of the synchronous DG, 4.05 MVA, connected at node 692.}
-\end{slideblock}
+\slide{11}{These are the parameters of the synchronous DG, 4.05 MVA, connected at node 692.}
 
-\begin{slideblock}{12}{4. Methodology: Protection Settings}{20 s}{s12.png}
-\point{the table}
-\say{1}{R1 has a pickup of 720 amperes. R2 forward uses plugs of 300 and 600 amperes, and the new reverse group 150 and 300 amperes.}
-\say{2}{The dials were already at their limits, so the fuse sizes were revised as shown.}
-\end{slideblock}
+\slide{12}{R1 has a pickup of 720 amperes. R2 forward uses plugs of 300 and 600 amperes, and the new reverse group 150 and 300 amperes. The dials were already at their limits, so the fuse sizes were revised as shown.}
 
-\begin{slideblock}{13}{5. Results: Branch Currents and Fault Levels (DG out)}{15 s}{s13.png}
-\say{1}{The first result is the base case without DG: the rated current and the minimum and maximum fault current of each branch. The feeder head sees 4.73 kiloamperes.}
-\end{slideblock}
+\slide{13}{The first result is the base case without DG: the rated current and the minimum and maximum fault current of each branch. The feeder head sees 4.73 kiloamperes.}
 
-\begin{slideblock}{14}{5. Results: Fuse Coefficients}{10 s}{s14.png}
-\say{1}{These are the fuse coefficients from the method's fuse equation, with the installed fuse and its melting time in the last columns.}
-\end{slideblock}
+\slide{14}{These are the fuse coefficients from the method's fuse equation, with the installed fuse and its melting time in the last columns.}
 
-\begin{slideblock}{15}{5. Results: Coordination Without DG}{15 s}{s15.png}
-\say{1}{Without DG, 35 of 39 cells were coordinated, and all 39 after one fuse change.}
-\point{the left plot, then the right plot}
-\say{2}{In both examples, R2's fast curve is below the fuses and its delayed curve is above them.}
-\end{slideblock}
+\slide{15}{Without DG, 35 of 39 cells were coordinated, and all 39 after one fuse change. In both examples, R2's fast curve is below the fuses and its delayed curve is above them.}
 
-\begin{slideblock}{16}{5. Results: DG Connected, Conventional R2}{20 s}{s16.png}
-\point{the red crosses in the chart}
-\say{1}{With the DG and unchanged settings, coordination holds in only 24 of 39 cells. The fuse melts before the fast trip, and for some line-to-ground faults R2 does not even pick up the reverse current.}
-\end{slideblock}
+\slide{16}{With the DG and unchanged settings, coordination holds in only 24 of 39 cells. The fuse melts before the fast trip, and for some line-to-ground faults R2 does not even pick up the reverse current.}
 
-\begin{slideblock}{17}{5. Results: Conventional R2 with DG - Three Faults}{20 s}{s17.png}
-\point{the right plot}
-\say{1}{Three faults with the conventional settings. In the first two the recloser still trips first. For the three-phase fault close to 632, R2 trips in 0.121 seconds, but the fuse melts in 0.039 seconds: coordination is lost.}
-\end{slideblock}
+\slide{17}{Three faults with the conventional settings. In the first two the recloser still trips first. For the three-phase fault close to 632, R2 trips in 0.121 seconds, but the fuse melts in 0.039 seconds: coordination is lost.}
 
-\begin{slideblock}{18}{5. Results: With the DSDR}{35 s}{s18.png}
-\point{the chart: only one red cross is left}
-\say{1}{With R2 as a DSDR and revised fuses, 38 of 39 cells are held under the zero-margin criterion. With the same revised fuses but a single-setting R2, only 31, so the dual setting itself restores seven cells.}
-\say{2}{The DSDR with the old fuses gives only 25, so it needs the fuse revision. Only the line-to-ground fault at 692 stays lost, limited by the maximum delayed dial of R2.}
-\end{slideblock}
+\slide{18}{With R2 as a DSDR and revised fuses, 38 of 39 cells are held under the zero-margin criterion. With the same revised fuses but a single-setting R2, only 31, so the dual setting itself restores seven cells. The DSDR with the old fuses gives only 25, so it needs the fuse revision. Only the line-to-ground fault at 692 stays lost, limited by the maximum delayed dial of R2.}
 
-\begin{slideblock}{19}{5. Results: Bolted LL Fault at 646 with the DSDR}{20 s}{s19.png}
-\point{the left plot for R2, the right plot for R1}
-\say{1}{A bolted line-to-line fault at 646 with the DSDR. R2 trips in 0.086 seconds on its reverse group and R1 in 0.189 seconds. Both are before the fuse starts to melt at 0.415 seconds, so the fuse is saved.}
-\end{slideblock}
+\slide{19}{A bolted line-to-line fault at 646 with the DSDR. R2 trips in 0.086 seconds on its reverse group and R1 in 0.189 seconds. Both are before the fuse starts to melt at 0.415 seconds, so the fuse is saved.}
 
-\begin{slideblock}{20}{5. Results: Operating Times with the DSDR}{10 s}{s20.png}
-\say{1}{This table gives the operating times with the DSDR. In every row the fuse starts to melt after the last fast trip.}
-\end{slideblock}
+\slide{20}{This table gives the operating times with the DSDR. In every row the fuse starts to melt after the last fast trip.}
 
-\begin{slideblock}{21}{5. Results: Single vs Dual Setting}{20 s}{s21.png}
-\point{the table under the plots}
-\say{1}{One case in detail: the three-phase fault near 632. With the single setting, R2 trips in 0.121 seconds, after the fuse starts melting: lost. With the reverse group, R2 trips in 0.052 seconds: held. Only the setting group changed.}
-\end{slideblock}
+\slide{21}{One case in detail: the three-phase fault near 632. With the single setting, R2 trips in 0.121 seconds, after the fuse starts melting: lost. With the reverse group, R2 trips in 0.052 seconds: held. Only the setting group changed.}
 
-\begin{slideblock}{22}{5. Results: Time-Sequence Check of All Faults}{20 s}{s22.png}
-\say{1}{As a second check I followed every fault in time. Above R2 the single setting holds 15 of 18 cells and the DSDR all 18. Below R2 the DG feeds the fault directly, so R2's setting makes no difference.}
-\end{slideblock}
+\slide{22}{As a second check I followed every fault in time. Above R2 the single setting holds 15 of 18 cells and the DSDR all 18. Below R2 the DG feeds the fault directly, so R2's setting makes no difference.}
 
-\begin{slideblock}{23}{5. Results: Time-Domain (EMT) Verification}{25 s}{s23.png}
-\point{the upper waveform = without DG, the lower = with DG}
-\say{1}{This EMT simulation is a line-to-line fault at 684. Without DG, the two fast shots use only 45 per cent of the fuse's melting heat, and the fuse then clears the permanent fault.}
-\say{2}{With the DG, current keeps flowing while R2 is open, and the fuse melts at 0.75 seconds, during the second fast shot.}
-\end{slideblock}
+\slide{23}{This EMT simulation is a line-to-line fault at 684. Without DG, the two fast shots use only 45 per cent of the fuse's melting heat, and the fuse then clears the permanent fault. With the DG, current keeps flowing while R2 is open, and the fuse melts at 0.75 seconds, during the second fast shot.}
 
-\begin{slideblock}{24}{5. Results: Effect of the DG Penetration Level}{15 s}{s24.png}
-\point{the ring chart}
-\say{1}{Seven models with the DG from 0 to 100 per cent show the CTI falling: at 633 from plus 4 to minus 51 milliseconds, at 671 from 403 to 75 milliseconds.}
-\end{slideblock}
+\slide{24}{Seven models with the DG from 0 to 100 per cent show the CTI falling: at 633 from plus 4 to minus 51 milliseconds, at 671 from 403 to 75 milliseconds.}
 
-\begin{slideblock}{25}{5. Results: Summary and Verification}{30 s}{s25.png}
-\point{the table, top to bottom}
-\say{1}{In summary: without DG, 35 cells and 39 after the fuse revision; 24 with the DG and a conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both.}
-\say{2}{These counts use a zero margin; with a three-cycle breaker time they become 31, and 26 with a fuse safety margin as well.}
-\end{slideblock}
+\slide{25}{In summary: without DG, 35 cells and 39 after the fuse revision; 24 with the DG and a conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both. These counts use a zero margin; with a three-cycle breaker time they become 31, and 26 with a fuse safety margin as well.}
 
-\begin{slideblock}{26}{6. Conclusions and Future Work}{35 s}{s26.png}
-\say{1}{To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse revision raises this to 38 of 39, and the last cell is limited by R2's maximum delayed dial.}
-\say{2}{The DSDR alone gives only 25, so it is necessary but not sufficient, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional element, practical margins and inverter-based DG.}
-\end{slideblock}
+\slide{26}{To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse revision raises this to 38 of 39, and the last cell is limited by R2's maximum delayed dial. The DSDR alone gives only 25, so it is necessary but not sufficient, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional element, practical margins and inverter-based DG.}
 
-\begin{slideblock}{27}{7. References}{0 s}{s27.png}
-\say{1}{These are the main references.}
-\end{slideblock}
+\slide{27}{These are the main references.}
 
-\begin{slideblock}{32}{Thank You}{5 s}{s32.png}
-\say{1}{Thank you for your attention. I am happy to take your questions.}
-\end{slideblock}
+\slide{32}{Thank you for your attention. I am happy to take your questions.}
 
+\vspace{8pt}
+{\color{navy}\hrule height 0.8pt}\vspace{3pt}
+{\small\bfseries\color{navy} Appendix slides --- only if asked}
 
-\newpage
-\begin{center}
-{\Large\bfseries\color{navy} Appendix slides --- use only if you are asked}\\[3pt]
-{\small Slides 28 to 31 come after the references. Do not present them; open one when a question needs it.}
-\end{center}
+\slide{28}{Compared with the reference paper, load currents agree within 2 per cent and the R1 worked example almost exactly. My fault levels are lower because I validated against the IEEE benchmark. The paper reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced: the DSDR with the fuse revision restores the coordination between the grid and the DG.}
 
-\begin{slideblock}{28}{Appendix: Comparison with the Reference Paper}{30 s}{s28.png}
-\say{1}{Compared with the reference paper, load currents agree within 2 per cent and the R1 worked example almost exactly. My fault levels are lower because I validated against the IEEE benchmark. The paper reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced: the DSDR with the fuse revision restores the coordination between the grid and the DG.}
-\end{slideblock}
+\slide{29}{My fault levels are lower than the paper's, so I checked them against the IEEE short-circuit benchmark. My model agrees within 2 per cent at ten of eleven nodes. The paper's values are up to 151 per cent higher, and two of them exceed its own feeder-head value of 5.41 kiloamperes, which is not possible in a radial feeder without DG.}
 
-\begin{slideblock}{29}{Appendix: Fault Levels - IEEE Benchmark, This Study and the Paper}{30 s}{s29.png}
-\say{1}{My fault levels are lower than the paper's, so I checked them against the IEEE short-circuit benchmark. My model agrees within 2 per cent at ten of eleven nodes. The paper's values are up to 151 per cent higher, and two of them exceed its own feeder-head value of 5.41 kiloamperes, which is not possible in a radial feeder without DG.}
-\end{slideblock}
+\slide{30}{The operating times with the DSDR show the same behaviour as the paper: in every row the fuse melts after the fast trip of the recloser that protects it. R1's delayed time is twenty times the fast time in both, which confirms the dials. R2's settings are not published, so its times are compared in trend only.}
 
-\begin{slideblock}{30}{Appendix: DSDR Operating Times - This Study and the Paper}{25 s}{s30.png}
-\say{1}{The operating times with the DSDR show the same behaviour as the paper: in every row the fuse melts after the fast trip of the recloser that protects it. R1's delayed time is twenty times the fast time in both, which confirms the dials. R2's settings are not published, so its times are compared in trend only.}
-\end{slideblock}
-
-\begin{slideblock}{31}{Appendix: CTI with DG Penetration - Study and Paper}{10 s}{s31.png}
-\say{1}{Both studies show the margin decreasing with DG penetration; where it turns negative depends on settings the paper does not publish.}
-\end{slideblock}
+\slide{31}{Both studies show the margin decreasing with DG penetration; where it turns negative depends on settings the paper does not publish.}
 
 \end{document}

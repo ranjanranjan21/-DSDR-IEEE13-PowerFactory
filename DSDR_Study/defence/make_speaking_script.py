@@ -213,99 +213,46 @@ def words(items, kinds=(S, O)):
 
 
 def block(n, title, items):
-    w = words(items)
-    secs = int(round(w / WPM * 60 / 5.0) * 5)
-    out = ["\\begin{slideblock}{%d}{%s}{%s}{s%02d.png}" % (n, tex(title), "%d s" % secs if secs < 60 else
-                                                           "%d min %02d s" % (secs // 60, secs % 60), n)]
-    k = 0
-    for kind, text in items:
-        if kind == P:
-            out.append("\\point{%s}" % tex(text))
-        else:
-            k += 1
-            out.append("\\%s{%d}{%s}" % ("say" if kind == S else "opt", k, tex(text)))
-    out.append("\\end{slideblock}\n")
-    return "\n".join(out), w
+    """one slide: its number and the text to read (no picture, no pointing cues)"""
+    text = " ".join(t for k, t in items if k in (S, O))
+    return "\\slide{%d}{%s}\n" % (n, tex(text)), words(items)
 
 
-main_blocks, main_words, core_words = [], 0, 0
+main_blocks, main_words = [], 0
 for n, title, items in SLIDES:
     b, w = block(n, title, items)
     main_blocks.append(b)
     main_words += w
-    core_words += words(items, (S,))
 app_blocks = [block(n, t, it)[0] for n, t, it in APPENDIX]
 minutes = main_words / WPM
 
-DOC = r"""\documentclass[12pt,a4paper]{article}
-\usepackage[left=1.6cm,right=1.6cm,top=1.6cm,bottom=1.8cm]{geometry}
+DOC = r"""\documentclass[11pt,a4paper]{article}
+\usepackage[left=1.5cm,right=1.5cm,top=1.3cm,bottom=1.3cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{mathptmx}
-\usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{needspace}
-\usepackage{fancyhdr}
-\graphicspath{{slides/}}
 \definecolor{navy}{HTML}{1B3755}
-\definecolor{cue}{HTML}{8A4B08}
-\definecolor{rule}{HTML}{C9CED6}
-\definecolor{optc}{HTML}{5F6670}
 \setlength{\parindent}{0pt}
-\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\small\color{gray} Presentation script --- page \thepage}
-% one slide: number, title, time, picture
-\newenvironment{slideblock}[4]{\par\needspace{7.5cm}\vspace{4pt}
-  {\color{navy}\rule{\linewidth}{1.2pt}}\par\vspace{3pt}
-  \noindent\begin{minipage}[c]{0.60\linewidth}
-    {\fontsize{22}{24}\selectfont\bfseries\color{navy} SLIDE #1}\par\vspace{3pt}
-    {\large\bfseries #2}\par\vspace{3pt}
-    {\small\color{gray} about #3 to read}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.38\linewidth}\raggedleft
-    \fcolorbox{rule}{white}{\includegraphics[width=0.94\linewidth]{#4}}
-  \end{minipage}\par\vspace{8pt}}{\par\vspace{6pt}}
-\newcommand{\say}[2]{\par\vspace{10pt}\noindent
-  \begin{minipage}[t]{1.5cm}\fontsize{13.5}{19.5}\selectfont{\small\bfseries\color{navy} Para #1}\end{minipage}%
-  \begin{minipage}[t]{\dimexpr\linewidth-1.5cm}\fontsize{13.5}{19.5}\selectfont\raggedright #2\end{minipage}\par}
-\newcommand{\opt}[2]{\par\vspace{10pt}\noindent
-  \begin{minipage}[t]{1.5cm}\fontsize{13.5}{19.5}\selectfont{\small\bfseries\color{gray} Para #1}\\[-6pt]{\scriptsize\color{gray} optional}\end{minipage}%
-  \begin{minipage}[t]{\dimexpr\linewidth-1.5cm}\fontsize{13.5}{19.5}\selectfont\raggedright\color{optc} #2\end{minipage}\par}
-\newcommand{\point}[1]{\par\vspace{10pt}\noindent\hspace{1.5cm}%
-  \begin{minipage}[t]{\dimexpr\linewidth-1.5cm}\small\itshape\color{cue}$\triangleright$ Point to: #1\end{minipage}\par}
+\pagestyle{empty}
+% slide number in the margin column, the text to read beside it
+\newcommand{\slide}[2]{\par\vspace{6pt}\noindent
+  \makebox[0.95cm][r]{\fontsize{13}{15}\selectfont\bfseries\color{navy}#1}\hspace{0.3cm}%
+  \parbox[t]{\dimexpr\linewidth-1.25cm}{\fontsize{11.5}{15}\selectfont\raggedright #2}\par}
 
 \begin{document}
-\begin{center}
-{\LARGE\bfseries\color{navy} Presentation Script}\\[4pt]
-{\large Read-aloud text for every slide of \emph{DSDR\_Final\_Presentation.pptx}}\\[2pt]
-Jhala Nath Kafle (081MSPSE009)
-\end{center}
-\vspace{2pt}
-\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\textbf{How to use this.}
-Each block is one slide: the slide number, a small picture of the slide, and the paragraphs to read, numbered
-\textbf{Para 1, Para 2, \dots} Read them in order, at a normal pace, and change the slide when the block ends.
-The brown lines (\textit{\color{cue}$\triangleright$ Point to}) are not read: they say where to point on the
-screen before the next paragraph.\par\smallskip
-\textbf{Timing.} Slides 1 to 27 and the closing slide take about \textbf{MINUTES minutes} to read at a
-calm speed (COREMIN words). The text is based on the speaker notes of the presentation, shortened a little
-to fit 8 to 10 minutes.
-\par\smallskip
-\textbf{Numbers.} Read ``0.121'' as ``zero point one two one'', ``4.16 kV'' as ``four point one six
-kilovolts'', ``400E'' as ``four hundred E'', and ``CTI'' as the three letters.}}
-\vspace{4pt}
+{\large\bfseries\color{navy} Presentation script}\hfill{\small Jhala Nath Kafle (081MSPSE009) \quad
+number = slide \quad about MINUTES minutes}\par\vspace{2pt}
+{\color{navy}\hrule height 0.8pt}
 
 MAIN
-
-\newpage
-\begin{center}
-{\Large\bfseries\color{navy} Appendix slides --- use only if you are asked}\\[3pt]
-{\small Slides 28 to 31 come after the references. Do not present them; open one when a question needs it.}
-\end{center}
+\vspace{8pt}
+{\color{navy}\hrule height 0.8pt}\vspace{3pt}
+{\small\bfseries\color{navy} Appendix slides --- only if asked}
 
 APPENDIX
 \end{document}
 """
-doc = DOC.replace("MINUTES", "%.0f" % round(minutes)).replace("COREMIN", "%d" % main_words).replace("MAIN", "\n".join(main_blocks)) \
+doc = DOC.replace("MINUTES", "%.0f" % round(minutes)).replace("MAIN", "\n".join(main_blocks)) \
          .replace("APPENDIX", "\n".join(app_blocks))
 open(os.path.join(HERE, "DSDR_Presentation_Script.tex"), "w", encoding="utf-8").write(doc)
-print("main talk: %d words, about %.1f minutes at %d words per minute; without the optional paragraphs "
-      "%d words, %.1f minutes" % (main_words, minutes, WPM, core_words, core_words / WPM))
+print("main talk: %d words, about %.1f minutes at %d words per minute" % (main_words, minutes, WPM))
