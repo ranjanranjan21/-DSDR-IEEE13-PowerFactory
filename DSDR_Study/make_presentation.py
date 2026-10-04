@@ -227,9 +227,8 @@ NOTES = [
     # 5 objectives
     """The general objective was to build and validate a PowerFactory implementation of the DSDR method on
     the IEEE 13-node feeder, with and without DG. To reach it I set seven specific objectives, shown here as
-    steps: the model, load flow and short circuit, the settings, coordination without and with the DG, the
-    dual setting of R2, a time-domain check, and the effect of DG penetration. Under each step is the slide
-    where its result is shown.""",
+    points around it: the model, load flow and short circuit, the settings, coordination without and
+    with the DG, the dual setting of R2, a time-domain check, and the effect of DG penetration.""",
     # 6 scope
     """The study covers four fault types at twelve locations, which gives 39 node and fault-type cells,
     plus one EMT simulation and a penetration study. The limitations: some settings are not published and
@@ -303,81 +302,85 @@ NOTES = [
 
 
 def objectives_slide(prs):
-    """general objective as a banner with a target mark; the specific objectives as a numbered path of
-    seven steps, each with the slide where its result is shown"""
+    """hub: the general objective in the centre, the seven specific objectives around it"""
+    import math
     s = new_slide(prs, "2. Objectives")
     BLUE = RGBColor(0x2F, 0x6F, 0xB3)
-    # ---- general objective: navy banner with a target symbol
-    ban = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, emu(0.65), emu(1.15), emu(12.0), emu(1.45))
-    ban.adjustments[0] = 0.12
-    ban.fill.solid()
-    ban.fill.fore_color.rgb = NAVY
-    ban.line.fill.background()
-    for d, col in ((1.05, RGBColor(0xFF, 0xFF, 0xFF)), (0.72, NAVY), (0.42, RGBColor(0xFF, 0xFF, 0xFF)),
-                   (0.16, RED)):
-        c = s.shapes.add_shape(MSO_SHAPE.OVAL, emu(1.45 - d / 2), emu(1.875 - d / 2), emu(d), emu(d))
-        c.fill.solid()
-        c.fill.fore_color.rgb = col
-        c.line.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-    tb = s.shapes.add_textbox(emu(2.25), emu(1.22), emu(10.2), emu(1.3))
-    tf = tb.text_frame
-    tf.word_wrap = True
-    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
-    r = tf.paragraphs[0].add_run()
-    r.text = "GENERAL OBJECTIVE"
-    r.font.size, r.font.bold, r.font.name = Pt(13), True, "Aptos"
-    r.font.color.rgb = RGBColor(0x9D, 0xC3, 0xE6)
-    p = tf.add_paragraph()
-    r = p.add_run()
-    r.text = ("To build and validate a DIgSILENT PowerFactory implementation of the dual-setting directional "
-              "recloser (DSDR) coordination method on the IEEE 13-node feeder, with and without DG.")
-    r.font.size, r.font.name = Pt(18), "Aptos"
-    r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-    # ---- specific objectives: a path of seven numbered steps
-    lab = s.shapes.add_textbox(emu(0.65), emu(2.85), emu(6), emu(0.4))
-    r = lab.text_frame.paragraphs[0].add_run()
-    r.text = "SPECIFIC OBJECTIVES"
-    r.font.size, r.font.bold, r.font.name = Pt(14), True, "Aptos"
-    r.font.color.rgb = BLUE
-    steps = [("Model", "Build and verify the IEEE 13-node feeder with its protection", "slide 8"),
-             ("Studies", "Unbalanced load flow and short circuit, LG / LL / LLG / LLL", "slide 10"),
-             ("Settings", "Pickups, time dials and fuse coefficients", "slide 9"),
-             ("Coordination", "Without DG, then with a 4.05 MVA DG at 692", "slides 10–11"),
-             ("DSDR", "Forward and reverse settings for R2; classify again", "slides 12–14"),
-             ("Time domain", "Verify the reclosing sequence with EMT", "slide 15"),
-             ("Penetration", "Effect of DG from 0 to 100 %", "slide 16")]
+    WHITE = RGBColor(0xFF, 0xFF, 0xFF)
+    cx, cy = 6.67, 4.15                     # centre of the hub (inches)
+    steps = ["Build and verify the IEEE 13-node feeder with its recloser and fuse protection",
+             "Unbalanced load-flow and short-circuit studies for LG, LL, LLG and LLL faults",
+             "Calculate pickups, time dials and fuse coefficients",
+             "Coordination without DG, then with a 4.05 MVA DG at node 692",
+             "Forward and reverse settings of R2 as a DSDR",
+             "Verify the reclosing sequence in the time domain (EMT)",
+             "Effect of DG penetration from 0 to 100 %"]
     n = len(steps)
-    x0, x1, yc, d = 0.65, 12.65, 3.85, 0.78
-    gap = (x1 - x0) / n
-    line = s.shapes.add_connector(1, emu(x0 + gap / 2), emu(yc), emu(x1 - gap / 2), emu(yc))
-    line.line.color.rgb = RGBColor(0x9D, 0xB4, 0xCF)
-    line.line.width = Pt(3)
-    for k, (head, body, where) in enumerate(steps):
-        xc = x0 + gap * (k + 0.5)
-        c = s.shapes.add_shape(MSO_SHAPE.OVAL, emu(xc - d / 2), emu(yc - d / 2), emu(d), emu(d))
-        c.fill.solid()
-        c.fill.fore_color.rgb = NAVY if k % 2 == 0 else BLUE
-        c.line.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        c.line.width = Pt(2.5)
-        p = c.text_frame.paragraphs[0]
+    bw, bh, rx, ry = 3.05, 0.95, 4.55, 2.15
+    pos = []
+    for k in range(n):
+        ang = math.radians(90 - 360.0 * k / n)
+        pos.append((cx + rx * math.cos(ang), cy - ry * math.sin(ang)))
+    # spokes first, so that they lie behind the boxes
+    for x, y in pos:
+        ln = s.shapes.add_connector(1, emu(cx), emu(cy), emu(x), emu(y))
+        ln.line.color.rgb = RGBColor(0x9D, 0xB4, 0xCF)
+        ln.line.width = Pt(2)
+    # centre: general objective
+    hub = s.shapes.add_shape(MSO_SHAPE.OVAL, emu(cx - 1.75), emu(cy - 1.2), emu(3.5), emu(2.4))
+    hub.fill.solid()
+    hub.fill.fore_color.rgb = NAVY
+    hub.line.color.rgb = WHITE
+    hub.line.width = Pt(4)
+    tf = hub.text_frame
+    tf.word_wrap = True
+    tf.margin_left = tf.margin_right = emu(0.25)
+    for j, (t, size, bold, col) in enumerate((("GENERAL OBJECTIVE", 11, True, RGBColor(0x9D, 0xC3, 0xE6)),
+                                              ("Build and validate the DSDR coordination method in DIgSILENT "
+                                               "PowerFactory on the IEEE 13-node feeder, with and without DG",
+                                               12.5, False, WHITE))):
+        p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
         p.alignment = PP_ALIGN.CENTER
         r = p.add_run()
-        r.text = str(k + 1)
-        r.font.size, r.font.bold, r.font.name = Pt(22), True, "Aptos Display"
-        r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        tb = s.shapes.add_textbox(emu(xc - gap / 2 + 0.05), emu(yc + d / 2 + 0.12), emu(gap - 0.1), emu(1.9))
-        tf = tb.text_frame
+        r.text = t
+        r.font.size, r.font.bold, r.font.name = Pt(size), bold, "Aptos"
+        r.font.color.rgb = col
+    # specific objectives around the hub
+    for k, ((x, y), t) in enumerate(zip(pos, steps)):
+        box = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, emu(x - bw / 2), emu(y - bh / 2), emu(bw), emu(bh))
+        box.adjustments[0] = 0.2
+        box.fill.solid()
+        box.fill.fore_color.rgb = WHITE
+        box.line.color.rgb = BLUE
+        box.line.width = Pt(1.5)
+        tf = box.text_frame
         tf.word_wrap = True
-        for j, (t, size, bold, col) in enumerate(((head, 15, True, NAVY), (body, 12, False, INK),
-                                                   (where, 11, False, GREY))):
-            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
-            p.alignment = PP_ALIGN.CENTER
-            p.space_after = Pt(4)
-            r = p.add_run()
-            r.text = t
-            r.font.size, r.font.bold, r.font.name = Pt(size), bold, "Aptos"
-            r.font.italic = j == 2
-            r.font.color.rgb = col
+        tf.margin_left, tf.margin_right = emu(0.55), emu(0.1)
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        p = tf.paragraphs[0]
+        p.alignment = PP_ALIGN.LEFT
+        r = p.add_run()
+        r.text = t
+        r.font.size, r.font.name = Pt(13), "Aptos"
+        r.font.color.rgb = INK
+        d = 0.5
+        c = s.shapes.add_shape(MSO_SHAPE.OVAL, emu(x - bw / 2 - d / 2 + 0.25), emu(y - d / 2), emu(d), emu(d))
+        c.fill.solid()
+        c.fill.fore_color.rgb = BLUE
+        c.line.color.rgb = WHITE
+        c.line.width = Pt(2)
+        p = c.text_frame.paragraphs[0]
+        p.alignment = PP_ALIGN.CENTER
+        c.text_frame.margin_left = c.text_frame.margin_right = 0
+        r = p.add_run()
+        r.text = str(k + 1)
+        r.font.size, r.font.bold, r.font.name = Pt(14), True, "Aptos"
+        r.font.color.rgb = WHITE
+    lab = s.shapes.add_textbox(emu(0.65), emu(1.05), emu(4), emu(0.4))
+    r = lab.text_frame.paragraphs[0].add_run()
+    r.text = "Specific objectives (1-7) around the general objective"
+    r.font.size, r.font.italic, r.font.name = Pt(12), True, "Aptos"
+    r.font.color.rgb = GREY
     return s
 
 
