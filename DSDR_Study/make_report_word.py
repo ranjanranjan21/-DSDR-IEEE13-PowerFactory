@@ -298,21 +298,23 @@ def section_break(doc, paragraph):
 
 
 def page_numbers(section, fmt, start=1):
-    """page number at the top right (header), fmt: lowerRoman or decimal; start: first number"""
+    """page number at the bottom centre (footer), fmt: lowerRoman or decimal; start: first number"""
     pg = section._sectPr.find(qn("w:pgNumType"))
     if pg is None:
         pg = OxmlElement("w:pgNumType")
         section._sectPr.append(pg)
     pg.set(qn("w:fmt"), fmt)
     pg.set(qn("w:start"), str(start))
-    section.footer.is_linked_to_previous = False
-    for fp in section.footer.paragraphs:
-        fp.text = ""
-    header = section.header
-    header.is_linked_to_previous = False
-    p = header.paragraphs[0]
+    section.header.is_linked_to_previous = False
+    for hp in section.header.paragraphs:
+        hp.text = ""
+    footer = section.footer
+    footer.is_linked_to_previous = False
+    p = footer.paragraphs[0]
     p.text = ""
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.first_line_indent = Cm(0)
+    p.paragraph_format.left_indent = Cm(0)
     run = p.add_run()
     run.font.name, run.font.size = "Times New Roman", Pt(12)
     for kind, text in (("begin", None), (None, "PAGE"), ("end", None)):
@@ -341,6 +343,7 @@ def polish(path, tex):
         sec.left_margin, sec.right_margin = Cm(3.5), Cm(2.0)
         sec.top_margin, sec.bottom_margin = Cm(3.5), Cm(2.0)
         sec.header_distance = Cm(2.0)
+        sec.footer_distance = Cm(1.0)
     st = doc.styles
     for name in ("Normal", "Body Text", "First Paragraph", "Compact"):
         if name in [s.name for s in st]:

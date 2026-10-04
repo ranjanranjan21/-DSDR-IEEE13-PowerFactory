@@ -9,7 +9,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{mathptmx}                       % Times, as in the reference report
 % guideline: A4; margins left 3.5 cm, right 2 cm, top 3.5 cm, bottom 2 cm; page number at the top right
-\usepackage[a4paper,left=3.5cm,right=2cm,top=3.5cm,bottom=2cm,headheight=15pt,headsep=1cm]{geometry}
+\usepackage[a4paper,left=3.5cm,right=2cm,top=3.5cm,bottom=2cm,footskip=1cm]{geometry}
 \usepackage{fancyhdr}
 \usepackage{indentfirst}               % every paragraph indented, also the first
 \usepackage{setspace}
@@ -41,9 +41,9 @@
 \setlength{\parskip}{10pt}                 % and separated by an empty line
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[R]{\thepage}
+\fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
-\fancypagestyle{plain}{\fancyhf{}\fancyhead[R]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
 \tolerance=1000
 \emergencystretch=3em
 \hbadness=5000
@@ -133,40 +133,6 @@ DEPARTMENT OF ELECTRICAL ENGINEERING\par
 \end{titlepage}
 \pagenumbering{roman}                       % the title page counts as page i, its number is not shown
 \setcounter{page}{2}
-
-% =====================================================================================================
-\fronthead{PAGE OF APPROVAL}
-\begin{center}
-TRIBHUVAN UNIVERSITY\\ INSTITUTE OF ENGINEERING\\ PULCHOWK CAMPUS\\ DEPARTMENT OF ELECTRICAL ENGINEERING
-\end{center}
-\noindent The undersigned certify that they have read, and recommended to the Institute of Engineering for
-acceptance, a project report entitled ``\textit{An Adaptive Overcurrent Protection Scheme for Dual-Setting
-Directional Recloser and Fuse Coordination in Unbalanced Distribution Networks With Distributed Generation}''
-submitted by \textit{Jhala Nath Kafle} in partial fulfilment of the requirements for the Master's degree in
-Power System Engineering.
-
-\vspace{1.6cm}
-\noindent\begin{minipage}[t]{0.47\textwidth}
-\rule{0.9\linewidth}{0.4pt}\\
-\textit{[Name of Supervisor]}\\ Supervisor\\ Department of Electrical Engineering
-\end{minipage}\hfill
-\begin{minipage}[t]{0.47\textwidth}
-\rule{0.9\linewidth}{0.4pt}\\
-\textit{[Name of the Head of Department]}\\ Head of the Department\\ Department of Electrical Engineering
-\end{minipage}
-
-\vspace{1.8cm}
-\noindent\begin{minipage}[t]{0.47\textwidth}
-\rule{0.9\linewidth}{0.4pt}\\
-\textit{[Name of External Examiner]}\\ (External Examiner)\\ \textit{[Title]}\\ \textit{[Name of the Organization]}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.47\textwidth}
-\rule{0.9\linewidth}{0.4pt}\\
-\textit{[Name of External Examiner]}\\ (External Examiner)\\ \textit{[Title]}\\ \textit{[Name of the Organization]}
-\end{minipage}
-
-\vspace{1.8cm}
-\begin{center}\textbf{DATE OF APPROVAL:} \textit{Day/Month/Year}\end{center}
 
 % =====================================================================================================
 \fronthead{COPYRIGHT}
