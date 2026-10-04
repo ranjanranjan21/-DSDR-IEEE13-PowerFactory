@@ -20,7 +20,7 @@ import pypandoc
 from docx import Document
 from docx.enum.section import WD_SECTION
 from docx.enum.style import WD_STYLE_TYPE
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
@@ -323,17 +323,28 @@ def polish(path, tex):
     for name in ("Normal", "Body Text", "First Paragraph", "Compact"):
         if name in [s.name for s in st]:
             set_font(st[name], 12, color=False)
-            st[name].paragraph_format.line_spacing = 1.5 if name != "Compact" else 1.0
-            st[name].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY if name != "Compact" else None
+            pf = st[name].paragraph_format
+            if name == "Compact":
+                pf.line_spacing = 1.0
+            else:                                      # as the LaTeX report: one-and-a-half spacing, 8 pt parskip
+                pf.line_spacing = Pt(17)
+                pf.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
+                pf.space_before, pf.space_after = Pt(0), Pt(6)
+            pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY if name != "Compact" else None
     for name, size in (("Heading 1", 14), ("Heading 2", 12), ("Heading 3", 12)):
         set_font(st[name], size, True)
         st[name].font.italic = False
+        st[name].paragraph_format.space_before = Pt(10 if name != "Heading 1" else 0)
+        st[name].paragraph_format.space_after = Pt(4 if name != "Heading 1" else 12)
     st["Heading 1"].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     st["Heading 1"].paragraph_format.page_break_before = True
     for name in ("Image Caption", "Table Caption", "Captioned Figure"):
         if name in [s.name for s in st]:
-            set_font(st[name], 11, color=True)
+            set_font(st[name], 10.5, color=True)
             st[name].font.italic = False
+            st[name].paragraph_format.space_before = Pt(3)
+            st[name].paragraph_format.space_after = Pt(6)
+            st[name].paragraph_format.line_spacing = 1.0
             st[name].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     for t in doc.tables:
         borders(t)
@@ -341,9 +352,29 @@ def polish(path, tex):
             for c in row.cells:
                 for p in c.paragraphs:
                     p.paragraph_format.line_spacing = 1.0
+                    p.paragraph_format.space_before = Pt(0)
+                    p.paragraph_format.space_after = Pt(0)
                     p.paragraph_format.alignment = None
                     for r in p.runs:
-                        r.font.size = Pt(10)
+                        r.font.size = Pt(9)
+        # full text width, small cell margins: fewer wrapped lines, closer to the LaTeX tables
+        pr = t._tbl.tblPr
+        tw = pr.find(qn("w:tblW"))
+        if tw is None:
+            tw = OxmlElement("w:tblW")
+            pr.append(tw)
+        tw.set(qn("w:type"), "pct")
+        tw.set(qn("w:w"), "5000")
+        mar = pr.find(qn("w:tblCellMar"))
+        if mar is not None:
+            pr.remove(mar)
+        mar = OxmlElement("w:tblCellMar")
+        for side, v in (("top", 15), ("left", 60), ("bottom", 15), ("right", 60)):
+            e = OxmlElement("w:%s" % side)
+            e.set(qn("w:w"), str(v))
+            e.set(qn("w:type"), "dxa")
+            mar.append(e)
+        pr.append(mar)
     for p in doc.paragraphs:
         if p.text.strip() == "TOCMARKER":
             p.text = ""
@@ -388,14 +419,31 @@ def main():
     except PermissionError:
         raise SystemExit("close DSDR_Report.docx in Word and run again")
     polish(OUT, tex)
-    update_in_word(OUT)
+    # page breaks at the same places as in the LaTeX PDF
+    pdf = os.path.join(REP, "DSDR_Report.pdf")
+    if os.path.exists(pdf) and os.path.getmtime(pdf) >= os.path.getmtime(os.path.join(REP, "main.tex")):
+        import word_page_match
+        doc = Document(OUT)
+        log = []
+        word_page_match.match(doc, pdf, log)
+        doc.save(OUT)
+        front = word_page_match.front_breaks(pdf)
+        print("\n".join(log).encode("ascii", "replace").decode())
+    else:
+        print("DSDR_Report.pdf is older than main.tex: build the PDF first (build_report_pdf.py) to match the pages")
+        front = []
+    update_in_word(OUT, front)
     print("WORD REPORT:", OUT)
 
 
-def update_in_word(path):
-    """fill the table of contents with Word itself (if Word is installed); otherwise Word asks on opening"""
+def update_in_word(path, front=()):
+    """fill the table of contents with Word itself (if Word is installed); otherwise Word asks on opening.
+    front: [(list 1/2/3, entry text)] entries that start a new page, as in the PDF"""
+    brk = "".join(
+        "foreach ($q in $d.TablesOfContents.Item(%d).Range.Paragraphs) { if ($q.Range.Text.Trim().StartsWith('%s')) "
+        "{ $q.Format.PageBreakBefore = -1; break } }; " % (n, txt.replace("'", "''")) for n, txt in front)
     ps = ("$w = New-Object -ComObject Word.Application; $w.Visible = $false; $w.DisplayAlerts = 0; "
-          "try { $d = $w.Documents.Open('%s', $false, $false); "
+          "try { $d = $w.Documents.Open('DOCPATH', $false, $false); "
           # compact entries in the contents and the lists of figures and tables (Word's built-in styles
           # toc 1-3 = -20..-22, table of figures = -36; 5 = multiple line spacing, 13.8 pt = 1.15 lines)
           "foreach ($k in -20,-21,-22,-36) { $f = $d.Styles.Item($k).ParagraphFormat; $f.LineSpacingRule = 5; "
@@ -405,10 +453,15 @@ def update_in_word(path):
           # of its own when a list fills its last page exactly
           "foreach ($t in $d.TablesOfContents) { $e = $t.Range.End; $q = $d.Range($e, $e).Paragraphs.Item(1); "
           "$q.Range.Font.Size = 1; $q.SpaceAfter = 0; $q.SpaceBefore = 0; $q.LineSpacingRule = 4; $q.LineSpacing = 1 }; "
-          "$d.Save(); $d.Close() } finally { $w.Quit() }" % path.replace("'", "''"))
+          # page breaks inside the lists where the PDF starts a new page, then refresh the page numbers
+          "BREAKS"
+          "foreach ($t in $d.TablesOfContents) { $t.UpdatePageNumbers() }; "
+          "$d.Save(); $d.Close() } finally { $w.Quit() }")
+    ps = ps.replace("DOCPATH", path.replace("'", "''")).replace("BREAKS", brk)
     r = subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True, text=True)
     if r.returncode:
         print("table of contents not updated (Word not available); Word will ask to update it on opening")
+        print(r.stderr[-800:])
 
 
 if __name__ == "__main__":
