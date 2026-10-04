@@ -408,8 +408,23 @@ def title_slide(prs):
             for r in p.runs:
                 r.text = r.text.replace("Progress report presentation on", "Final project presentation on")
                 r.text = r.text.replace("Progress report", "Final project").replace("September 2026", "October 2026")
-        if sh.text_frame.text.startswith("Jhala Nath Kafle"):
-            pass
+        if sh.text_frame.text.startswith("Jhala Nath Kafle") and "Roll No." not in sh.text_frame.text:
+            # roll number as the second line, formatted like the lines below the name
+            paras = sh.text_frame.paragraphs
+            ref = paras[1]
+            new_p = copy.deepcopy(ref._p)
+            ref._p.addprevious(new_p)
+            runs = new_p.findall(qn("a:r"))
+            for extra in runs[1:]:
+                new_p.remove(extra)
+            runs[0].find(qn("a:t")).text = "Roll No. 081MSPSE009"
+    # TU logo: small, top right
+    for sh in s.shapes:
+        if sh.shape_type == 13 and sh.top < emu(1.0):
+            w = emu(0.42)
+            h = int(sh.height * w / sh.width)
+            sh.width, sh.height = w, h
+            sh.left, sh.top = W - w - emu(0.35), emu(0.22)
 
 
 def build():
