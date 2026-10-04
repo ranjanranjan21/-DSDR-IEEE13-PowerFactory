@@ -102,6 +102,29 @@ load current (largest phase) from the load flow. The pickup must also be below t
 (LG through 3\,$\Omega$ at the farthest node), so that the recloser still sees the weakest fault.
 
 \smallskip
+\textbf{How the smallest fault current was obtained (database calculation).} In PowerFactory, with the DG out, an LG
+fault through $R_f = 3\,\Omega$ was applied at every node of the recloser's zone and on every phase. For each fault
+the phase current through the recloser was read. The table gives the farthest node and the lowest value found.
+
+\smallskip
+{\footnotesize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|l|>{\centering}p{2.3cm}|>{\centering}p{2.3cm}|>{\centering}p{2.4cm}|>{\centering}p{3.3cm}|c|c|}
+\hline
+\textbf{Recloser} & \textbf{Farthest node (line length)} & \textbf{Current at the fault, LG 3\,$\Omega$} &
+\textbf{Current through the recloser} & \textbf{Lowest over all LG 3\,$\Omega$ faults} & \textbf{Pickup} &
+\textbf{Check} \\ \hline
+R1 & 652 (5100\,ft) & 617.2\,A (ph.\ a) & 1102.4\,A & \textbf{1074.4\,A} (fault at 680, ph.\ b) & 720\,A & \checkmark \\ \hline
+R2 forward & 652 (1100\,ft from 671) & 617.2\,A (ph.\ a) & 1028.3\,A & \textbf{878.5\,A} (fault at 680, ph.\ b) & 600\,A &
+\checkmark \\ \hline
+\end{tabular}}
+
+\smallskip
+Why the recloser current is larger than the current at the fault: the recloser carries the fault current
+\emph{plus} the load current of its phase, added as phasors (617\,A at the fault becomes about 1102\,A at R1). The lowest value is
+therefore not at the farthest node but at 680 on phase b, the phase with the smallest sum of load and fault
+current. Rounded, these are the 1074\,A and 879\,A of Table~II, and both pickups (720\,A, 600\,A) are below them.
+
+\smallskip
 {\footnotesize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.25}
 \begin{tabular}{|l|c|c|c|>{\centering}p{3.0cm}|c|c|}
 \hline
