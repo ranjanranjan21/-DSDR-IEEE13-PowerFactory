@@ -1424,6 +1424,28 @@ for a fault on the 0.48\,kV side, so this row is not comparable.}
 \label{tab:e2}
 \end{table}
 
+The maximum fault currents of the model are lower than those of the paper's Table~II. To decide which values are
+right, both are compared in Table~\ref{tab:bench} with the IEEE 13-node short-circuit benchmark~\cite{kersting2012},
+as quoted by the same authors in~\cite{yousaf2020}. The model agrees with the benchmark within 2\,\% at <<BENCH_N2>>
+of the <<BENCH_N>> nodes (largest difference <<BENCH_MAX>>\,\%), while the paper's values lie 4 to 151\,\% above it.
+Two of the paper's values, 6.73\,kA on 632--633 and 7.83\,kA on 692--675, even exceed its own 5.41\,kA at the feeder
+head, which is not possible in a radial feeder without DG. The lower fault levels of this study are therefore
+those of the IEEE benchmark, not an error of the model.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\hd & \textbf{IEEE benchmark} & \multicolumn{2}{c}{\textbf{This study}} & \multicolumn{2}{c}{\textbf{Reference paper}} \\
+\hd\textbf{Node} & \textbf{(kA)} & \textbf{If,max (kA)} & \textbf{dev.\,\%} & \textbf{If,max of branch (kA)} & \textbf{dev.\,\%} \\
+\midrule
+<<TABLE_BENCH>>
+\end{tabular}
+\caption{Maximum fault current, DG out: IEEE benchmark, this study and the paper's Table~II. Deviations are
+relative to the benchmark.}
+\label{tab:bench}
+\end{table}
+
 \begin{table}[H]
 \centering\footnotesize
 \begin{tabular}{@{}lcccccccccc@{}}

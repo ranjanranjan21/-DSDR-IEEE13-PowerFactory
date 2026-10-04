@@ -183,6 +183,17 @@ def case_rows(cid):
 
 
 T["CASE05_TABLE"] = case_rows("05")
+
+# ---- fault levels against the IEEE short-circuit benchmark (Appendix) -----------------------
+_fb = read(os.path.join(RES, "Fault_level_benchmark.csv"))
+T["TABLE_BENCH"] = rows([[r["Node"], "%.2f" % float(r["IEEE benchmark (kA)"]), "%.2f" % float(r["This study (kA)"]),
+                          "$%+.1f$" % float(r["Study vs benchmark (%)"]),
+                          "%.2f" % float(r["Paper Table II If,max of the branch (kA)"]),
+                          "$%+.1f$" % float(r["Paper vs benchmark (%)"])] for r in _fb])
+_dev = [abs(float(r["Study vs benchmark (%)"])) for r in _fb]
+T["BENCH_N2"] = str(sum(d <= 2.0 for d in _dev))
+T["BENCH_N"] = str(len(_dev))
+T["BENCH_MAX"] = "%.1f" % max(_dev)
 T["CASE07_TABLE"] = case_rows("07")
 
 # ---- Fig. 10 ----------------------------------------------------------------------------------
