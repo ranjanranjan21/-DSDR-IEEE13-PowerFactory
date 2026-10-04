@@ -143,6 +143,30 @@ the fuse current rises by 54\,\% (2574 $\rightarrow$ 3963\,A) and its melting ti
 $\rightarrow$ 0.148\,s), while R2's current falls by 6\,\% and its fast time rises only from 0.067 to 0.072\,s. The
 CTI falls from +403 to +75\,ms --- the same mechanism, but the large starting margin keeps it positive.
 
+
+\textbf{The same on the time--current characteristic (TCC).}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{tcc_degradation.png}
+\par\smallskip{\small TCC of the fault at 633 with the conventional protection: fuse F633 (250E) and R1. Left: full view.
+Right: zoom on the operating points at 0\,\% (dark) and 100\,\% DG (red).}
+\end{figure}
+
+How to read it:
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item The \textbf{curves never move} --- the settings and fuse are the same at every DG level. Only the
+  \textbf{operating points} move, because the currents change.
+\item Each device is read at \emph{its own} current: the fuse (square) on the green melting curve at the fuse current,
+  R1 (circle) on the blue fast curve at R1's current. The vertical dotted lines mark these currents.
+\item \textbf{0\,\% DG:} the two currents are almost equal (4102 and 4162\,A), the points sit almost on top of each other
+  where the curves cross; the fuse square is just \emph{above} the R1 circle: CTI = +4\,ms, R1 trips first.
+\item \textbf{100\,\% DG:} the fuse square slides \emph{down the green curve to the right} (more current, 5426\,A, melts at
+  0.055\,s), while the R1 circle moves only slightly \emph{left and up} (less current, 3970\,A, 0.106\,s). The fuse is now
+  far \emph{below} R1: CTI = $-51$\,ms, the fuse melts first.
+\item The vertical gap between square and circle \emph{is} the CTI. DG pulls the two points apart sideways (different
+  currents), and on falling curves sideways separation turns into a time gap of the wrong sign.
+\end{itemize}
+
 \textbf{In short:} DG makes the fuse and the recloser carry \emph{different} currents. The fuse, nearer the fault,
 gets more; the recloser gets the same or less. The fuse therefore speeds up while the recloser does not, and the gap
 between them --- the CTI --- closes.
@@ -242,6 +266,28 @@ Same mechanism (the DG at 692 feeds the fault at 684 through F671-2 but not thro
   and the margin is negative ($-279$ and $-14$\,ms). The conventional R2 is worse there: it does not trip at 25\,\%
   and trips only after 1.109\,s at 37\,\% ($-1033$\,ms). The remedy is adaptive: a reverse group selected for the
   actual DG output --- listed as future work.
+\end{itemize}
+
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{tcc_dsdr.png}
+\par\smallskip{\small TCC of the fault at 633 with the DSDR protection. Left: 100\,\% DG. Right: 25\,\% DG. Grey: the old
+F633 250E, for comparison.}
+\end{figure}
+
+How to read it --- the two actions of the DSDR are both visible:
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item \textbf{Fuse revision = the green curve moved up and right} (grey 250E $\rightarrow$ green 400E). At the same fuse
+  current the melting time is longer: at 100\,\% DG 0.149\,s instead of 0.055\,s. The fuse square is now
+  \emph{above} the R1 circle again: CTI against R1 = +43\,ms.
+\item \textbf{Reverse group = the solid orange curve.} R2 carries the DG share (1500\,A in reverse at 100\,\%). On the
+  reverse curve it trips in 0.060\,s; on the conventional forward curve (dashed orange) it would take 0.160\,s, longer
+  than the fuse's 0.149\,s. So R1 removes the grid share at 0.106\,s and R2 the DG share at 0.060\,s --- both before
+  the fuse melts: the margin to the last fast trip is +43\,ms.
+\item \textbf{25\,\% DG (right):} the fuse and R1 are still fine (+140\,ms), but the DG share is only 416\,A, just above
+  the start of the reverse curve (300\,A), where the curve is steep and slow: R2 trips at about 0.52\,s, after the
+  fuse's 0.24\,s. This is the weak spot of a reverse group designed for 100\,\% DG; the conventional R2 does not trip
+  at all.
 \end{itemize}
 
 \begin{figure}[H]\centering
