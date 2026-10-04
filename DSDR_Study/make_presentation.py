@@ -98,6 +98,7 @@ def picture(s, name, x, y, w, h):
 
 def caption(s, x, y, w, t):
     tb = s.shapes.add_textbox(emu(x), emu(y), emu(w), emu(0.35))
+    tb.text_frame.word_wrap = True
     p = tb.text_frame.paragraphs[0]
     p.alignment = PP_ALIGN.CENTER
     r = p.add_run()
@@ -329,6 +330,11 @@ NOTES = [
     the source the same authors used in their 2020 paper. My model agrees within 2 percent at ten of eleven
     nodes. The paper's values are up to 151 percent higher, and two of them exceed its own feeder-head value of
     5.41 kiloamperes, which is not possible in a radial feeder without DG.""",
+    # 20c operating times vs paper
+    """The operating times with the DSDR show the same behaviour as the paper: in every row the fuse melts after
+    the fast trip of the recloser that protects it. R1's delayed time is twenty times the fast time in both, which confirms the dials; the
+    differences follow the lower fault levels. R2's settings are not published, so its times are compared in
+    trend only.""",
     # 21 appendix penetration
     """Both studies show the margin decreasing with DG penetration; where it turns negative depends on
     settings the paper does not publish.""",
@@ -733,8 +739,15 @@ def build():
           0.5, 1.2, 11.2, [3.2, 2.9, 2.8, 2.6], size=12, row_h=0.47)
 
     s = new_slide(prs, "Appendix: Fault Levels – IEEE Benchmark, This Study and the Paper")
-    picture(s, os.path.join(HERE, "results", "figures", "Fault_level_benchmark.png"), 0.3, 1.1, 8.3, 4.6)
-    caption(s, 0.3, 5.75, 8.3, "Maximum fault current, DG out. Benchmark: Kersting & Shirek [6], values as quoted in [5]")
+    fl = [["Node", "IEEE benchmark (kA)", "This study (kA)", "Study vs benchmark", "Paper, Table II (kA)",
+           "Paper vs benchmark"]]
+    for r in read_csv("Fault_level_benchmark.csv"):
+        fl.append([r["Node"], "%.2f" % float(r["IEEE benchmark (kA)"]), "%.2f" % float(r["This study (kA)"]),
+                   "%+.1f %%" % float(r["Study vs benchmark (%)"]), "%.2f" % float(r["Paper Table II If,max of the branch (kA)"]),
+                   "%+.1f %%" % float(r["Paper vs benchmark (%)"])])
+    table(s, fl, 0.45, 1.15, 8.1, [0.9, 1.45, 1.3, 1.45, 1.45, 1.45], size=11.5, row_h=0.36, first_col_left=False)
+    caption(s, 0.45, 5.6, 8.1, "Maximum fault current, DG out. Benchmark: Kersting & Shirek [6], values as quoted in [5]; "
+            "paper: If,max of the branch ending at the node")
     text(s, 8.75, 1.25, 3.9, 5.2, [
         "**This study vs IEEE benchmark:** within 2 % at 10 of 11 nodes; largest difference 4.7 % (652, LG).",
         "**Paper vs benchmark:** 4 % to 151 % higher.",
@@ -742,6 +755,23 @@ def build():
         "not possible in a radial feeder without DG.",
         "So the model was validated against the benchmark, not tuned to the paper's Table II."],
         size=14, space=8)
+
+    s = new_slide(prs, "Appendix: DSDR Operating Times – This Study and the Paper")
+    op = [["Node", "Fault", "R1 fast (s)", "R1 delayed (s)", "R2 fast (s)", "R2 delayed (s)", "Fuse melts (s)"]]
+    for r in read_csv(os.path.join("comparison", "Table_IV_vs_paper.csv")):
+        pair = lambda a, b: "–" if a in ("---", "") else "%s / %s" % (a, b)
+        op.append([r["node"], r["fault"], pair(r["R1 fast (s)"], r["paper R1 fast"]),
+                   pair(r["R1 delayed (s)"], r["paper R1 delayed"]), pair(r["R2 fast (s)"], r["paper R2 fast"]),
+                   pair(r["R2 delayed (s)"], r["paper R2 delayed"]), pair(r["fuse MMT (s)"], r["paper fuse MMT"])])
+    table(s, op, 0.45, 1.1, 8.3, [0.8, 0.8, 1.35, 1.4, 1.35, 1.4, 1.4], size=11, row_h=0.345, first_col_left=False)
+    caption(s, 0.45, 5.65, 8.3, "Each cell: this study / reference paper [1]; DG connected, R2 as DSDR")
+    text(s, 8.95, 1.2, 3.85, 5.2, [
+        "**Same behaviour:** in every row of both studies the fuse melts after the fast trip of the recloser(s) that protect it (R1 and R2 above R2, R2 below) – coordination held.",
+        "**R1:** delayed = 20 × fast in both (dials 0.5 / 10 confirmed). Times differ with the fault current: "
+        "lower fault levels give slower R1.",
+        "**R2:** reverse group for 632–DL, forward below R2 in both.",
+        "R2 settings and fuse sizes are not published in [1], so R2 and fuse times are compared in trend, not row by row."],
+        size=13, space=7)
 
     s = new_slide(prs, "Appendix: CTI with DG Penetration – Study and Paper")
     picture(s, "pen_ring_vs_paper.png", 0.4, 1.1, 7.6, 5.2)
