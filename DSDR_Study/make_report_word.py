@@ -641,6 +641,11 @@ def polish(path, tex):
                 if "] " in r.text:
                     r.text = r.text.replace("] ", "]\t", 1)
                     break
+    for p in doc.paragraphs:                               # sign-off of the acknowledgements, as in the PDF
+        if p.text.strip().startswith("Jhala Nath Kafle") and "081MSPSE009" in p.text:
+            p.paragraph_format.first_line_indent = Cm(0)
+            p.paragraph_format.space_before = Pt(28)
+            p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
     for p in doc.paragraphs:
         if p.text.strip() in ("Symbols", "Abbreviations"):
             p.paragraph_format.first_line_indent = Cm(1)
