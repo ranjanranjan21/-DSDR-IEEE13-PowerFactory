@@ -94,6 +94,8 @@ def body_for_pandoc(tex, labels, cites):
     s = re.sub(r"\\no\b", "\u2717", s)
     s = re.sub(r"\\ohm(\{\})?", "\u2009\u03a9", s)
     s = re.sub(r"\\PF(\{\})?", "PowerFactory", s)
+    s = re.sub(r"\$([+-]?)(\d[\d.,]*)\$", lambda m: m.group(1).replace("-", "\u2212") + m.group(2), s)
+    s = s.replace("$\\approx$", "\u2248").replace("$\\rightarrow$", "\u2192")
     # ---- headings with the numbering of the PDF
     chap = [0, 0, 0]
 
@@ -244,6 +246,47 @@ def borders(table):
     pr.append(jc)
 
 
+def plain_list(table):
+    """two-column list without borders (3.6 cm + 11.4 cm), 12 pt, as the lists of symbols and abbreviations"""
+    pr = table._tbl.tblPr
+    for tag in ("w:tblBorders", "w:tblW", "w:jc", "w:tblLayout", "w:tblCellMar", "w:tblStyle"):
+        old = pr.find(qn(tag))
+        if old is not None:
+            pr.remove(old)
+    b = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        e = OxmlElement("w:%s" % edge)
+        e.set(qn("w:val"), "nil")
+        b.append(e)
+    pr.append(b)
+    lay = OxmlElement("w:tblLayout")
+    lay.set(qn("w:type"), "fixed")
+    pr.append(lay)
+    mar = OxmlElement("w:tblCellMar")
+    for side, v in (("top", 20), ("left", 0), ("bottom", 20), ("right", 60)):
+        e = OxmlElement("w:%s" % side)
+        e.set(qn("w:w"), str(v))
+        e.set(qn("w:type"), "dxa")
+        mar.append(e)
+    pr.append(mar)
+    widths = (Cm(3.6), Cm(11.4))
+    grid = table._tbl.tblGrid
+    for gc, w in zip(grid.findall(qn("w:gridCol")), widths):
+        gc.set(qn("w:w"), str(int(w.twips)))
+    for row in table.rows:
+        for c, w in zip(row.cells, widths):
+            c.width = w
+            for p in c.paragraphs:
+                pf = p.paragraph_format
+                pf.first_line_indent, pf.left_indent = Cm(0), Cm(0)
+                pf.space_before = pf.space_after = Pt(0)
+                pf.line_spacing, pf.line_spacing_rule = Pt(18.6), WD_LINE_SPACING.EXACTLY
+                pf.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                for r in p.runs:
+                    r.font.size = Pt(12)
+                    r.bold = False
+
+
 def toc_field(paragraph, instr=None):
     run = paragraph.add_run()
     for kind, text in (("begin", None), (None, instr or 'TOC \\o "1-3" \\h \\z \\u'), ("separate", None), (None, None), ("end", None)):
@@ -268,18 +311,21 @@ def title_page(doc, tex):
     title = re.search(r"\\itshape (An Adaptive.*?)\\par", tp, re.S).group(1)
     title = " ".join(title.replace("\\\\", " ").split())
     first = doc.paragraphs[0]
-    lines = [("LOGO", 0, False, False, 24), ("TRIBHUVAN UNIVERSITY", 14, False, False, 4),
-             ("INSTITUTE OF ENGINEERING", 16, True, False, 4), ("PULCHOWK CAMPUS", 14, True, False, 40),
-             (title, 14, True, True, 40), ("BY:", 12, False, False, 4), ("Jhala Nath Kafle", 12, True, True, 4),
-             ("(081MSPSE009)", 12, False, False, 90),
+    lines = [("LOGO", 0, False, False, 50), ("TRIBHUVAN UNIVERSITY", 14, False, False, 21),
+             ("INSTITUTE OF ENGINEERING", 16, True, False, 17), ("PULCHOWK CAMPUS", 14, True, False, 53),
+             (title, 14, True, True, 50), ("BY:", 12, False, False, 10), ("Jhala Nath Kafle", 12, True, True, 10),
+             ("(081MSPSE009)", 12, False, False, 36),
              ("A PROJECT REPORT SUBMITTED IN PARTIAL FULFILLMENT OF THE REQUIREMENTS FOR THE MASTER'S DEGREE IN "
-              "POWER SYSTEM ENGINEERING", 12, False, False, 10),
+              "POWER SYSTEM ENGINEERING", 12, False, False, 21),
              ("DEPARTMENT OF ELECTRICAL ENGINEERING", 12, False, False, 30), ("OCTOBER, 2026", 12, False, True, 0)]
     for text, size, bold, ital, after in lines:
         p = first.insert_paragraph_before()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.paragraph_format.first_line_indent = Cm(0)
         p.paragraph_format.space_after = Pt(after)
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.line_spacing = Pt(22 if text == title else 20 if size >= 14 else 18)
+        p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.EXACTLY if text != "LOGO" else WD_LINE_SPACING.SINGLE
         if text == "LOGO":
             p.add_run().add_picture(os.path.join(FIGS, "tu_logo.png"), width=Cm(3.4))
             continue
@@ -336,6 +382,41 @@ def no_page_number(section):
             p.text = ""
 
 
+def pdf_table_sizes():
+    """font size of every table of the LaTeX PDF, by table number (the text above each table caption)"""
+    pdf = os.path.join(REP, "DSDR_Report.pdf")
+    sizes = {}
+    if not os.path.exists(pdf):
+        return sizes
+    import collections
+    import fitz
+    for pg in fitz.open(pdf):
+        spans = [(ln["bbox"][1], sp["size"], sp["text"], sp["bbox"][0], sp["bbox"][2])
+                 for b in pg.get_text("dict")["blocks"] if b["type"] == 0
+                 for ln in b["lines"] for sp in ln["spans"] if sp["text"].strip()]
+        caps = sorted((y, m.group(1)) for y, sz, t, x0, x1 in spans
+                      for m in [re.match(r"Table ([A-Z0-9]+\.\d+)", t)] if m and abs(sz - 12) < 0.3)
+        prev = 0
+        for y, num in caps:
+            cell = [(z, x0, x1) for y0, z, t, x0, x1 in spans if prev < y0 < y and z < 11.5]
+            if cell:
+                size = collections.Counter(round(z * 2) / 2 for z, _, _ in cell).most_common(1)[0][0]
+                span = max(x1 for _, _, x1 in cell) - min(x0 for _, x0, _ in cell)
+                sizes[num] = (size, span > 0.85 * 467)        # 467 pt = text width: a full-width table
+            prev = y
+    return sizes
+
+
+def table_number(tbl):
+    """number of a Word table from its caption (just after or just before it)"""
+    for el in (tbl.getnext(), tbl.getprevious()):
+        if el is not None and el.tag == qn("w:p"):
+            m = re.match(r"\s*Table ([A-Z0-9]+\.\d+)", "".join(t.text or "" for t in el.iter(qn("w:t"))))
+            if m:
+                return m.group(1)
+    return None
+
+
 def polish(path, tex):
     doc = Document(path)
     for sec in doc.sections:
@@ -351,30 +432,46 @@ def polish(path, tex):
             pf = st[name].paragraph_format
             if name == "Compact":
                 pf.line_spacing = 1.0
-            else:                                      # as the LaTeX report: one-and-a-half spacing, 8 pt parskip
-                pf.line_spacing = Pt(17)
+            else:                                      # as the LaTeX report: 17.9 pt lines, 10 pt parskip
+                pf.line_spacing = Pt(17.9)
                 pf.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
-                pf.space_before, pf.space_after = Pt(0), Pt(6)
+                pf.space_before, pf.space_after = Pt(0), Pt(10)
                 pf.first_line_indent = Cm(1)
             pf.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY if name != "Compact" else None
     for name, size in (("Heading 1", 14), ("Heading 2", 12), ("Heading 3", 12)):
         set_font(st[name], size, True)
         st[name].font.italic = False
-        st[name].paragraph_format.space_before = Pt(10 if name != "Heading 1" else 0)
-        st[name].paragraph_format.space_after = Pt(4 if name != "Heading 1" else 12)
+        hf = st[name].paragraph_format
+        hf.space_before, hf.space_after = {"Heading 1": (Pt(0), Pt(30)), "Heading 2": (Pt(22), Pt(14)),
+                                           "Heading 3": (Pt(14), Pt(10))}[name]
+        hf.first_line_indent, hf.left_indent = Cm(0), Cm(0)
+        hf.line_spacing = 1.0
+        hf.keep_with_next = True
     st["Heading 1"].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
     st["Heading 1"].paragraph_format.page_break_before = True
     for name in ("Image Caption", "Table Caption", "Captioned Figure"):
         if name in [s.name for s in st]:
             set_font(st[name], 12, color=True)
             st[name].font.italic = False
-            st[name].paragraph_format.space_before = Pt(3)
-            st[name].paragraph_format.space_after = Pt(6)
+            st[name].paragraph_format.space_before = Pt(8)
+            st[name].paragraph_format.space_after = Pt(14)
+            st[name].paragraph_format.first_line_indent = Cm(0)
             st[name].paragraph_format.line_spacing = 1.0
             st[name].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    tsizes = pdf_table_sizes()
     for t in doc.tables:
+        if table_number(t._tbl) is None:                      # symbols and abbreviations: a plain list
+            plain_list(t)
+            continue
         borders(t)
-        size = Pt(8) if len(t.columns) >= 8 else Pt(8.5)      # wide tables at the guideline minimum of 8 pt
+        tsize, wide = tsizes.get(table_number(t._tbl), (10, False))
+        for row in t.rows:                                   # short labels of the first column on one line
+            tc = row.cells[0]._tc
+            if len(tc.xpath("string(.)")) <= 32:
+                pr_ = tc.get_or_add_tcPr()
+                if pr_.find(qn("w:noWrap")) is None:
+                    pr_.append(OxmlElement("w:noWrap"))
+        size = Pt(tsize)                                      # as the same table in the PDF
         for row in t.rows:
             for c in row.cells:
                 for p in c.paragraphs:
@@ -382,27 +479,63 @@ def polish(path, tex):
                     p.paragraph_format.space_before = Pt(0)
                     p.paragraph_format.space_after = Pt(0)
                     p.paragraph_format.first_line_indent = Cm(0)
-                    p.paragraph_format.alignment = None
+                    if p.paragraph_format.alignment in (None, WD_ALIGN_PARAGRAPH.JUSTIFY):
+                        p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
                     for r in p.runs:
                         r.font.size = size
+                    for mr in p._p.iter(qn("m:r")):           # equations in the cells at the same size
+                        rpr = mr.find(qn("w:rPr"))
+                        if rpr is None:
+                            rpr = OxmlElement("w:rPr")
+                            mr.insert(0 if mr.find(qn("m:rPr")) is None else 1, rpr)
+                        for tag in ("w:sz", "w:szCs"):
+                            old = rpr.find(qn(tag))
+                            if old is not None:
+                                rpr.remove(old)
+                            e = OxmlElement(tag)
+                            e.set(qn("w:val"), "20")
+                            rpr.append(e)
         # full text width, small cell margins: fewer wrapped lines, closer to the LaTeX tables
         pr = t._tbl.tblPr
         tw = pr.find(qn("w:tblW"))
         if tw is None:
             tw = OxmlElement("w:tblW")
             pr.append(tw)
-        tw.set(qn("w:type"), "pct")
-        tw.set(qn("w:w"), "5000")
+        tw.set(qn("w:type"), "pct" if wide else "auto")      # full width or as wide as the contents (as LaTeX)
+        tw.set(qn("w:w"), "5000" if wide else "0")
+        lay = pr.find(qn("w:tblLayout"))
+        if lay is None:
+            lay = OxmlElement("w:tblLayout")
+            pr.append(lay)
+        lay.set(qn("w:type"), "autofit")
+        for tc in t._tbl.iter(qn("w:tcW")):
+            tc.set(qn("w:type"), "auto")
+            tc.set(qn("w:w"), "0")
         mar = pr.find(qn("w:tblCellMar"))
         if mar is not None:
             pr.remove(mar)
         mar = OxmlElement("w:tblCellMar")
-        for side, v in (("top", 15), ("left", 60), ("bottom", 15), ("right", 60)):
+        for side, v in (("top", 40), ("left", 100), ("bottom", 40), ("right", 100)):
             e = OxmlElement("w:%s" % side)
             e.set(qn("w:w"), str(v))
             e.set(qn("w:type"), "dxa")
             mar.append(e)
         pr.append(mar)
+    # list items close together, as in the PDF (2 pt between items)
+    paras = doc.paragraphs
+    for k, p in enumerate(paras):
+        if p._p.find(qn("w:pPr") + "/" + qn("w:numPr")) is not None:
+            pf = p.paragraph_format
+            pf.line_spacing, pf.line_spacing_rule = Pt(17.9), WD_LINE_SPACING.AT_LEAST
+            pf.space_before = Pt(0)
+            last = k + 1 >= len(paras) or paras[k + 1]._p.find(qn("w:pPr") + "/" + qn("w:numPr")) is None
+            pf.space_after = Pt(10 if last else 2)
+    for t in doc.tables:
+        prev = t._tbl.getprevious()
+        if prev is not None and prev.tag == qn("w:p"):
+            sty = prev.find(qn("w:pPr") + "/" + qn("w:pStyle"))
+            if sty is not None and sty.get(qn("w:val")) in ("TableCaption", "Table Caption"):
+                t._tbl.addnext(prev)
     for p in doc.paragraphs:
         if p.text.strip() == "TOCMARKER":
             p.text = ""
@@ -412,7 +545,7 @@ def polish(path, tex):
             nxt = next(q for q in doc.paragraphs if q.style.name == "Heading 1" and q.text.startswith("LIST OF SYMBOLS"))
             for title, style in (("LIST OF FIGURES", "Image Caption"), ("LIST OF TABLES", "Table Caption")):
                 nxt.insert_paragraph_before(title, style="Heading 1")
-                toc_field(nxt.insert_paragraph_before(), 'TOC '+chr(92)+'h '+chr(92)+'z '+chr(92)+'t "%s,1"' % style)
+                toc_field(nxt.insert_paragraph_before(), 'TOC '+chr(92)+'h '+chr(92)+'z '+chr(92)+'t "%s,9"' % style)    # level 9: own style
         if any(r._r.find(qn("w:drawing")) is not None for r in p.runs):
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     # ---- three sections: title page (no number), front matter (i, ii, ...), chapters (1, 2, ...)
@@ -476,6 +609,11 @@ def update_in_word(path, front=()):
           # toc 1-3 = -20..-22, table of figures = -36; 5 = multiple line spacing, 13.8 pt = 1.15 lines)
           "foreach ($k in -20,-21,-22,-36) { $f = $d.Styles.Item($k).ParagraphFormat; $f.LineSpacingRule = 5; "
           "$f.LineSpacing = 12; $f.SpaceAfter = 2; $f.SpaceBefore = 0; $f.Alignment = 0 }; "
+          "$t1 = $d.Styles.Item(-20); $t1.Font.Bold = -1; $t1.ParagraphFormat.SpaceBefore = 9; "
+          "$d.Styles.Item(-21).ParagraphFormat.LeftIndent = 14; $d.Styles.Item(-22).ParagraphFormat.LeftIndent = 42; "
+          # lists of figures and tables (TOC level 9): plain entries, the text hanging after the number
+          "$t9 = $d.Styles.Item(-28); $t9.Font.Bold = 0; $f = $t9.ParagraphFormat; $f.LeftIndent = 62; "
+          "$f.FirstLineIndent = -62; $f.SpaceBefore = 0; $f.SpaceAfter = 3; $f.LineSpacingRule = 0; $f.Alignment = 0; "
           "foreach ($t in $d.TablesOfContents) { $t.Update() }; "
           # the empty paragraph that ends each list is made 1 pt high, so that it never spills onto a page
           # of its own when a list fills its last page exactly

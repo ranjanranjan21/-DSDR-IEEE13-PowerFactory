@@ -337,6 +337,8 @@ def match(doc, pdf_path, log=None):
             else:
                 missed.append((page, kind, line[:50]))
                 continue
+        elif kind == "table" and blocks[k - 1][1] == "tbl":     # caption below its table: break before the table
+            break_before(blocks[k - 1][0].find(".//" + W_P))
         elif bk == "tbl":                            # the table's caption sits above it in Word
             prev = blocks[k - 1][0]
             break_before(prev if prev.tag == W_P and "caption" in style_of(prev).lower() else el) \

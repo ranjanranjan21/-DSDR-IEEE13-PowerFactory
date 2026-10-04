@@ -186,10 +186,13 @@ the lateral fuses for faults on both sides of it. The strategy is implemented on
 in DIgSILENT \PF{} with a synchronous DG, the characteristics of commercial recloser relays and fuses,
 unbalanced load-flow and short-circuit studies, and an electromagnetic-transient simulation of the reclosing
 sequence. The results show that the DG makes the fuses operate before the fast operation of a conventional
-recloser, increasingly so as the DG penetration rises, and that the dual-setting directional recloser,
-together with a revision of the fuse sizes, restores the fuse-saving coordination in the zone between the grid
-and the DG. They also show the limits of the strategy: the dial range of the recloser and the DG infeed to
-faults beyond the recloser.
+recloser, increasingly so as the DG penetration rises. With the DG connected, a conventional single-setting
+mid-line recloser keeps the coordination in 24 of the 39 studied fault cells. The dual-setting directional
+recloser alone raises this to 25 cells, and together with a revision of the fuse sizes to 38 of 39 cells under
+the zero-margin criterion; the remaining cell, an LG fault at node 692, is limited by the delayed dial range of
+the recloser. When a three-cycle breaker interrupting time and a fuse safety margin are included, the number
+of coordinated cells falls to 31 and 26. The relay and fuse models of \PF{} confirm the calculated operating
+times within 1.22 per cent.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
 coordination, IEEE 13-node feeder, DIgSILENT \PF.
@@ -248,7 +251,7 @@ R1 & Feeder-Head Recloser \\
 R2 & Mid-Line Recloser (the DSDR) \\
 RMS & Root Mean Square \\
 SBDG & Synchronous-Based Distributed Generator \\
-TCC & Time-Current Characteristic \\
+TCC & Time--Current Characteristic \\
 TCT & Total Clearing Time \\
 TDS & Time Dial Setting \\
 TMS & Time Multiplier Setting \\
@@ -280,8 +283,8 @@ of~\cite{yousaf2022} on the IEEE 13-node feeder in DIgSILENT \PF{} and evaluates
 The problem addressed is the loss of recloser--fuse coordination caused by the change of fault-current
 magnitude and direction when a DG is connected. A conventional scheme that is coordinated without DG may lose
 the fuse-saving property in the zone between the grid and the DG. The project investigates whether the DSDR
-method restores the coordination in an independently built model that uses the real characteristics of
-the protection devices.
+method restores the coordination in an independently built model that uses the manufacturer-based
+time--current characteristics of the specified commercial protection devices.
 
 \subsection{Objectives}
 \subsubsection{General Objective}
@@ -297,8 +300,8 @@ To build and validate a DIgSILENT \PF{} implementation of the DSDR protection-co
 \item Connect the 4.05\,MVA synchronous DG at node 692 and quantify the change of the fault currents and of
       their direction at the reclosers.
 \item Classify the coordination with DG for a conventional recloser R2.
-\item Design the forward and reverse settings of R2 as a DSDR and classify the coordination again
-      and determine the operating times.
+\item Design the forward and reverse settings of R2 as a DSDR, classify the resulting coordination, and
+      determine the corresponding operating times.
 \item Verify the reclosing sequence in the time domain.
 \item Study how the coordination degrades as the DG penetration rises from 0 to 100 per cent.
 \end{enumerate}
@@ -316,9 +319,11 @@ respected, and it separates the contribution of the dual setting from the contri
 
 \subsection{Limitations of the Study}
 \begin{itemize}
-\item The method leaves the settings of R2, the fuse sizes, the source impedance and the fault type of each
-      operating-time case open. These were chosen; every choice and its basis is listed in
-      Section~\ref{sec:assumptions}.
+\item The method does not uniquely specify the R2 settings, the fuse sizes, the source impedance or the fault
+      type of each operating-time case; these choices were therefore defined in this study, and every choice
+      and its basis is listed in Section~\ref{sec:assumptions}.
+\item The coordination is classified with a zero margin; the effect of a breaker interrupting time and a
+      fuse safety margin is evaluated separately in Section~\ref{sec:margin}.
 \item The library model of the CDG34 relay is not directional. The two setting groups are modelled as
       separate relay units and the direction is assigned from the fault location.
 \item Coordination is judged with a zero-margin criterion (the fuse must not start to melt before the fast
@@ -375,7 +380,7 @@ The study follows the adaptive overcurrent protection scheme with a DSDR of~\cit
 the forward and reverse operating times, pickups, fuse coefficients and setting constraints, and its flowchart
 for the design sequence. The reference reports that the DSDR restores coordination in every case, but it does
 not publish the DSDR settings, and its fuse curves differ from its own fuse equation. The gap addressed here is
-an independent implementation in \PF{} with the real relay curves, dial ranges and fuse sizes, which shows how
+an independent implementation in \PF{} with device-specific relay curves, dial ranges and fuse sizes, which shows how
 much of the improvement comes from the dual setting and where the method reaches the limits of the devices.
 
 % =====================================================================================================
@@ -417,6 +422,7 @@ minimum is an LG fault through 3\ohm{} at its farthest node~\cite{yousaf2022}. T
 every fuse and every branch of Table~\ref{tab:t2} is stored for each fault.
 
 \subsection{Mathematical Formulation of the DSDR}
+\label{sec:dsdr}
 The equations below are those of the reference method~\cite{yousaf2022}.
 
 \subsubsection{Forward Fast and Delayed Operating Time}
@@ -519,6 +525,9 @@ t = t_1\left(\frac{t_2}{t_1}\right)^{f},\qquad f=\frac{\ln(M/M_1)}{\ln(M_2/M_1)}
 \label{eq:cdg}
 \end{equation}
 The table is not defined below a multiplier of 0.1, so 0.1 is the fastest setting of this relay.
+The dial of R1 is called the time dial setting (TDS), as in the IAC77B801A documentation, whereas the CDG34
+documentation calls the dial of R2 the time multiplier setting (TMS). Both scale the operating time of the
+curve in the same way, and the general equations of Section~\ref{sec:dsdr} write TDS for either.
 
 \subsubsection{Fuses}
 The fuses are Gould-Shawmut A055C (5.5\,kV, E-rated) with their minimum-melting and total-clearing curves.
@@ -537,7 +546,10 @@ t_{TCT}(I_{fuse}) < t_D \quad\text{for the same reclosers,}
 \label{eq:crit2}
 \end{equation}
 together with the series-fuse condition of eq.~\eqref{eq:75} and a margin of at least 10~cycles
-between the delayed curves of R2 and R1. A cell (node and fault type) is held only if every phase
+between the delayed curves of R2 and R1. The coordination time interval is $CTI = t_{MMT} - t_F$, the time by
+which the fuse starts to melt after the latest fast trip; a cell is held when $CTI > 0$ (the zero-margin
+criterion). An additional engineering margin, for the breaker interrupting time and for uncertainty, is not
+part of the classification and is examined separately in Section~\ref{sec:margin}. A cell (node and fault type) is held only if every phase
 combination of that fault type is held. The fuse and each recloser are evaluated at their own currents,
 because with DG they differ.
 
@@ -1066,7 +1078,7 @@ Figures~\ref{fig:case5} and \ref{fig:case7} show two of the diagrams.
 02 & Fig. 9 & LLG fault at the middle of 692-675 & 1 & 1445 & 1310 (fwd) & 0.742 & 0.204 & 0.204 & F692-R 250E: 0.618 & held & held \\ \hline
 03 & Fig. 11 & LL fault at 646 & 1 & 1899 & 847 (rev) & 0.395 & 0.500 & 0.131 & F646 400E: 1.734 & lost & lost \\ \hline
 04 & Fig. 12 & LL fault at 645 & 1.5 & 1694 & 783 (rev) & 0.507 & 0.605 & 0.149 & F632 500E: 9.129 & lost & lost \\ \hline
-05 & Fig. 13 & 3-phase fault at 10 \% of 632-633 & 0 & 4645 & 1777 (rev) & 0.084 & 0.121 & 0.052 & F633 400E: 0.100 & lost & held \\ \hline
+05 & Fig. 13 & Three-phase fault at 10 \% of 632-633 & 0 & 4645 & 1777 (rev) & 0.084 & 0.121 & 0.052 & F633 400E: 0.100 & lost & held \\ \hline
 06 & Figs. 15, 16 & LL fault at 646 & 0 & 2785 & 1114 (rev) & 0.189 & 0.278 & 0.086 & F646 400E: 0.415 & held & held \\ \hline
 07 & Fig. 14 / 17 cell & LG fault at 646 (phase c) & 0 & 2359 & 469 (rev) & 0.255 & no trip & 0.396 & F646 400E: 1.057 & lost & held \\ \hline
 08 & Fig. 14 / 17 cell & LG fault at 633 (phase b) & 0 & 2874 & 644 (rev) & 0.178 & 0.974 & 0.210 & F633 400E: 0.502 & lost & held \\ \hline
@@ -1098,7 +1110,7 @@ Tables~\ref{tab:case5} and \ref{tab:case7} list their currents, settings and ope
 \begin{tabularx}{\textwidth}{|p{4.4cm}|L|L|}
 \hline
 \textbf{Quantity} & \textbf{Single setting} & \textbf{Dual setting (DSDR)} \\ \hline
-Fault & \multicolumn{2}{l|}{3-phase fault at 10 \% of 632-633, LLL, phases a-b-c} \\ \hline
+Fault & \multicolumn{2}{l|}{Three-phase fault at 10 \% of 632-633, LLL, phases a-b-c} \\ \hline
 Fault impedance $Z_f$ & \multicolumn{2}{l|}{0\ohm{} (bolted)} \\ \hline
 Fault-path current (F633) & \multicolumn{2}{l|}{6398 A} \\ \hline
 Current through R1, direction & \multicolumn{2}{l|}{4645 A, forward (RG60 $\rightarrow$ 632), grid contribution} \\ \hline
@@ -1418,12 +1430,20 @@ recloser.
 \subsection{Conclusion}
 The DSDR method of~\cite{yousaf2022} was implemented on the IEEE 13-node feeder in DIgSILENT \PF{} with
 the real characteristics of the protection devices. The feeder model agrees with the IEEE short-circuit
-benchmark within about 2 per cent. Without DG the
-conventional scheme is coordinated in all 39 cells. With the 4.05\,MVA DG at node 692 and a
-conventional R2, coordination is held in 24 cells. With R2 as a DSDR and the fuse revision of the
-method it is held in 38 cells; with the same fuses and a single setting in 31. The dual-setting directional recloser therefore restores the coordination in the zone between the grid
-and the DG, with the qualification that the result depends on the fuse revision and that one cell and the
-faults downstream of R2 remain open.
+benchmark within about 2 per cent. Without DG, the revised fuse scheme achieves coordination in all
+39 cells, compared with 35 of 39 cells with the starting fuse sizes. With the 4.05\,MVA DG at
+node 692 and a conventional R2, coordination is held in 24 cells. The dual setting alone, with the
+fuses of the design without DG, raises this to 25 cells; the fuse revision alone, with a single-setting R2,
+to 31; and the two together to 38 of 39 cells. The combined DSDR and
+fuse-revision strategy therefore substantially improves the coordination in the zone between the grid and
+the DG, achieving 38 of 39 coordinated fault cells under the zero-margin criterion, and
+seven of the restored cells need the dual setting. The remaining LG fault at node 692 is limited by the
+maximum available R2 delayed dial.
+
+The result depends on the margin. When a three-cycle breaker interrupting time is added to the fast trip,
+the number of coordinated cells decreases from 38 to 31, and with an additional fuse safety margin
+to 26. The faults downstream of R2 with the DG in service also remain outside what the dual setting can
+correct. The relay and fuse models of \PF{} confirm the calculated operating times within 1.22 per cent.
 
 \subsection{Major Findings}
 \begin{enumerate}
@@ -1433,10 +1453,13 @@ faults downstream of R2 remain open.
       pickup by eq.~\eqref{eq:iprv} 315.3\,A.
 \item With DG the load current at R2 reverses (252\,A) and R2 carries 1.1 to 2.0\,kA in reverse for upstream
       faults.
-\item Coordination: 39 cells without DG; 24 with DG and a conventional R2; 38 with the
-      DSDR.
+\item Coordination (of 39 cells): 35 without DG with the starting fuses and 39 after the fuse revision;
+      24 with DG and a conventional R2; 25 with the DSDR alone; 31 with the fuse revision
+      alone; 38 with the DSDR and the fuse revision, under the zero-margin criterion.
+\item The 38 cells become 31 when a three-cycle breaker interrupting time is added to the fast trip,
+      and 26 when a safety margin is also kept on the fuse melting time.
 \item The dual setting restores seven cells with the revised fuses and one cell without the revision.
-\item The LG fault at 692 cannot be coordinated within the dial range of R2.
+\item The LG fault at 692 cannot be coordinated within the delayed dial range of R2.
 \item With rising DG penetration and fixed settings the CTI falls at both studied nodes (633: from about
       $+4$ to $-51$\,ms; 671: from $+403$ to $+75$\,ms), the fault level rises by up to 64 per cent, and R2 stops
       detecting the weakest fault of its zone above about 50 per cent.

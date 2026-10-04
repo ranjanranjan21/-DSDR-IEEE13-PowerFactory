@@ -317,7 +317,7 @@ assert not left, left
 from table_style import excel_tables             # spreadsheet-style tables (all cells framed)
 template = excel_tables(template)
 with open(os.path.join(OUT, "main.tex"), "w", encoding="utf-8") as fh:
-    fh.write(template)
+    fh.write(template.replace("3-phase fault", "Three-phase fault"))
 print("written", os.path.join(OUT, "main.tex"), "(%d lines)" % template.count("\n"))
 print("figures:", ", ".join(sorted(os.listdir(FIGS))))
 
