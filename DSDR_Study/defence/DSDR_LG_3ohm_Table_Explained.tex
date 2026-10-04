@@ -89,7 +89,30 @@ protect against (without DG).
 current it measures for a fault in its own zone is 1074\,A (R1) and 879\,A (R2), both above the pickups of 720\,A and
 600\,A, so the pickups are correctly set.}
 
-\sect{5. Likely questions}
+\sect{5. ``Isn't the fault a sink that takes everything?''}
+Only for a bolted fault. With 3\,$\Omega$ the fault does not short the feeder out:
+
+\textbf{(1) The voltage stays up.} At the fault point $V \approx I_f \times R_f = 701.5\,\text{A} \times 3\,\Omega
+\approx 2.1$\,kV, against 2.58\,kV before the fault. The feeder still runs at about 80\,\% voltage, so every load keeps
+drawing most of its normal current.
+
+\textbf{(2) Kirchhoff's current law at R1.} With the DG out, R1 is the only entry from the grid, so everything that
+flows anywhere on the feeder passes through it:
+\[
+I_{R1} = I_{fault} + \sum I_{loads}
+\]
+For the fault at 680 (phase B): 701.5\,A into the fault plus 411\,A of phase-B load. The two are almost in phase
+($-176^\circ$ and $-173.5^\circ$), so they nearly add: $\approx$ 1112\,A. PowerFactory gives 1074\,A, a little less
+because the loads draw somewhat less at 80\,\% voltage.
+
+\textbf{(3) When the fault does take almost everything.} For a bolted fault (0\,$\Omega$) the voltage near the fault
+collapses and the loads draw very little, so R1 carries about the fault current alone. Example: bolted 3-phase fault
+at 633, 4102\,A at the fault and 4162\,A at R1 --- only about 60\,A apart.
+
+\textbf{Why it matters.} The relay measures the total current of its phase, load plus fault. The pickup must
+therefore be compared with what the relay actually sees, 1074\,A for R1 and 879\,A for R2.
+
+\sect{6. Likely questions}
 \textbf{Why 3\,$\Omega$?} It is the fault resistance prescribed by the method for the minimum fault (weakest
 realistic fault).\\
 \textbf{Why the largest phase current at the recloser?} A phase-overcurrent relay operates on the phase with the
