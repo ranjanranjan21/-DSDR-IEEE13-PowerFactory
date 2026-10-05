@@ -11,6 +11,7 @@
 % guideline: A4; margins left 3.5 cm, right 2 cm, top 3.5 cm, bottom 2 cm; page number at the top right
 \usepackage[a4paper,left=3.5cm,right=2cm,top=3.5cm,bottom=2cm,footskip=1cm]{geometry}
 \usepackage{fancyhdr}
+\usepackage{listings}
 \usepackage{indentfirst}               % every paragraph indented, also the first
 \usepackage{setspace}
 \usepackage{amsmath,amssymb}
@@ -67,6 +68,10 @@
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 \fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\lstset{language=Python,basicstyle=\ttfamily\scriptsize,breaklines=true,breakatwhitespace=false,
+  columns=fullflexible,keepspaces=true,showstringspaces=false,numbers=left,numberstyle=\tiny\color{gray},
+  numbersep=6pt,xleftmargin=1.6em,frame=single,rulecolor=\color{gray},aboveskip=6pt,belowskip=10pt,
+  commentstyle=\color{gray},keywordstyle=\bfseries,captionpos=t}
 \tolerance=1000
 \widowpenalty=10000
 \clubpenalty=10000
@@ -239,8 +244,7 @@ recloser, increasingly so as the DG penetration rises. With the DG connected, a 
 mid-line recloser keeps the coordination in 24 of the 39 studied fault cells. The dual-setting directional
 recloser alone raises this to 25 cells, and together with a revision of the fuse sizes to 38 of 39 cells under
 the zero-margin criterion; the remaining cell, an LG fault at node 692, is limited by the delayed dial range of
-the recloser. The relay and fuse models of \PF{} confirm the calculated operating
-times within 1.22 per cent.
+the recloser.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
 coordination, IEEE 13-node feeder, DIgSILENT \PF.
@@ -1257,8 +1261,7 @@ Fuse heat after the fast shots & 45\,\% & 105\,\% \\ \hline
 \subsection{Verification With the Relay and Fuse Models of \PF}
 The operating times of Chapter Five are calculated from the time--current curves of the devices. As a check,
 the settings were entered into the relay and fuse elements of the model, and \PF{} itself calculated the tripping
-time of every device for every fault, for the conventional and for the DSDR settings. Over 1896 operating
-times the largest deviation is 1.22 per cent.
+time of every device for every fault, for the conventional and for the DSDR settings.
 
 \subsection{Sensitivity of the Pickups With DG}
 \label{sec:pickdg}
@@ -1484,7 +1487,7 @@ the DG, achieving 38 of 39 coordinated fault cells under the zero-margin criteri
 seven of the restored cells need the dual setting. The remaining LG fault at node 692 is limited by the
 maximum available R2 delayed dial.
 
-The faults downstream of R2 with the DG in service remain outside what the dual setting can correct. The relay and fuse models of \PF{} confirm the calculated operating times within 1.22 per cent.
+The faults downstream of R2 with the DG in service remain outside what the dual setting can correct.
 
 \subsection{Major Findings}
 \begin{enumerate}
@@ -1502,7 +1505,6 @@ The faults downstream of R2 with the DG in service remain outside what the dual 
 \item With rising DG penetration and fixed settings the CTI falls at both studied nodes (633: from about
       $+4$ to $-51$\,ms; 671: from $+403$ to $+75$\,ms), the fault level rises by up to 64 per cent, and R2 stops
       detecting the weakest fault of its zone above about 50 per cent.
-\item \PF's own relay and fuse models confirm the operating times within 1.22 per cent.
 \item In the EMT simulation the fuse survives the two fast shots without DG and melts at 1.25\,s; with DG it melts during the second fast shot.
 \end{enumerate}
 
@@ -1865,5 +1867,1907 @@ not publish.
 \caption{CTI shares against DG penetration: this study and the paper's Fig.~7.}
 \label{tab:e7}
 \end{table}
+
+% =====================================================================================================
+\appendixhead{D}{PYTHON SCRIPTS}
+The model, the studies and the evaluation of the coordination were run in DIgSILENT \PF{} through its Python
+interface. This appendix lists the scripts in the order in which they are run. Table~\ref{tab:scripts} gives
+the purpose of each script.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{|l|L|}
+\hline
+\textbf{Script} & \textbf{Purpose} \\ \hline
+\texttt{pf\_setup.py} & Connection to PowerFactory and helper functions \\ \hline
+\texttt{protection\_data.py} & Feeder, device and fault data \\ \hline
+\texttt{curves.py} & Relay and fuse time--current curves \\ \hline
+\texttt{step1\_build\_model.py} & Builds the protection devices and the DG in the model \\ \hline
+\texttt{step2\_studies.py} & Unbalanced load flow and short-circuit studies \\ \hline
+\texttt{step3\_design\_and\_evaluate.py} & Settings, fuse coefficients and classification of the coordination \\ \hline
+\texttt{step4\_apply\_settings.py} & Writes the settings into the relay and fuse elements of the model \\ \hline
+\texttt{step5\_fig10\_emt.py} & EMT simulation of the reclosing sequence \\ \hline
+\end{tabularx}
+\caption{Python scripts of the study.}
+\label{tab:scripts}
+\end{table}
+
+\subsection*{D.1\quad \texttt{pf\_setup.py}}
+Connection to PowerFactory and helper functions.
+\begin{lstlisting}
+"""
+Shared PowerFactory helpers for the replication of
+
+  M. Yousaf, A. Jalilian, K. M. Muttaqi, D. Sutanto, "An Adaptive Overcurrent Protection Scheme
+  for Dual-Setting Directional Recloser and Fuse Coordination in Unbalanced Distribution Networks
+  With Distributed Generation", IEEE Trans. Ind. Appl., 58(2), 1831-1842, 2022.
+
+Runs either inside PowerFactory (ComPython) or from a normal Python 3.9 shell (engine mode).
+"""
+
+import os
+import sys
+
+PF_DIR = r"C:\Program Files\DIgSILENT\PowerFactory 2021 SP2"
+PROJECT = "IEEE13 DSDR Fuse Coordination"
+PFD_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "IEEE 13 Node Feeder.pfd")
+# The IEEE short-circuit benchmark (Kersting & Shirek 2012, used in ref. [8]) includes the
+# 115/4.16 kV 5 MVA substation transformer; this study case reproduces it within ~2 %.
+STUDY_CASE = "Study with Substation Transformer"
+# Protection devices are built in the base network (this case has no active variation), so they
+# exist in every study case; the substation transformer case then adds only its variation.
+BUILD_CASE = "Study Detailed Network Model"
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+RESULTS = os.path.join(HERE, "results")
+os.makedirs(RESULTS, exist_ok=True)
+
+_app = None
+
+
+def get_app():
+    global _app
+    if _app is not None:
+        return _app
+    try:
+        import powerfactory as pf                  # inside PowerFactory
+    except ImportError:
+        os.environ["PATH"] = PF_DIR + ";" + os.environ["PATH"]
+        sys.path.append(os.path.join(PF_DIR, "Python", "%d.%d" % sys.version_info[:2]))
+        import powerfactory as pf
+    _app = pf.GetApplication()
+    if _app is None:
+        raise RuntimeError("Could not start PowerFactory")
+    return _app
+
+
+def attr(obj, name, default=None):
+    try:
+        v = obj.GetAttribute(name)
+        return default if v is None else v
+    except Exception:
+        return default
+
+
+def out(msg=""):
+    print(msg)
+    try:
+        get_app().PrintPlain(msg)
+    except Exception:
+        pass
+
+
+def activate(build=False):
+    """Activate the replication project (importing the .pfd the first time) and the study case
+    (BUILD_CASE for model changes, STUDY_CASE for calculations)."""
+    app = get_app()
+    user = app.GetCurrentUser()
+    prj = user.GetContents(PROJECT + ".IntPrj")
+    if not prj:
+        before = {p.loc_name for p in user.GetContents("*.IntPrj")}
+        imp = user.CreateObject("CompfdImport", "import")
+        imp.SetAttribute("e:g_file", PFD_FILE)
+        imp.SetAttribute("g_target", user)
+        imp.Execute()
+        imp.Delete()
+        new = [p for p in user.GetContents("*.IntPrj") if p.loc_name not in before]
+        new[0].SetAttribute("loc_name", PROJECT)
+        prj = [new[0]]
+    prj[0].Activate()
+    clean_variation()
+    name = BUILD_CASE if build else STUDY_CASE
+    case = app.GetProjectFolder("study").GetContents(name + ".IntCase", 1)[0]
+    case.Activate()
+    ldf = app.GetFromStudyCase("ComLdf")
+    ldf.SetAttribute("iopt_net", 1)                # unbalanced 3-phase load flow
+    return app
+
+
+# The "Substation Transformer" variation as delivered in the .pfd: 13 objects.  Anything else in its
+# stage was recorded by a script (or a click) that changed the network while STUDY_CASE was active -
+# DG in / out, relay or fuse settings, a breaker closed - and overrides the base network from then on.
+_ORIGINAL_STAGE = {"Substation Transformer": {
+    "Terminal", "2-Winding Transformer", "Cub_1", "Switch", "Cub_5", "Switch(1)", "External Grid(1)", "Cub_2",
+    "Switch(2)", "Cub_4", "External Grid", "GND611(1)", "Cub_6"}}
+
+
+def clean_variation():
+    """Restore the variation stage to its original objects, so that the base network applies."""
+    app = get_app()
+    n = 0
+    for st in app.GetActiveProject().GetContents("*.IntSstage", 1):
+        keep = _ORIGINAL_STAGE.get(st.loc_name)
+        if keep is None:
+            continue
+        for o in st.GetContents():
+            if o.loc_name not in keep:
+                o.Delete()
+                n += 1
+    return n
+
+
+def obj(name, cls):
+    hits = get_app().GetCalcRelevantObjects("%s.%s" % (name, cls))
+    if not hits:
+        raise KeyError("%s.%s not found" % (name, cls))
+    return hits[0]
+
+
+def lib_type(pattern, must_contain=""):
+    hits = [h for h in get_app().GetGlobalLibrary().GetContents(pattern, 1)
+            if must_contain in h.GetFullName() and "\\Arch\\" not in h.GetFullName()
+            and "\\v001\\" not in h.GetFullName()]
+    if not hits:
+        raise KeyError("library type %s (%s) not found" % (pattern, must_contain))
+    return hits[0]
+
+
+def dg_units():
+    return get_app().GetCalcRelevantObjects("*.ElmSym")
+
+
+def save_table1():
+    """Read the DG and its transformer back from the model -> results/Table_I_model.json (Table I)."""
+    import json
+    sym = dg_units()[0]
+    typ = sym.typ_id
+    tr = obj("2-Winding Transformer", "ElmTr2").typ_id
+    keys = ("sgn", "ugn", "iturbo", "xl", "rstr", "xd", "xq", "xds", "xqs", "xdss", "xqss", "tds0", "tdss0", "tqs0",
+            "tqss0", "h")
+    data = {k: round(float(attr(typ, k, float("nan"))), 5) for k in keys}
+    data.update(tr_strn=round(attr(tr, "strn"), 4), tr_hv=round(attr(tr, "utrn_h"), 4), tr_lv=round(attr(tr, "utrn_l"), 4),
+                tr_uk=round(attr(tr, "uktr"), 4), node=sym.bus1.cterm.loc_name, type=typ.loc_name)
+    with open(os.path.join(RESULTS, "Table_I_model.json"), "w") as fh:
+        json.dump(data, fh, indent=1)
+    return data
+
+
+def set_dg(in_service):
+    for g in dg_units():
+        g.SetAttribute("outserv", 0 if in_service else 1)
+\end{lstlisting}
+
+\subsection*{D.2\quad \texttt{protection\_data.py}}
+Feeder, device and fault data.
+\begin{lstlisting}
+"""
+Protection data of the IEEE 13-node feeder (Fig. 6 of Yousaf et al. 2022) and the paper's
+published values, used by every other script.
+
+Sources for device data the 2022 paper does not print:
+  [8]  M. Yousaf, K. M. Muttaqi, D. Sutanto, "Overcurrent protection scheme for the IEEE 13-node
+       benchmark test feeder with improved selectivity", IEEE PES GM 2020, Table V
+       (Gould-Shawmut A055C fuses, GE IAC recloser, GE/Alstom CDG relay, gL-800 LV fuse).
+  Figs. 8, 9, 11, 12, 13, 15, 16 of the 2022 paper: fuse bands digitised and matched to the
+       A055C library curves (melting current at 100 s / 1000 s, within 2 %); used for every
+       fuse that a figure shows (F632, F633, F646, F671-1, F671-2, F684, F692, F692-R).
+"""
+
+# --------------------------------------------------------------------------------------------
+# Device locations.  ("line", name, side)  -> cubicle of branch `name` at `side` (bus1/bus2/buslv)
+#                    ("load", name)        -> cubicle of load `name`
+# --------------------------------------------------------------------------------------------
+# Fuse sizes: the size drawn in the 2022 paper's own figures where a figure shows the fuse (bands
+# digitised and matched to the A055C library curves), otherwise ref. [8] Table V.  The figure sizes
+# take precedence because they are what the 2022 results were produced with: with [8]'s smaller
+# F671-2 (200E) the fuse melts in the second fast shot of Fig. 10 (0.62 s) instead of after both
+# shots (paper 1.21 s; 300E gives 1.25 s).  The two papers name some devices differently
+# ([8] Fig. 1 against Fig. 6 of the 2022 paper):
+#   [8] REC1, REC2  = reclosers R1, R2 of the 2022 paper
+#   [8] R1, R2, R5  = overcurrent relays at 632 and 671 - not used in the 2022 scheme, neglected
+#   [8] F671        = fuse at 671 towards 684            -> F671-2 here
+#   [8] F671-R      = fuse of the load L671              -> F671 here
+#   F632 (632-645) and F671-1 (671-692) replace [8]'s relays R1 and R5; they are not in [8], so
+#   their sizes come from the fuse bands of the 2022 paper's figures.
+#   [8] also fuses the capacitors (F-C611 50E, F-C675 125E); Fig. 6 of the 2022 paper has no
+#   capacitor fuses, so they are not modelled.
+FUSES = {
+    #  name      location                              library type   source of the size
+    "F632":   (("line", "LOHL632-645", "bus1"),      "A055C400E", "2022 Figs. 12, 15, 16 (not in [8]: relay R1 there)"),
+    "F633":   (("line", "LOHL632-633", "bus1"),      "A055C250E", "[8] Table V"),
+    "F634":   (("line", "XFM-1", "buslv"),           "gL-800A",   "[8] Table V (IEC 60269 gL 800 A)"),
+    "F645":   (("load", "L645-YcPQ"),                "A055C250E", "[8] Table V"),
+    "F646":   (("line", "LOHL645-646", "bus1"),      "A055C300E", "2022 Figs. 11, 15, 16 ([8]: 200E)"),
+    "F-DL":   (("line", "LDL", "bus1"),              "A055C250E", "[8] Table V"),
+    "F671":   (("load", "L571-DcPQ"),                "A055C250E", "[8] Table V (F671-R there)"),
+    "F671-1": (("line", "Switch", "bus1"),           "A055C300E", "2022 Fig. 9 (not in [8]: relay R5 there)"),
+    "F692":   (("load", "L692-DcI"),                 "A055C200E", "[8] Table V"),
+    "F692-R": (("line", "LC692-675", "bus1"),        "A055C250E", "2022 Fig. 9 ([8]: 300E)"),
+    "F675":   (("load", "L675-YcPQ"),                "A055C200E", "[8] Table V"),
+    "F671-2": (("line", "LOHL671-684", "bus1"),      "A055C300E", "2022 Fig. 8 ([8]: 200E, F671 there)"),
+    "F684":   (("line", "LOHL684-611", "bus1"),      "A055C200E", "2022 Fig. 8 ([8]: 150E)"),
+    "F611":   (("load", "L611-YcI"),                 "A055C125E", "[8] Table V"),
+    "F652":   (("line", "LC684-652A", "bus1"),       "A055C150E", "[8] Table V"),
+}
+
+# Reclosers.  R1: feeder recloser (GE IAC77B801A, extremely inverse, TDS 0.5 / 10 - paper).
+#             R2: mid-line recloser on 632-671 at the 671 end (GE/Alstom CDG34, extremely inverse).
+RECLOSERS = {
+    "R1": dict(loc=("line", "LOHL650-632", "bus1"), relay="IAC77B801A", ct=900.0),
+    "R2": dict(loc=("line", "LOHL632-671end", "bus2"), relay="CDG34", ct=500.0),
+}
+R2_UNITS = ["R2 Fast", "R2 Delayed", "R2 Rev Fast", "R2 Rev Delayed"]
+
+# Distributed load: the middle lump is moved behind a short lateral nDL - DL so that a fault at
+# "DL" lies below fuse F-DL, as drawn in Fig. 6.
+DL_LUMP = "DistributedLoad"
+
+# --------------------------------------------------------------------------------------------
+# Fault locations of Figs. 14 / 17 and Table IV.  Nodes upstream of R2 are in R1's zone.
+# phases: conductors present at the node.  primary: fuse feeding the node (Table IV "Fuse").
+# path: fuses in series from the fault towards the source (primary first).
+# --------------------------------------------------------------------------------------------
+NODES = {
+    "632": dict(phases="ABC", zone="R1", path=[]),
+    "633": dict(phases="ABC", zone="R1", path=["F633"]),
+    "634": dict(phases="ABC", zone="R1", path=["F634", "F633"], lv=True),
+    "645": dict(phases="BC",  zone="R1", path=["F632"]),
+    "646": dict(phases="BC",  zone="R1", path=["F646", "F632"]),
+    "DL":  dict(phases="ABC", zone="R1", path=["F-DL"]),
+    "671": dict(phases="ABC", zone="R2", path=[]),
+    "692": dict(phases="ABC", zone="R2", path=["F671-1"]),
+    "675": dict(phases="ABC", zone="R2", path=["F692-R", "F671-1"]),
+    "680": dict(phases="ABC", zone="R2", path=[]),
+    "684": dict(phases="AC",  zone="R2", path=["F671-2"]),
+    "652": dict(phases="A",   zone="R2", path=["F652", "F671-2"]),
+    "611": dict(phases="C",   zone="R2", path=["F684", "F671-2"]),
+}
+NODE_ORDER = ["632", "633", "634", "645", "646", "671", "692", "675", "680", "684", "652", "611", "DL"]
+FAULT_TYPES = ["LG", "LL", "LLG", "LLL"]
+PF_FAULT = {"LG": "spgf", "LL": "2psc", "LLG": "2pgf", "LLL": "3rst"}
+
+# Branches of Table II:  label -> (branch, side of the measuring cubicle, downstream nodes)
+TABLE2_BRANCHES = [
+    ("RG60", "632",      "LOHL650-632", "bus1", ["632", "633", "645", "646", "DL", "671", "692", "675", "680", "684", "652", "611"]),
+    ("632", "633",       "LOHL632-633", "bus1", ["633"]),
+    ("632", "645",       "LOHL632-645", "bus1", ["645", "646"]),
+    ("632", "671",       "LOHL632-671end", "bus2", ["671", "692", "675", "680", "684", "652", "611"]),
+    ("XFM1-HV", "side",  "XFM-1", "bushv", ["634"]),
+    ("XFM1-LV", "side",  "XFM-1", "buslv", ["634"]),
+    ("645", "646",       "LOHL645-646", "bus1", ["646"]),
+    ("671", "692",       "Switch", "bus1", ["692", "675"]),
+    ("671", "684",       "LOHL671-684", "bus1", ["684", "652", "611"]),
+    ("671", "680",       "LOHL671-680", "bus1", ["680"]),
+    ("692", "675",       "LC692-675", "bus1", ["675"]),
+    ("684", "611",       "LOHL684-611", "bus1", ["611"]),
+    ("684", "652",       "LC684-652A", "bus1", ["652"]),
+]
+
+# --------------------------------------------------------------------------------------------
+# Published values (for comparison only)
+# --------------------------------------------------------------------------------------------
+PAPER_TABLE2 = {  # (from, to): (Inom A, If,min kA, If,max kA)
+    ("RG60", "632"): (587.1, 1.24, 5.41), ("632", "633"): (81.1, 0.72, 6.73),
+    ("632", "645"): (143.3, 0.93, 4.25), ("632", "671"): (478.2, 1.08, 4.52),
+    ("XFM1-HV", "side"): (81.1, 0.73, 6.48), ("XFM1-LV", "side"): (704.7, 0.59, 18.76),
+    ("645", "646"): (64.9, 0.84, 3.64), ("671", "692"): (229.3, 0.78, 3.69),
+    ("671", "684"): (70.9, 0.69, 3.47), ("671", "680"): (0.0, 0.59, 6.25),
+    ("692", "675"): (205.9, 0.71, 7.83), ("684", "611"): (70.8, 0.63, 1.93),
+    ("684", "652"): (63.1, 0.66, 2.67),
+}
+PAPER_TABLE3 = {"F632": 6.38, "F633": 6.83, "F634": 8.32, "F645": 6.65, "F646": 6.67, "F-DL": 6.54,
+                "F611": 6.19, "F692": 6.13, "F671": 6.08, "F671-1": 5.85, "F671-2": 5.87,
+                "F652": 6.17, "F684": 6.15, "F675": 6.19, "F692-R": 6.14}
+PAPER_TABLE4 = {  # node: (R1 fast, R1 delayed, R2 fast, R2 delayed, fuse MMT)
+    "632": (0.070, 1.398, 0.045, 0.514, None), "633": (0.094, 1.880, 0.052, 0.706, 0.163),
+    "645": (0.105, 2.095, 0.087, 1.659, 0.276), "646": (0.128, 2.555, 0.103, 2.046, 0.181),
+    "DL": (0.087, 1.733, 0.076, 1.402, 0.248), "671": (0.105, 2.091, 0.068, 1.113, None),
+    "692": (0.115, 2.307, 0.072, 1.258, 0.175), "675": (0.121, 2.414, 0.074, 1.332, 0.185),
+    "684": (0.125, 2.507, 0.075, 1.394, 0.205), "680": (0.137, 2.747, 0.079, 1.555, None),
+    "611": (0.326, 6.523, 0.146, 4.385, 0.417), "652": (0.676, 13.525, 0.143, 9.370, 0.233),
+}
+# Fig. 14 (without DSDR): cells marked "doesn't exist"; Fig. 17 (with DSDR): none.
+PAPER_FIG14_LOST = {("633", "LLG"), ("633", "LLL"), ("645", "LG"), ("645", "LL"), ("645", "LLG"),
+                    ("646", "LL"), ("646", "LLG"), ("675", "LLG"), ("675", "LLL")}
+
+OLF = 1.25            # overload factor, eqs. (3) and (12)
+A_FUSE = -1.8         # fuse slope a_i, eq. (6)
+T_RECL_MIN = 10 / 60  # minimum time delay between the reclosers' delayed curves (10 cycles)
+\end{lstlisting}
+
+\subsection*{D.3\quad \texttt{curves.py}}
+Relay and fuse time--current curves.
+\begin{lstlisting}
+"""
+Operating-time curves, identical to the PowerFactory library types (data from studies.json):
+
+  R1  GE IAC77B801A   IAC extremely inverse GES7005B (formula), curve from 1.5 x Ip to 40 x Ip
+  R2  GE/Alstom CDG34 CDG14 extremely inverse 398.S23.37 (table of t vs M for TMS 0.1-1.0),
+                      curve from 2 x Is to 40 x Is, t >= 0.031 s at any TMS
+  fuses               minimum melting (MMT) and total clearing (TCT) tables of the library type
+Times are in s, currents in primary A.  A current below a curve's start returns inf (no trip).
+"""
+
+import math
+
+INF = float("inf")
+
+
+def _loglog(x, pts):
+    """Log-log interpolation in a sorted list of (x, y); None outside the range."""
+    if x < pts[0][0] or x > pts[-1][0]:
+        return None
+    for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
+        if x1 <= x <= x2:
+            if x2 == x1:
+                return y1
+            f = (math.log(x) - math.log(x1)) / (math.log(x2) - math.log(x1))
+            return math.exp(math.log(y1) + f * (math.log(y2) - math.log(y1)))
+    return pts[-1][1]
+
+
+class IAC:
+    """IAC extremely inverse: t = TDS (0.004 + 0.6379/(M-0.62) + 1.7872/(M-0.62)^2 + 0.2461/(M-0.62)^3)."""
+
+    def __init__(self, data):
+        self.imin, self.imax = data["imin"], data["imax"]
+
+    def t(self, i, ip, tds):
+        m = i / ip
+        if m < self.imin:
+            return INF
+        x = min(m, self.imax) - 0.62
+        return tds * (0.004 + 0.6379 / x + 1.7872 / x ** 2 + 0.2461 / x ** 3)
+
+
+class CDG:
+    """CDG14 extremely-inverse table, log-log in M, linear in TMS (extrapolated below 0.1)."""
+
+    def __init__(self, data):
+        rows = data["vmat"]
+        self.tms = rows[0][1:]
+        self.rows = rows[1:]
+        self.imin, self.imax, self.tmin = data["imin"], data["imax"], data["tmin"]
+
+    def t(self, i, ip, tms):
+        m = i / ip
+        if m < self.imin:
+            return INF
+        m = min(m, self.imax)
+        col = [_loglog(m, [(r[0], r[j + 1]) for r in self.rows]) for j in range(len(self.tms))]
+        k = max(0, min(len(self.tms) - 2, next((j for j in range(len(self.tms) - 1)
+                                                if tms <= self.tms[j + 1]), len(self.tms) - 2)))
+        f = (tms - self.tms[k]) / (self.tms[k + 1] - self.tms[k])
+        return max(self.tmin, col[k] + f * (col[k + 1] - col[k]))    # tmin is absolute (as in PF)
+
+
+class Fuse:
+    def __init__(self, data):
+        m = data["vmat"]
+        self.irat = data["irat"]
+        self.melt = sorted((r[0], r[1]) for r in m if r[0] > 0)
+        self.clear = sorted((r[2], r[3]) for r in m if r[2] > 0)
+
+    @staticmethod
+    def _t(pts, i):
+        if i < pts[0][0]:
+            return INF
+        if i > pts[-1][0]:
+            return pts[-1][1]
+        return _loglog(i, pts)
+
+    def mmt(self, i):
+        return self._t(self.melt, i)
+
+    def tct(self, i):
+        return self._t(self.clear, i)
+
+    def i_at_mmt(self, t):
+        """Current that melts the fuse in t seconds."""
+        pts = sorted((b, a) for a, b in self.melt)
+        return _loglog(t, pts)
+\end{lstlisting}
+
+\subsection*{D.4\quad \texttt{step1\_build\_model.py}}
+Builds the protection devices and the DG in the model.
+\begin{lstlisting}
+"""
+Step 1 - build the protection system of Fig. 6 in a clean copy of the IEEE 13-node feeder.
+
+  * removes every relay, fuse and CT left in the project (fresh start)
+  * adds the lateral nDL - DL for the distributed-load fuse F-DL (fault location "DL")
+  * sets the synchronous DG to the data of Table I
+  * places the 15 fuses (Gould-Shawmut A055C / gL, see protection_data.FUSES)
+  * places R1 (2 x GE IAC77B801A: fast, delayed) and R2 (4 x GE/Alstom CDG34: forward fast,
+    forward delayed, reverse fast, reverse delayed) with their CTs.
+Settings are written afterwards by step4_apply_settings.py from results/settings.json.
+"""
+
+from pf_setup import activate, attr, out, obj, lib_type, save_table1
+from protection_data import FUSES, RECLOSERS, R2_UNITS, DL_LUMP
+
+app = activate(build=True)
+grid = obj("632", "ElmTerm").GetParent()
+
+
+def cubicle(loc):
+    if loc[0] == "load":
+        return obj(loc[1], "ElmLod").GetAttribute("bus1")
+    for cls in ("ElmLne", "ElmTr2", "ElmCoup"):
+        hits = app.GetCalcRelevantObjects("%s.%s" % (loc[1], cls))
+        if hits:
+            return hits[0].GetAttribute(loc[2])
+    raise KeyError(loc)
+
+
+# ---- 1. fresh start --------------------------------------------------------------------------
+n = 0
+for cls in ("ElmRelay", "RelFuse", "StaCt"):
+    for o in grid.GetContents("*." + cls, 1):
+        o.Delete()
+        n += 1
+for f in app.GetProjectFolder("equip").GetContents("Fuse Types Yousaf 2022*"):
+    f.Delete()
+out("Removed %d old protection objects" % n)
+
+# ---- 2. distributed-load lateral nDL - DL ------------------------------------------------------
+if not app.GetCalcRelevantObjects("DL.ElmTerm"):
+    ndl = obj("nDL", "ElmTerm")
+    dl = grid.AddCopy(ndl, "DL")
+    for c in dl.GetContents("*.StaCubic"):
+        c.Delete()
+    proto = obj("LOHL632-671start", "ElmLne")
+    line = grid.AddCopy(proto, "LDL")
+    line.SetAttribute("bus1", ndl.CreateObject("StaCubic", "Cub_LDL"))
+    line.SetAttribute("bus2", dl.CreateObject("StaCubic", "Cub_LDL"))
+    line.SetAttribute("dline", 10.0)                  # 10 ft (project length unit)
+    load = obj(DL_LUMP, "ElmLod")
+    old = load.GetAttribute("bus1")
+    load.SetAttribute("bus1", dl.CreateObject("StaCubic", "Cub_Load"))
+    old.Delete()
+    out("Added terminal DL and 10 ft lateral LDL (config 601); %s moved to DL" % DL_LUMP)
+
+# ---- 3. DG of Table I --------------------------------------------------------------------------
+sym = obj("Synchronous Machine", "ElmSym")
+typ = sym.typ_id
+table1 = dict(xl=0.05, rstr=0.0014, xd=1.4, xq=1.372, xds=0.231, xqs=0.8, xdss=0.118, xqss=0.118,
+              tds0=5.5, tdss0=0.05, tqs0=1.25, tqss0=0.19, h=0.75)
+# The machine type takes short-circuit time constants; convert Table I's open-circuit ones.
+sc_tc = dict(tds=5.5 * 0.231 / 1.4, tdss=0.05 * 0.118 / 0.231, tqs=1.25 * 0.8 / 1.372,
+             tqss=0.19 * 0.118 / 0.8)
+# Table I gives X'q and T'q0, i.e. a round-rotor machine; with the salient-pole model PowerFactory
+# ignores them and reads T''q as T''q0 * X''q / Xq, which turns T''q0 = 0.19 s into 0.326 s.
+for k, v in [("iturbo", 1)] + list(table1.items()) + list(sc_tc.items()):
+    try:
+        typ.SetAttribute(k, v)
+    except Exception:
+        pass
+out("DG (%s): %s" % (typ.loc_name, ", ".join("%s=%s" % (k, round(attr(typ, k, float("nan")), 4))
+                                              for k in table1)))
+save_table1()
+
+# ---- 4. fuses ---------------------------------------------------------------------------------
+for name, (loc, tname, src) in FUSES.items():
+    cub = cubicle(loc)
+    f = cub.CreateObject("RelFuse", name)
+    f.typ_id = lib_type(tname + ".TypFuse", "ProtFuse")
+    out("  %-7s %-10s at %-6s (%s)" % (name, tname, cub.GetAttribute("cterm").loc_name, src))
+
+
+# ---- 5. reclosers -----------------------------------------------------------------------------
+def ct_type(prim):
+    equip = app.GetProjectFolder("equip")
+    name = "CT %.0f-5A" % prim
+    hit = equip.GetContents(name + ".TypCt")
+    t = hit[0] if hit else equip.CreateObject("TypCt", name)
+    t.SetAttribute("primtaps", [prim])
+    t.SetAttribute("sectaps", [5.0])
+    return t
+
+
+def add_relay(cub, name, rtype):
+    r = cub.CreateObject("ElmRelay", name)
+    r.typ_id = rtype
+    r.SlotUpdate()
+    for e in r.GetContents("*.RelIoc") + r.GetContents("*Earth*.RelToc"):
+        e.SetAttribute("outserv", 1)                   # phase time-overcurrent only
+    return r
+
+
+iac = lib_type("IAC77B801A.TypRelay", "ProtRelay\\GE\\IAC\\60Hz")
+cdg = lib_type("CDG34-5A (1-4).TypRelay", "CDG34 A & B & C\\Prefered Taps")
+for rname, cfg in RECLOSERS.items():
+    cub = cubicle(cfg["loc"])
+    ct = cub.CreateObject("StaCt", "CT " + rname)
+    ct.typ_id = ct_type(cfg["ct"])
+    ct.SetAttribute("ptapset", cfg["ct"])
+    ct.SetAttribute("stapset", 5.0)
+    units = ["R1 Fast", "R1 Delayed"] if rname == "R1" else R2_UNITS
+    for u in units:
+        add_relay(cub, u, iac if rname == "R1" else cdg)
+    out("  %s: %s at %s, CT %.0f/5, units %s" % (rname, cfg["relay"], cub.GetAttribute("cterm").loc_name,
+                                                cfg["ct"], ", ".join(units)))
+
+ldf = app.GetFromStudyCase("ComLdf")
+out("Load flow after build: %s" % ("OK" if ldf.Execute() == 0 else "FAILED"))
+\end{lstlisting}
+
+\subsection*{D.5\quad \texttt{step2\_studies.py}}
+Unbalanced load flow and short-circuit studies.
+\begin{lstlisting}
+"""
+Step 2 - load flows and short circuits in PowerFactory (complete method, unbalanced).
+
+Saves results/studies.json with, for every case, the phase currents (A) through R1, R2, every
+fuse and every Table II branch.  The currents do not depend on the protection settings, so the
+design (step 3) can be iterated in Python without re-running PowerFactory.
+
+Cases
+  loadflow   DG out / DG in                              -> Inom (Table II), reverse current at R2
+  max        all nodes x LG/LL/LLG/LLL x phases, Rf = 0, DG out and DG in (100 %)
+  min        LG through 3 ohm at all nodes, DG out        -> If,min (Table II)
+  pen        LLL at 633 and 671, DG penetration 0-100 %   (kept in studies.json; Fig. 7 is not produced)
+  figures    the faults of Figs. 8-13, 15, 16 and Fig. 10 (DG in)
+"""
+
+import json
+import os
+
+from pf_setup import activate, attr, out, obj, lib_type, RESULTS, dg_units, clean_variation, save_table1
+from protection_data import FUSES, RECLOSERS, NODES, NODE_ORDER, PF_FAULT, TABLE2_BRANCHES
+
+app = activate()
+ldf = app.GetFromStudyCase("ComLdf")
+shc = app.GetFromStudyCase("ComShc")
+shc.SetAttribute("iopt_mde", 3)          # complete method (prefault load flow)
+shc.SetAttribute("iopt_allbus", 0)
+
+# ---- measuring points ------------------------------------------------------------------------
+POINTS = {}
+for name, cfg in RECLOSERS.items():
+    POINTS[name] = cfg["loc"]
+for name, (loc, _, _) in FUSES.items():
+    POINTS[name] = loc
+for frm, to, br, side, _ in TABLE2_BRANCHES:
+    POINTS["%s-%s" % (frm, to)] = ("line", br, side)
+
+
+def element(loc):
+    if loc[0] == "load":
+        return obj(loc[1], "ElmLod"), "bus1"
+    for cls in ("ElmLne", "ElmTr2", "ElmCoup"):
+        hits = app.GetCalcRelevantObjects("%s.%s" % (loc[1], cls))
+        if hits:
+            return hits[0], loc[2]
+    raise KeyError(loc)
+
+
+ELEMENTS = {k: element(v) for k, v in POINTS.items()}
+TERMS = {t.loc_name: t for t in app.GetCalcRelevantObjects("*.ElmTerm")}
+
+
+def currents(var, scale=1000.0):
+    """Phase currents in A (short-circuit results are in kA, load-flow results in A)."""
+    res = {}
+    for k, (e, side) in ELEMENTS.items():
+        res[k] = [round(scale * abs(attr(e, "%s:%s:%s" % (var, side, p), 0.0)), 2) for p in "ABC"]
+    return res
+
+
+# ---- DG penetration ---------------------------------------------------------------------------
+sym = dg_units()[0]
+dg_tr = obj("2-Winding Transformer", "ElmTr2")
+BASE = dict(sgn=attr(sym.typ_id, "sgn"), strn=attr(dg_tr.typ_id, "strn"),
+            pgini=attr(sym, "pgini"), qgini=attr(sym, "qgini"))
+save_table1()                            # Table I as it is in the model (results/Table_I_model.json)
+
+
+def set_penetration(p):
+    """p = DG rating / 4.05 MVA (4.05 MVA = total feeder load, so 1.0 = 100 %)."""
+    if p <= 0:
+        sym.SetAttribute("outserv", 1)
+        return
+    sym.SetAttribute("outserv", 0)
+    sym.typ_id.SetAttribute("sgn", BASE["sgn"] * p)
+    dg_tr.typ_id.SetAttribute("strn", BASE["strn"] * p)
+    sym.SetAttribute("pgini", BASE["pgini"] * p)
+    sym.SetAttribute("qgini", BASE["qgini"] * p)
+
+
+# ---- short circuits ---------------------------------------------------------------------------
+PH_ATTR = {"spgf": "i_pspgf", "2psc": "i_p2psc", "2pgf": "i_p2pgf"}
+
+
+def run_fault(where, ftype, index=0, rf=0.0, xf=0.0, dist=None):
+    """where: terminal name, or line name with dist = % from bus1. Returns dict or None."""
+    code = PF_FAULT[ftype]
+    if dist is None:
+        shc.SetAttribute("shcobj", TERMS[where])
+    else:
+        shc.SetAttribute("shcobj", obj(where, "ElmLne"))
+        shc.SetAttribute("ppro", float(dist))
+    shc.SetAttribute("iopt_shc", code)
+    if code in PH_ATTR:
+        shc.SetAttribute(PH_ATTR[code], index)
+    shc.SetAttribute("Rf", rf)
+    shc.SetAttribute("Xf", xf)
+    if shc.Execute() != 0:
+        return None
+    if dist is None:
+        t = TERMS[where]
+        ifault = [round(1000.0 * abs(attr(t, "m:Ikss:" + p, 0.0)), 2) for p in "ABC"]
+    else:
+        ifault = None
+    faulted = None
+    if ifault:
+        big = max(ifault)
+        faulted = "".join(p for p, i in zip("ABC", ifault) if big > 0 and i > 0.2 * big)
+    return dict(where=where, type=ftype, index=index, rf=rf, dist=dist, phases=faulted,
+                ifault=ifault, I=currents("m:Ikss"))
+
+
+def sweep(dg, rf=0.0, types=("LG", "LL", "LLG", "LLL"), nodes=NODE_ORDER, tag="max"):
+    res = []
+    for node in nodes:
+        for ft in types:
+            seen = set()
+            for idx in ([0] if ft == "LLL" else [0, 1, 2]):
+                r = run_fault(node, ft, idx, rf)
+                if r is None or not r["phases"]:
+                    continue
+                key = r["phases"]
+                if ft != "LLL" and (key in seen or len(key) != (1 if ft == "LG" else 2)):
+                    continue
+                if not set(key) <= set(NODES[node]["phases"]):
+                    continue
+                seen.add(key)
+                r.update(case=tag, dg=dg)
+                res.append(r)
+    return res
+
+
+def loadflow(dg_on):
+    set_penetration(1.0 if dg_on else 0.0)
+    if ldf.Execute() != 0:
+        raise RuntimeError("load flow failed")
+    res = currents("m:I", 1.0)
+    e, side = ELEMENTS["R2"]
+    res["R2_P_kW"] = round(attr(e, "m:Psum:%s" % side, 0.0), 1)
+    res["DG_P_MW"] = round(attr(sym, "m:Psum:bus1", 0.0) / 1000.0, 3) if dg_on else 0.0
+    return res
+
+
+data = dict(points={k: list(v) for k, v in POINTS.items()})
+data["loadflow"] = {"dg_out": loadflow(False), "dg_in": loadflow(True)}
+out("Load flow: R2 %.0f kW (DG out) / %.0f kW (DG in)" % (
+    data["loadflow"]["dg_out"]["R2_P_kW"], data["loadflow"]["dg_in"]["R2_P_kW"]))
+
+faults = []
+set_penetration(0.0)
+faults += sweep(0.0, tag="max")
+faults += sweep(0.0, rf=3.0, types=("LG",), tag="min")
+set_penetration(1.0)
+faults += sweep(1.0, tag="max")
+faults += sweep(1.0, rf=3.0, types=("LG",), tag="min")
+out("Node sweeps: %d faults" % len(faults))
+
+for p in (0.0, 0.10, 0.25, 0.37, 0.50, 0.75, 1.0):
+    set_penetration(p)
+    for r in sweep(p, types=("LLL",), nodes=["633", "671"], tag="pen"):
+        faults.append(r)
+
+# Figure faults (DG in service).  Fig. 9: LLG at the middle of 692-675 through 1 ohm;
+# Fig. 13: 3-phase at 10 % of 632-633; Fig. 10: LL (a-c) at 684 through 0.2 ohm.
+set_penetration(1.0)
+FIG = [("Fig8", "611", "LG", None, 0.0, None), ("Fig9", "LC692-675", "LLG", None, 1.0, 50.0),
+       ("Fig10", "684", "LL", "AC", 0.2, None), ("Fig11", "646", "LL", "BC", 1.0, None),
+       ("Fig12", "645", "LL", "BC", 1.5, None), ("Fig13", "LOHL632-633", "LLL", None, 0.0, 10.0),
+       ("Fig15", "646", "LL", "BC", 0.0, None)]
+for fig, where, ft, want, rf, dist in FIG:
+    for idx in ([0] if ft in ("LLL",) else [0, 1, 2]):
+        r = run_fault(where, ft, idx, rf, dist=dist)
+        if r is None:
+            continue
+        if want and r["phases"] != want:
+            continue
+        if dist is not None and ft == "LLG" and idx != 1:      # b-c on the 3-phase cable
+            continue
+        r.update(case=fig, dg=1.0)
+        faults.append(r)
+        out("  %s: %s %s at %s%s, Rf %.1f -> R1 %.0f A, R2 %.0f A" % (
+            fig, ft, r["phases"] or "", where, "" if dist is None else " (%.0f %%)" % dist, rf,
+            max(r["I"]["R1"]), max(r["I"]["R2"])))
+        break
+
+data["faults"] = faults
+
+# ---- curve data used by the Python analysis (identical to the PowerFactory types) -------------
+curves = {"fuses": {}}
+for name, (loc, tname, _) in FUSES.items():
+    t = obj(name, "RelFuse").typ_id         # keyed by the installed type: step 4 may have revised the size
+    curves["fuses"][t.loc_name] = dict(irat=attr(t, "irat"), vmat=[list(r) for r in t.GetAttribute("vmat")])
+a055c = lib_type("A055C200E.TypFuse", "ProtFuse").GetParent()
+for t in a055c.GetContents("A055C*.TypFuse"):                 # every size, for fuse revision
+    curves["fuses"].setdefault(t.loc_name, dict(irat=attr(t, "irat"),
+                                                vmat=[list(r) for r in t.GetAttribute("vmat")]))
+cdg = obj("R2 Fast", "ElmRelay").GetContents("*.RelToc")[0]
+ch = attr(cdg, "pcharac")
+curves["cdg"] = dict(name=ch.loc_name, imin=attr(ch, "imin"), imax=attr(ch, "imax"),
+                     tmin=attr(ch, "tmin"), vmat=[list(r) for r in ch.GetAttribute("vmat")])
+iac = attr(obj("R1 Fast", "ElmRelay").GetContents("Toc.RelToc")[0], "pcharac")
+curves["iac"] = dict(name=iac.loc_name, expr=attr(iac, "expr"), imin=attr(iac, "imin"),
+                     imax=attr(iac, "imax"))
+data["curves"] = curves
+set_penetration(1.0)
+ldf.Execute()
+with open(os.path.join(RESULTS, "studies.json"), "w") as f:
+    json.dump(data, f, indent=1)
+clean_variation()                       # DG switching above was recorded in the study case's variation
+out("Saved %d fault cases to results/studies.json" % len(faults))
+\end{lstlisting}
+
+\subsection*{D.6\quad \texttt{step3\_design\_and\_evaluate.py}}
+Settings, fuse coefficients and classification of the coordination.
+\begin{lstlisting}
+"""
+Step 3 - protection design by the paper's method (Section II, Fig. 5) and coordination analysis.
+Pure Python on results/studies.json (no PowerFactory needed).
+
+The paper's workflow, in three stages:
+
+ A  Design without DG (conventional fuse-saving scheme)
+      step 1  load flow -> Inom (Table II)
+      step 3  pickups by eq. (3), Ip = OLF x Inom, realised with the relay's CT and taps
+              R1  IAC77B801A, TDS 0.5 (fast) / 10 (delayed) - paper
+              R2  CDG34 (CDG14 table, curve from 2 x plug).  Fast plug = Ip/2 (curve starts at Ip,
+                  as in Figs. 8 and 13), delayed plug = Ip.  Fast TMS = lowest dial 0.1; delayed
+                  TMS = highest dial that stays 10 cycles below R1's delayed curve.
+      step 4  fuse coefficients b_i, eqs. (6)-(9) -> Table III (i = 1 closest to the fault, [25])
+      step 5  fault study; steps 8-10 until every fault is coordinated without DG
+ B  DG added (4.05 MVA at 692), settings unchanged -> Fig. 14, Figs. 8-13
+ C  R2 as DSDR: reverse pickup eq. (12), TMS revised by If,Rec / If,Fuse (step 8);
+    fuse revision (step 9) where a dial limit is reached -> Fig. 17, Table IV, Figs. 15-16
+
+Coordination of one fault ("held"):
+  * every recloser that interrupts a source feeding the fault (R1 for the grid in R1's zone,
+    R2 for the grid in R2's zone, R2 in reverse for the DG in R1's zone) picks up, trips on its
+    fast curve before the primary fuse melts (MMT), and on its delayed curve after the fuse clears
+    (TCT);
+  * series fuses: TCT(primary) < 0.75 MMT(backup), eq. (8);
+  * R2-zone faults: R2 fast before R1 fast and R2 delayed >= 10 cycles before R1 delayed.
+A cell of Figs. 14 / 17 is held only if every phase combination of that fault type holds.
+"""
+
+import copy
+import csv
+import json
+import math
+import os
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+
+from curves import IAC, CDG, Fuse, INF, _loglog
+from protection_data import (FUSES, NODES, NODE_ORDER, FAULT_TYPES, TABLE2_BRANCHES, PAPER_TABLE2,
+                             PAPER_TABLE3, PAPER_TABLE4, PAPER_FIG14_LOST, OLF, A_FUSE, T_RECL_MIN)
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+RES = os.path.join(HERE, "results")
+FIG = os.path.join(RES, "figures")
+os.makedirs(FIG, exist_ok=True)
+
+D = json.load(open(os.path.join(RES, "studies.json")))
+IACC, CDGC = IAC(D["curves"]["iac"]), CDG(D["curves"]["cdg"])
+FTYPE = {t: Fuse(v) for t, v in D["curves"]["fuses"].items()}
+A055C = sorted([t for t in FTYPE if t.startswith("A055C")], key=lambda t: FTYPE[t].irat)
+FAULTS = D["faults"]
+LF = D["loadflow"]
+REPORT = []
+
+CDG_TAPS = [1.0, 1.2, 1.5, 2.0, 2.4, 3.0, 4.0]                     # CDG34-5A (1-4), secondary A
+IAC_TAPS = [0.5, 0.6, 0.7, 0.8, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0]   # IAC77B801A, secondary A
+CT_R1, CT_R2, CT_R2RV = 900.0, 1000.0, 500.0
+TMS_MIN, TMS_MAX = 0.1, 1.0            # CDG34 dial range
+# The DSDR keeps the CDG34 extremely-inverse curve (paper, Section IV-A).  That curve is a table
+# for TMS 0.1-1.0 whose times are not proportional to TMS, so the dial is not extended below 0.1
+# (PowerFactory's linear extrapolation below 0.1 even gives negative times at low multiples).
+DSDR_TMS_MIN = TMS_MIN
+
+
+def say(s=""):
+    print(s)
+    REPORT.append(s)
+
+
+def imax(rec, point):
+    return max(rec["I"][point])
+
+
+def fmt(t, nd=3):
+    return "no trip" if t == INF else ("%.*f" % (nd, t))
+
+
+def save_png(fig, fname):
+    """Save a figure; if the file is open in a viewer (locked on Windows) write <name>_new.png."""
+    path = os.path.join(FIG, fname)
+    alt = path[:-4] + "_new.png"
+    try:
+        fig.savefig(path, dpi=160)
+        if os.path.isfile(alt):
+            os.remove(alt)
+    except OSError:
+        fig.savefig(alt, dpi=160)
+        print("NOTE: %s is open in another program; the new figure is %s" % (fname, os.path.basename(alt)))
+
+
+CMP = os.path.join(RES, "comparison")             # values of the reference paper, for the comparison only
+os.makedirs(CMP, exist_ok=True)
+
+
+def write_csv(name, header, rows):
+    path = os.path.join(RES, name)
+    try:
+        f = open(path, "w", newline="")
+    except PermissionError:                      # open in Excel: the old file stays, the new one goes beside it
+        f = open(path[:-4] + "_new.csv", "w", newline="")
+        print("NOTE: %s is open in another program; the new table is %s_new.csv" % (name, name[:-4]))
+    with f:
+        w = csv.writer(f)
+        w.writerow(header)
+        w.writerows(rows)
+
+
+def faults(case="max", dg=None, node=None, ftype=None, zone=None):
+    return [r for r in FAULTS if r["case"] == case and (dg is None or r["dg"] == dg)
+            and (node is None or r["where"] == node) and (ftype is None or r["type"] == ftype)
+            and (zone is None or (r["where"] in NODES and NODES[r["where"]]["zone"] == zone
+                                  and not NODES[r["where"]].get("lv")))]
+
+
+# =============================================================================================
+# Operating times
+# =============================================================================================
+def t_r1(i, s, mode):
+    return IACC.t(i, s["R1"]["ip"], s["R1"]["tds_" + mode])
+
+
+def t_r2(i, s, unit, mode):
+    u = s[unit]
+    return CDGC.t(i, u["is_" + mode], u["tms_" + mode])
+
+
+def fuse(s, name):
+    return FTYPE[s["fuses"][name]]
+
+
+# =============================================================================================
+# Coordination of one fault
+# =============================================================================================
+def evaluate(r, s, dsdr):
+    node = r["where"]
+    info = NODES[node]
+    i1, i2 = imax(r, "R1"), imax(r, "R2")
+    reasons, reclosers = [], []                       # reclosers: (name, unit, I, t_fast, t_delayed)
+    if info["zone"] == "R2":
+        reclosers.append(("R2", "R2fw", i2, t_r2(i2, s, "R2fw", "f"), t_r2(i2, s, "R2fw", "d")))
+        t1f, t1d = t_r1(i1, s, "f"), t_r1(i1, s, "d")
+        if reclosers[0][3] < INF and not reclosers[0][3] < t1f:
+            reasons.append("R2 fast (%.3f s) not before R1 fast (%s s)" % (reclosers[0][3], fmt(t1f)))
+        if reclosers[0][4] < INF and t1d < INF and not t1d - reclosers[0][4] >= T_RECL_MIN:
+            reasons.append("R2/R1 delayed margin %.3f s < 10 cycles" % (t1d - reclosers[0][4]))
+    else:
+        reclosers.append(("R1", "R1", i1, t_r1(i1, s, "f"), t_r1(i1, s, "d")))
+        if r["dg"] > 0 and i2 >= s["dg_infeed"]:        # DG infeed above the eq. (12) pickup
+            unit = "R2rv" if dsdr else "R2fw"
+            reclosers.append(("R2 rev" if dsdr else "R2", unit, i2, t_r2(i2, s, unit, "f"),
+                              t_r2(i2, s, unit, "d")))
+    res = dict(node=node, type=r["type"], phases=r["phases"], dg=r["dg"], reclosers=reclosers,
+               fuse=None, cti_f=None, cti_d=None, flags=set())
+    for name, unit, i, tf, td in reclosers:
+        if tf == INF:
+            reasons.append("%s does not pick up (%.0f A)" % (name, i))
+            res["flags"].add(("nopickup", unit))
+    path = info["path"]
+    if path:
+        p = path[0]
+        ip_ = imax(r, p)
+        f = fuse(s, p)
+        mmt, tct = f.mmt(ip_), f.tct(ip_)
+        tf = max(x[3] for x in reclosers)
+        td = min(x[4] for x in reclosers)
+        res.update(fuse=p, i_fuse=ip_, mmt=mmt, tct=tct, cti_f=mmt - tf, cti_d=td - tct)
+        for name, unit, i, tfk, tdk in reclosers:
+            if tfk < INF and not tfk < mmt:
+                reasons.append("%s melts (%.3f s) before %s fast (%.3f s)" % (p, mmt, name, tfk))
+                res["flags"].add(("fast", unit))
+            if tdk < INF and not tct < tdk:
+                reasons.append("%s delayed (%.3f s) before %s clears (%.3f s)" % (name, tdk, p, tct))
+                res["flags"].add(("delayed", unit))
+        for b in path[1:]:
+            mb = fuse(s, b).mmt(imax(r, b))
+            if not tct < 0.75 * mb:
+                reasons.append("series %s/%s: TCT %.3f > 0.75 x MMT %.3f" % (p, b, tct, 0.75 * mb))
+                res["flags"].add(("series", b))
+    res["held"] = not reasons
+    res["reason"] = "; ".join(reasons)
+    return res
+
+
+def classify(s, dsdr, dg):
+    grid, detail = {}, []
+    for node in NODE_ORDER:
+        for ft in FAULT_TYPES:
+            recs = faults("max", dg, node, ft)
+            if NODES[node].get("lv") or not recs:
+                grid[(node, ft)] = "n/a"
+                continue
+            ev = [evaluate(r, s, dsdr) for r in recs]
+            detail += ev
+            grid[(node, ft)] = "held" if all(e["held"] for e in ev) else "lost"
+    return grid, detail
+
+
+def count(grid):
+    return sum(v == "held" for v in grid.values()), sum(v != "n/a" for v in grid.values())
+
+
+# =============================================================================================
+# Steps 8-10 - revise the recloser dials, then the fuse sizes
+# =============================================================================================
+def step8(s, dsdr, dg, units, log):
+    """Revise TMS of the given R2 units by If,Rec / If,Fuse until held or at a limit."""
+    for _ in range(40):
+        changed = False
+        ev = [e for e in classify(s, dsdr, dg)[1] if not e["held"]]
+        for unit in units:
+            fast = [e for e in ev if ("fast", unit) in e["flags"]]
+            slow = [e for e in ev if ("delayed", unit) in e["flags"]]
+            if fast and s[unit]["tms_f"] > s[unit]["tms_min"]:
+                k = min(next(x[2] for x in e["reclosers"] if x[1] == unit) / e["i_fuse"] for e in fast)
+                new = max(s[unit]["tms_min"], round(s[unit]["tms_f"] * k, 3))
+                log.append("step 8: %s fast TMS %.3f x If,Rec/If,Fuse (%.3f) -> %.3f" % (unit, s[unit]["tms_f"], k, new))
+                s[unit]["tms_f"], changed = new, True
+            if slow and s[unit]["tms_d"] < s[unit]["tms_d_max"]:
+                k = max(e["i_fuse"] / next(x[2] for x in e["reclosers"] if x[1] == unit) for e in slow)
+                new = min(s[unit]["tms_d_max"], round(s[unit]["tms_d"] * max(k, 1.05), 3))
+                log.append("step 8: %s delayed TMS %.3f x If,Fuse/If,Rec (%.3f) -> %.3f" % (unit, s[unit]["tms_d"], k, new))
+                s[unit]["tms_d"], changed = new, True
+        if not changed:
+            return
+
+
+def resize(s, name, step, log, why):
+    t = s["fuses"][name]
+    if t not in A055C:
+        return False
+    k = A055C.index(t) + step
+    if not 0 <= k < len(A055C) or FTYPE[A055C[k]].irat < 100:
+        return False
+    s["fuses"][name] = A055C[k]
+    log.append("step 9/10: %s %s -> %s (%s)" % (name, t, A055C[k], why))
+    return True
+
+
+def n_lost(s, dsdr, dgs):
+    return sum(not e["held"] for dg in dgs for e in classify(s, dsdr, dg)[1])
+
+
+def step9(s, dsdr, dgs, log):
+    """Fuse revision (step 9) and series-fuse revision (step 10).  Candidate moves from the
+    failures: primary fuse one A055C size up (melts before a recloser's fast curve at its dial
+    limit) or down (clears after the delayed curve), or for eq. (8) the backup one size up or the
+    primary one size down.  The move that removes most lost cases is applied; repeat."""
+    for _ in range(30):
+        base = n_lost(s, dsdr, dgs)
+        if base == 0:
+            return
+        moves = set()
+        for dg in dgs:
+            for e in classify(s, dsdr, dg)[1]:
+                path = NODES[e["node"]]["path"]
+                for kind, what in e["flags"]:
+                    where = "%s %s" % (e["node"], e["type"])
+                    for k in (1, 2, 3):
+                        if kind == "fast":
+                            moves.add(((e["fuse"], k),))
+                            for k2 in (1, 2, 3):
+                                moves.add(((e["fuse"], k),) + tuple((b, k2) for b in path[1:]))
+                        elif kind == "delayed":
+                            moves.add(((e["fuse"], -k),))
+                        elif kind == "series":
+                            moves.add(((what, k),))
+                            moves.add(((e["fuse"], -k),))
+        best = None
+        for mv in sorted(moves):
+            trial = copy.deepcopy(s)
+            if not all(resize(trial, name, k, [], "") for name, k in mv):
+                continue
+            n = n_lost(trial, dsdr, dgs)
+            size = sum(abs(k) for _, k in mv)
+            if n < base and (best is None or (n, size) < (best[0], best[1])):
+                best = (n, size, mv)
+        if best is None:
+            return
+        for name, k in best[2]:
+            resize(s, name, k, log, "lost cases %d -> %d" % (base, best[0]))
+
+
+
+# =============================================================================================
+# Stage A - settings without DG
+# =============================================================================================
+def nearest_tap(target, taps, ratio):
+    return min(taps, key=lambda t: abs(t * ratio - target))
+
+
+def table2():
+    rows = []
+    for frm, to, br, side, nodes in TABLE2_BRANCHES:
+        key = "%s-%s" % (frm, to)
+        inom = max(LF["dg_out"][key])
+        fmax = [imax(r, key) for r in faults("max", 0.0) if r["where"] in nodes]
+        fmin = [imax(r, key) for r in faults("min", 0.0) if r["where"] in nodes]
+        rows.append([frm, to, round(inom, 1), round(min(fmin) / 1e3, 2), round(max(fmax) / 1e3, 2)])
+    write_csv("Table_II.csv", ["From", "To", "Inom (A)", "If,min (kA)", "If,max (kA)"], rows)
+    write_csv(os.path.join("comparison", "Table_II_vs_paper.csv"),
+              ["From", "To", "Inom (A)", "If,min (kA)", "If,max (kA)", "paper Inom (A)", "paper If,min (kA)",
+               "paper If,max (kA)"], [r + list(PAPER_TABLE2[(r[0], r[1])]) for r in rows])
+    say("\nTABLE II - rated (load flow), minimum (LG through 3 ohm, farthest node) and maximum "
+        "(bolted, nearest node) branch current, DG out")
+    say("  %-8s %-5s %8s | %8s | %8s" % ("from", "to", "Inom A", "Ifmin kA", "Ifmax kA"))
+    for r in rows:
+        say("  %-8s %-5s %8.1f | %8.2f | %8.2f" % (r[0], r[1], r[2], r[3], r[4]))
+    return {"%s-%s" % (r[0], r[1]): r for r in rows}
+
+
+def design_reclosers(t2):
+    s = {"fuses": {n: t for n, (_, t, _) in FUSES.items()}}
+    inom1 = t2["RG60-632"][2]
+    tap = nearest_tap(OLF * inom1, IAC_TAPS, CT_R1 / 5)
+    s["R1"] = dict(ct=CT_R1, tap=tap, ip=tap * CT_R1 / 5, ip_eq3=OLF * inom1, tds_f=0.5, tds_d=10.0)
+    inom2 = t2["632-671"][2]
+    ip = OLF * inom2
+    tf, td = nearest_tap(ip / 2, CDG_TAPS, CT_R2 / 5), nearest_tap(ip, CDG_TAPS, CT_R2 / 5)
+    fw = dict(ct=CT_R2, ip_eq3=ip, tap_f=tf, tap_d=td, is_f=tf * CT_R2 / 5, is_d=td * CT_R2 / 5,
+              tms_f=TMS_MIN, tms_d=None, tms_min=TMS_MIN)
+    for k in range(int(TMS_MAX * 100), 4, -1):            # highest delayed dial below R1 - 10 cycles
+        fw["tms_d"] = k / 100.0
+        if all(t_r2(imax(r, "R2"), {"R2fw": fw}, "R2fw", "d") == INF or
+               t_r1(imax(r, "R1"), s, "d") - t_r2(imax(r, "R2"), {"R2fw": fw}, "R2fw", "d") >= T_RECL_MIN
+               for dg in (0.0, 1.0) for r in faults("max", dg, zone="R2")):
+            break
+    fw["tms_d_max"] = fw["tms_d"]
+    s["R2fw"] = fw
+    # a DG infeed through R2 counts as a fault contribution above the eq. (12) pickup
+    s["dg_infeed"] = OLF * max(LF["dg_in"]["R2"])
+    say("\nSTAGE A - SETTINGS WITHOUT DG (step 3)")
+    say("  R1  GE IAC77B801A: Inom %.1f A -> Ip = 1.25 Inom = %.1f A -> CT 900/5, tap %.1f A = %.0f A; "
+        "TDS 0.5 (fast) / 10 (delayed)" % (inom1, OLF * inom1, s["R1"]["tap"], s["R1"]["ip"]))
+    say("  R2  GE/Alstom CDG34 (forward): Inom %.1f A -> Ip = %.1f A -> CT 1000/5; fast plug %.1f A = %.0f A "
+        "(curve from %.0f A), delayed plug %.1f A = %.0f A (curve from %.0f A); TMS %.2f / %.2f" % (
+            inom2, ip, tf, fw["is_f"], 2 * fw["is_f"], td, fw["is_d"], 2 * fw["is_d"], fw["tms_f"], fw["tms_d"]))
+    say("      delayed TMS %.2f = highest dial keeping R2 >= 10 cycles below R1 for all R2-zone faults" % fw["tms_d"])
+    return s
+
+
+# =============================================================================================
+# Table III
+# =============================================================================================
+FUSE_PATHS = {   # longest series path through each fuse (fault first), node below the fuse
+    "F632": ("645", ["F646", "F632"]), "F633": ("633", ["F633"]), "F634": ("634", ["F634", "F633"]),
+    "F645": ("645", ["F645", "F632"]), "F646": ("646", ["F646", "F632"]), "F-DL": ("DL", ["F-DL"]),
+    "F671": ("671", ["F671"]), "F671-1": ("692", ["F675", "F692-R", "F671-1"]),
+    "F692": ("692", ["F692", "F671-1"]), "F692-R": ("675", ["F675", "F692-R", "F671-1"]),
+    "F675": ("675", ["F675", "F692-R", "F671-1"]), "F671-2": ("684", ["F611", "F684", "F671-2"]),
+    "F684": ("611", ["F611", "F684", "F671-2"]), "F611": ("611", ["F611", "F684", "F671-2"]),
+    "F652": ("652", ["F652", "F671-2"]),
+}
+
+
+def table3(s):
+    rows = []
+    say("\nTABLE III - fuse coefficient b_i, eq. (9), a_i = -1.8, at the maximum fault current below the fuse (DG out)")
+    say("  %-7s %7s %4s %7s %7s %8s | %6s | %s" % ("fuse", "If A", "i/z", "t_F s", "t_D s", "t_fuse",
+                                                 "b_i", "b_i of the installed fuse"))
+    cmp_rows = []
+    for f, (node, path) in FUSE_PATHS.items():
+        recs = faults("max", 0.0, node)
+        i = max(max(r["ifault"]) for r in recs)
+        i_rel = i * (0.48 / 4.16) if NODES[node].get("lv") else i          # F634: recloser sees HV current
+        if NODES[node]["zone"] == "R1":
+            tf, td = t_r1(i_rel, s, "f"), t_r1(i_rel, s, "d")
+        else:
+            tf, td = t_r2(i_rel, s, "R2fw", "f"), t_r2(i_rel, s, "R2fw", "d")
+        z, idx = len(path), path.index(f) + 1
+        tgt = tf + idx / (z + 1.0) * (td - tf)
+        tgt_rev = tf + (z + 1 - idx) / (z + 1.0) * (td - tf)
+        b = math.log10(tgt) - A_FUSE * math.log10(i)
+        b_rev = math.log10(tgt_rev) - A_FUSE * math.log10(i)
+        mmt = fuse(s, f).mmt(i)
+        b_fit = math.log10(mmt) - A_FUSE * math.log10(i) if 0 < mmt < INF else float("nan")
+        base = [f, round(i), "%d/%d" % (idx, z), round(tf, 3), round(td, 3), round(tgt, 3), round(b, 2)]
+        rows.append(base + [round(b_fit, 2), s["fuses"][f], fmt(mmt), fmt(fuse(s, f).tct(i))])
+        cmp_rows.append(base + [round(b_rev, 2), PAPER_TABLE3[f]] + rows[-1][7:])
+        say("  %-7s %7.0f %4s %7.3f %7.3f %8.3f | %6.2f | %.2f  (%s)" % (*rows[-1][:8], s["fuses"][f]))
+    write_csv("Table_III.csv", ["Fuse", "If (A)", "i/z", "t_fast (s)", "t_delayed (s)", "t_fuse eq.(9) (s)",
+                                "b_i (eq. 9, i=1 closest to fault)", "b_i of installed fuse at If", "installed fuse",
+                                "t_MMT of installed fuse at If (s)", "t_TCT of installed fuse at If (s)"], rows)
+    write_csv(os.path.join("comparison", "Table_III_vs_paper.csv"),
+              ["Fuse", "If (A)", "i/z", "t_fast (s)", "t_delayed (s)", "t_fuse eq.(9) (s)",
+               "b_i (i=1 closest to fault, ref. [25])", "b_i (i counted from source)", "paper b_i",
+               "b_i of installed fuse at If", "installed fuse", "t_MMT of installed fuse at If (s)",
+               "t_TCT of installed fuse at If (s)"], cmp_rows)
+    return rows
+
+
+# =============================================================================================
+# Figures
+# =============================================================================================
+PAL = dict(blue="#2a78d6", orange="#eb6834", aqua="#1baf7a", violet="#4a3aa7", magenta="#e87ba4",
+           green="#008300", good="#0ca30c", critical="#d03b3b", ink="#0b0b0b", ink2="#52514e",
+           grid="#d9d8d4", surface="#fcfcfb")
+plt.rcParams.update({"font.size": 9, "axes.edgecolor": PAL["ink2"], "axes.labelcolor": PAL["ink"],
+                     "text.color": PAL["ink"], "xtick.color": PAL["ink2"], "ytick.color": PAL["ink2"],
+                     "figure.facecolor": PAL["surface"], "axes.facecolor": PAL["surface"],
+                     "savefig.facecolor": PAL["surface"], "font.family": "DejaVu Sans"})
+
+
+def coord_grid(grid, title, fname):
+    fig, ax = plt.subplots(figsize=(8.6, 3.1))
+    for x, node in enumerate(NODE_ORDER):
+        for y, ft in enumerate(FAULT_TYPES[::-1]):
+            st = grid[(node, ft)]
+            if st == "n/a":
+                ax.text(x, y, "-", ha="center", va="center", fontsize=13, color=PAL["ink2"])
+            else:
+                c = PAL["good"] if st == "held" else PAL["critical"]
+                ax.add_patch(plt.Circle((x, y), 0.36, facecolor="none", edgecolor=c, lw=1.6))
+                ax.text(x, y, "held" if st == "held" else "lost", ha="center", va="center", fontsize=12,
+                        color=c, fontweight="bold")
+    ax.set_xticks(range(len(NODE_ORDER)))
+    ax.set_xticklabels(NODE_ORDER)
+    ax.set_yticks(range(4))
+    ax.set_yticklabels(FAULT_TYPES[::-1])
+    ax.set_xlim(-0.6, len(NODE_ORDER) - 0.4)
+    ax.set_ylim(-0.6, 3.6)
+    ax.set_aspect("equal")
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    ax.tick_params(length=0)
+    ax.set_xlabel("Faulted node")
+    ax.set_title(title, fontsize=10, loc="left")
+    handles = [Line2D([], [], marker="$held$", color=PAL["good"], ls="", ms=9, label="coordination held"),
+               Line2D([], [], marker="$lost$", color=PAL["critical"], ls="", ms=9, label="coordination lost"),
+               Line2D([], [], marker="$-$", color=PAL["ink2"], ls="", ms=9, label="not applicable")]
+    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.3), ncol=3, frameon=False)
+    fig.tight_layout()
+    save_png(fig, fname)
+    plt.close(fig)
+
+
+def annotate_times(ax, opts, x_left=100.0):
+    """Operating times on a TCC: a dotted line from each operating point to the time axis with its value,
+    and the coordination margins as arrows at the primary fuse current:
+      CTI = t_MMT(primary fuse) - t_fast(recloser)        (fast trip before the fuse melts)
+      t_delayed(recloser) - t_TCT(primary fuse)            (fuse clears before the delayed trip)
+    opts: [(device, current, [t1, t2], colour)] - for a recloser t1/t2 = fast/delayed, for a fuse MMT/TCT."""
+    import math
+    labels = []
+    for dev, i_dev, ops, c in opts:
+        names = ("melts", "clears") if dev in FUSES else ("fast", "delayed")
+        short = dev.replace("R2rv", "R2 rev").replace("R2fw", "R2")
+        for t, nm in zip(ops, names):
+            if t < INF and 0.01 < t < 1000:
+                ax.plot([x_left, i_dev], [t, t], color=c, lw=0.7, ls=":", alpha=0.9, zorder=2)
+                labels.append([t, "%s %s %.3f s" % (short, nm, t), c])
+    # labels at the left edge, spread so that they do not overlap (log axis)
+    labels.sort(key=lambda x: x[0])
+    ys = []
+    for t, _, _ in labels:
+        y = math.log10(t)
+        if ys and y - ys[-1] < 0.13:
+            y = ys[-1] + 0.13
+        ys.append(y)
+    for (t, txt, c), y in zip(labels, ys):
+        ax.text(x_left * 1.08, 10 ** y, txt, fontsize=6.4, color=c, va="bottom", ha="left",
+                bbox=dict(boxstyle="square,pad=0.08", fc="white", ec="none", alpha=0.75), zorder=7)
+    recs = [o for o in opts if o[0] not in FUSES]
+    fuses = [o for o in opts if o[0] in FUSES]
+    if not recs or not fuses:
+        return
+    # a recloser that carries current but does not pick up
+    lo_y, hi_y = ax.get_ylim()
+    for dev, i_dev, (tf, _), c in recs:
+        if tf == INF and i_dev > 1.0:
+            ax.text(i_dev * 1.05, (lo_y * hi_y) ** 0.5 / 3, "%s: %.0f A, does not trip" % (
+                dev.replace("R2rv", "R2 rev").replace("R2fw", "R2"), i_dev), rotation=90, fontsize=7.4,
+                color="#c62828", fontweight="bold", va="center", ha="left", zorder=8,
+                bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="#c62828", lw=0.6, alpha=0.9))
+    # the recloser that decides: the one with the latest fast trip (it must still beat the fuse)
+    live = [r for r in recs if r[2][0] < INF]
+    if not live:
+        return
+    _, i_rec, (tf, td), _ = max(live, key=lambda r: r[2][0])
+    _, i_fu, (mmt, tct), _ = fuses[0]
+    x = i_fu * 1.35
+    for lo, hi, name in ((tf, mmt, "CTI"), (tct, td, "t$_D$ - t$_{TCT}$")):
+        if not (lo < INF and hi < INF and 0.01 < min(lo, hi) and max(lo, hi) < 1000):
+            continue
+        ok = hi > lo
+        col = "#2e7d32" if ok else "#c62828"
+        d = hi - lo
+        val = ("%+.0f ms" % (1000 * d)) if abs(d) < 1 else ("%+.2f s" % d)
+        ax.annotate("", xy=(x, hi), xytext=(x, lo), arrowprops=dict(arrowstyle="<->", color=col, lw=1.3), zorder=8)
+        right = x * 4.5 < ax.get_xlim()[1]                    # room for the label right of the arrow?
+        ax.text(x * 1.06 if right else x / 1.06, (lo * hi) ** 0.5, "%s = %s" % (name, val.replace("-", "-")),
+                fontsize=7.2, color=col, fontweight="bold", va="center", ha="left" if right else "right", zorder=8,
+                bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=col, lw=0.6, alpha=0.9))
+
+
+def tcc(fig_id, rec, s, devices, title, fname, dsdr):
+    fig, ax = plt.subplots(figsize=(6.6, 4.8))
+    ii = [10 ** (2 + k / 200.0) for k in range(601)]
+    colors = [PAL["blue"], PAL["orange"], PAL["aqua"], PAL["violet"]]
+    handles = []
+    opts = []
+    for n, dev in enumerate(devices):
+        c = colors[n]
+        if dev in FUSES:
+            f = fuse(s, dev)
+            i_dev = imax(rec, dev)
+            lo = [(i, f.mmt(i)) for i in ii if f.mmt(i) < 1000]
+            hi = [(i, f.tct(i)) for i in ii if f.tct(i) < 1000]
+            ax.plot(*zip(*lo), color=c, lw=1.3)
+            ax.plot(*zip(*hi), color=c, lw=1.3)
+            ax.fill_betweenx([p[1] for p in lo], [p[0] for p in lo],
+                             [_loglog(p[1], sorted((b, a) for a, b in f.clear)) or p[0] for p in lo],
+                             color=c, alpha=0.2, lw=0)
+            ops = [f.mmt(i_dev), f.tct(i_dev)]
+            label = ("%s %s  %.0f A: melts %.3f s, clears %.3f s" % (dev, s["fuses"][dev], i_dev, ops[0], ops[1])
+                     if ops[1] < INF else "%s %s  %.0f A: does not melt" % (dev, s["fuses"][dev], i_dev))
+        else:
+            i_dev = imax(rec, "R1" if dev == "R1" else "R2")
+            if dev == "R1":
+                fun = lambda i, m: t_r1(i, s, m)
+                name = "R1"
+            else:
+                unit = "R2rv" if dev == "R2rv" else "R2fw"
+                fun = lambda i, m, u=unit: t_r2(i, s, u, m)
+                name = "R2 reverse (DSDR)" if dev == "R2rv" else "R2"
+            for m, ls in (("f", "-"), ("d", "--")):
+                pts = [(i, fun(i, m)) for i in ii if fun(i, m) < 1000]
+                ax.plot(*zip(*pts), color=c, lw=1.7, ls=ls)
+            ops = [fun(i_dev, "f"), fun(i_dev, "d")]
+            label = "%s  %.0f A: fast %s, delayed %s" % (name, i_dev, *(("%.3f s" % x) if x < INF else "no trip"
+                                                                       for x in ops))
+        ax.axvline(i_dev, color=c, lw=0.8, alpha=0.7)
+        for t in ops:
+            if t < INF:
+                ax.plot([i_dev], [t], marker="o", ms=6, color=c, mec=PAL["surface"], mew=1.5, zorder=5)
+        handles.append(Line2D([], [], color=c, lw=1.7, label=label))
+        opts.append((dev, i_dev, ops, c))
+    handles.append(Line2D([], [], color=PAL["ink2"], lw=1.2, ls="--", label="dashed: recloser delayed curve"))
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(100, 1e5)
+    ax.set_ylim(0.01, 1000)
+    annotate_times(ax, opts)
+    ax.grid(True, which="major", color=PAL["grid"], lw=0.8)
+    ax.grid(True, which="minor", color=PAL["grid"], lw=0.3, alpha=0.6)
+    ax.set_xlabel("Current (A at 4.16 kV)")
+    ax.set_ylabel("Time (s)")
+    status = evaluate(rec, s, dsdr) if rec["where"] in NODES else None
+    extra = "" if status is None else ("  -  coordination held" if status["held"] else "  -  coordination LOST")
+    ax.set_title("%s%s" % (title, extra), fontsize=9.5, loc="left")      # the figure number is in the caption
+    ax.legend(handles=handles, loc="upper right", fontsize=7.3, frameon=True, framealpha=0.92)
+    fig.tight_layout()
+    save_png(fig, fname)
+    plt.close(fig)
+
+
+# =============================================================================================
+# main
+# =============================================================================================
+def main():
+    t2 = table2()
+    s = design_reclosers(t2)
+
+    # ---------------- stage A: conventional scheme without DG ----------------------------------
+    g, _ = classify(s, False, 0.0)
+    say("\n  published fuse sizes, no DG: %d of %d cells held" % count(g))
+    for e in classify(s, False, 0.0)[1]:
+        if not e["held"]:
+            say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
+    log_a = []
+    step8(s, False, 0.0, ["R2fw"], log_a)
+    step9(s, False, [0.0], log_a)
+    for l in log_a:
+        say("  " + l)
+    gA, dA = classify(s, False, 0.0)
+    say("  after steps 8-10, no DG: %d of %d cells held" % count(gA))
+    for e in dA:
+        if not e["held"]:
+            say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
+    t3 = table3(s)
+    s_conv = copy.deepcopy(s)
+
+    # ---------------- stage B: DG added, conventional R2 -----------------------------------------
+    g14, d14 = classify(s_conv, False, 1.0)
+    say("\nSTAGE B - DG 4.05 MVA at 692, conventional (non-directional) R2 -> Fig. 14: %d of %d cells held" % count(g14))
+    for e in d14:
+        if not e["held"]:
+            say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
+    coord_grid(g14, "Coordination without DSDR, DG 4.05 MVA at 692", "Fig14_without_DSDR.png")
+
+    # ---------------- stage C: R2 as DSDR -------------------------------------------------------
+    i_rv = max(LF["dg_in"]["R2"])
+    ip_rv = OLF * i_rv
+    tf, td = nearest_tap(ip_rv / 2, CDG_TAPS, CT_R2RV / 5), nearest_tap(ip_rv, CDG_TAPS, CT_R2RV / 5)
+    s["R2rv"] = dict(ct=CT_R2RV, ip_eq12=ip_rv, i_nom_rv=i_rv, tap_f=tf, tap_d=td, is_f=tf * CT_R2RV / 5,
+                     is_d=td * CT_R2RV / 5, tms_f=s["R2fw"]["tms_f"], tms_d=s["R2fw"]["tms_d"],
+                     tms_d_max=TMS_MAX, tms_min=DSDR_TMS_MIN)
+    s["R2fw"]["tms_min"] = DSDR_TMS_MIN
+    say("\nSTAGE C - R2 AS DUAL-SETTING DIRECTIONAL RECLOSER")
+    say("  reverse load current with DG %.1f A (%.0f kW towards 632) -> Ip,rv = 1.25 x %.1f = %.1f A (eq. 12)" % (
+        i_rv, LF["dg_in"]["R2_P_kW"], i_rv, ip_rv))
+    say("  DSDR: CDG34 extremely-inverse curve in both directions, TMS %.1f-%.1f; reverse setting group on CT 500/5" % (
+        DSDR_TMS_MIN, TMS_MAX))
+    say("  reverse fast plug %.1f A = %.0f A (curve from %.0f A), delayed plug %.1f A = %.0f A (curve from %.0f A)" % (
+        tf, s["R2rv"]["is_f"], 2 * s["R2rv"]["is_f"], td, s["R2rv"]["is_d"], 2 * s["R2rv"]["is_d"]))
+    log_c = []
+    step8(s, True, 1.0, ["R2rv", "R2fw"], log_c)
+    step9(s, True, [1.0, 0.0], log_c)
+    step8(s, True, 1.0, ["R2rv", "R2fw"], log_c)
+    for l in log_c:
+        say("  " + l)
+    say("  final: reverse TMS %.3f (fast) / %.3f (delayed); forward TMS %.3f / %.3f" % (
+        s["R2rv"]["tms_f"], s["R2rv"]["tms_d"], s["R2fw"]["tms_f"], s["R2fw"]["tms_d"]))
+    g17, d17 = classify(s, True, 1.0)
+    g17_0, _ = classify(s, True, 0.0)
+    say("  Fig. 17: %d of %d cells held with DG;  %d of %d without DG" % (count(g17) + count(g17_0)))
+    for e in d17:
+        if not e["held"]:
+            say("    lost  %-4s %-3s %-3s  %s" % (e["node"], e["type"], e["phases"], e["reason"]))
+    coord_grid(g17, "Coordination with DSDR, DG 4.05 MVA at 692", "Fig17_with_DSDR.png")
+
+    # the same fuse sizes with the conventional R2 (to separate the DSDR's effect from step 9)
+    s_mix = copy.deepcopy(s)
+    s_mix["R2fw"] = copy.deepcopy(s_conv["R2fw"])
+    g14b, _ = classify(s_mix, False, 1.0)
+    say("  check: final fuse sizes but conventional R2 -> %d of %d cells held" % count(g14b))
+
+    rows = [[n, ft, g14[(n, ft)], g17[(n, ft)], g14b[(n, ft)]] for n in NODE_ORDER for ft in FAULT_TYPES]
+    write_csv("Fig14_Fig17_classification.csv", ["node", "fault", "without DSDR (Fig14)", "with DSDR (Fig17)",
+                                                 "revised fuses, conventional R2"], rows)
+    write_csv(os.path.join("comparison", "Fig14_Fig17_vs_paper.csv"),
+              ["node", "fault", "Fig14 model", "Fig14 paper", "Fig17 model", "final fuses, conventional R2"],
+              [[r[0], r[1], r[2], "n/a" if r[2] == "n/a" else ("lost" if (r[0], r[1]) in PAPER_FIG14_LOST else "held"),
+                r[3], r[4]] for r in rows])
+    comp = [r for r in rows if r[2] != "n/a"]
+    say("  Fig. 14: %d of %d cells held;  Fig. 17: %d of %d" % (
+        sum(r[2] == "held" for r in comp), len(comp), sum(r[3] == "held" for r in comp), len(comp)))
+
+    det = []
+    for tag, dd in (("conventional (Fig. 14)", d14), ("DSDR (Fig. 17)", d17)):
+        for e in dd:
+            det.append([tag, e["node"], e["type"], e["phases"], e["fuse"] or "", round(e.get("i_fuse", 0)),
+                        fmt(e["mmt"]) if e["fuse"] else "", fmt(e["tct"]) if e["fuse"] else "",
+                        " | ".join("%s %.0f A: %s / %s s" % (x[0], x[2], fmt(x[3]), fmt(x[4])) for x in e["reclosers"]),
+                        "held" if e["held"] else "lost", e["reason"]])
+    write_csv("Coordination_detail.csv", ["scheme", "node", "fault", "phases", "primary fuse", "I fuse (A)", "MMT (s)",
+                                          "TCT (s)", "reclosers: fast / delayed", "status", "reason"], det)
+
+    # sympathetic operation of F671-1 (DG current flows up through it for faults outside its zone)
+    say("\nSYMPATHETIC CHECK - F671-1 carries the DG current for faults outside its zone (DSDR, DG in)")
+    for node in ("632", "633", "645", "646", "DL", "671", "680", "684", "611", "652"):
+        worst = None
+        for r in faults("max", 1.0, node):
+            e = evaluate(r, s, True)
+            t_clear = max((x[3] for x in e["reclosers"] if x[0].startswith("R2")), default=None)
+            m = fuse(s, "F671-1").mmt(imax(r, "F671-1"))
+            ref = t_clear if t_clear is not None else None
+            if worst is None or m < worst[0]:
+                worst = (m, r["type"], r["phases"], imax(r, "F671-1"), ref)
+        m, ft, ph, i, ref = worst
+        say("  fault %-4s worst %-3s %-3s: F671-1 %5.0f A melts %s s; %s" % (
+            node, ft, ph, i, fmt(m), ("R2 reverse fast %s s -> %s" % (fmt(ref), "ok" if ref < m else "F671-1 melts first"))
+            if ref is not None else "no recloser between the DG and the fault"))
+
+    # ---------------- Table IV ------------------------------------------------------------------
+    rep = {"632": "LLL", "633": "LLL", "645": "LL", "646": "LL", "DL": "LLL", "671": "LLL", "692": "LLL",
+           "675": "LLL", "684": "LL", "680": "LLL", "611": "LG", "652": "LG"}
+    say("\nTABLE IV - operating times with the DSDR, DG in; bolted LLL (LL at 2-phase nodes, LG at 1-phase nodes)")
+    say("  %-4s %-3s | %-17s | %-22s | %-7s %-15s" % ("node", "flt", "R1 fast / delayed", "R2 unit fast / delayed",
+                                                      "fuse", "MMT / TCT"))
+    rows4 = []
+    for node, ft in rep.items():
+        r = max(faults("max", 1.0, node, ft), key=lambda x: imax(x, "R1"))
+        e = evaluate(r, s, True)
+        i1, i2 = imax(r, "R1"), imax(r, "R2")
+        unit = "R2fw" if NODES[node]["zone"] == "R2" else "R2rv"
+        r1 = (t_r1(i1, s, "f"), t_r1(i1, s, "d"))
+        r2 = (t_r2(i2, s, unit, "f"), t_r2(i2, s, unit, "d"))
+        rows4.append([node, ft, r["phases"], round(i1), fmt(r1[0]), fmt(r1[1]), round(i2), "fwd" if unit == "R2fw" else "rev",
+                      fmt(r2[0]), fmt(r2[1]), e["fuse"] or "---", round(e.get("i_fuse", 0)) if e["fuse"] else "",
+                      fmt(e["mmt"]) if e["fuse"] else "---", fmt(e["tct"]) if e["fuse"] else "---",
+                      "held" if e["held"] else "lost"])
+        say("  %-4s %-3s | %7s / %-7s | %s %7s / %-7s | %-7s %6s / %-6s%s" % (
+            node, ft, fmt(r1[0]), fmt(r1[1]), rows4[-1][7], fmt(r2[0]), fmt(r2[1]), e["fuse"] or "---",
+            rows4[-1][12], rows4[-1][13], "" if e["held"] else "   LOST: " + e["reason"]))
+    head4 = ["node", "fault", "phases", "I R1 (A)", "R1 fast (s)", "R1 delayed (s)", "I R2 (A)", "R2 unit", "R2 fast (s)",
+             "R2 delayed (s)", "fuse", "I fuse (A)", "fuse MMT (s)", "fuse TCT (s)", "status"]
+    write_csv("Table_IV.csv", head4, rows4)
+    write_csv(os.path.join("comparison", "Table_IV_vs_paper.csv"),
+              head4 + ["paper R1 fast", "paper R1 delayed", "paper R2 fast", "paper R2 delayed", "paper fuse MMT"],
+              [r + [x if x is not None else "---" for x in PAPER_TABLE4[r[0]]] for r in rows4])
+
+    # ---------------- time-current figures ------------------------------------------------------
+    fr = {c: [r for r in FAULTS if r["case"] == c][0] for c in ("Fig8", "Fig9", "Fig11", "Fig12", "Fig13", "Fig15")}
+    tcc("Fig. 8", fr["Fig8"], s_conv, ["R2", "F684", "F671-2"], "LG fault at 611", "Fig08_LG_611.png", False)
+    tcc("Fig. 9", fr["Fig9"], s_conv, ["R2", "F692-R", "F671-1"], "LLG fault mid 692-675, 1 ohm",
+        "Fig09_LLG_692-675.png", False)
+    tcc("Fig. 11", fr["Fig11"], s_conv, ["R1", "F646", "F632"], "LL fault at 646, 1 ohm", "Fig11_LL_646_R1.png", False)
+    tcc("Fig. 12", fr["Fig12"], s_conv, ["R2", "F646", "F632"], "LL at 645, 1.5 ohm, conventional R2",
+        "Fig12_LL_645_conventional_R2.png", False)
+    tcc("Fig. 13", fr["Fig13"], s_conv, ["R2", "F633"], "3-ph fault at 10 % of 632-633, conventional R2",
+        "Fig13_LLL_632-633_conventional_R2.png", False)
+    tcc("Fig. 15", fr["Fig15"], s, ["R2rv", "F646", "F632"], "solid LL at 646, R2 as DSDR",
+        "Fig15_LL_646_DSDR.png", True)
+    tcc("Fig. 16", fr["Fig15"], s, ["R1", "F646", "F632"], "solid LL at 646, R1", "Fig16_LL_646_R1.png", True)
+
+    out = {"conventional": s_conv, "dsdr": s}
+    json.dump(out, open(os.path.join(RES, "settings.json"), "w"), indent=1)
+    with open(os.path.join(RES, "summary.txt"), "w", encoding="utf-8") as f:
+        f.write("\n".join(REPORT))
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection*{D.7\quad \texttt{step4\_apply\_settings.py}}
+Writes the settings into the relay and fuse elements of the model.
+\begin{lstlisting}
+"""
+Step 4 - write the designed settings (results/settings.json) into PowerFactory and check that
+PowerFactory's own relay and fuse models give the operating times used in step 3.
+
+  python step4_apply_settings.py            # DSDR scheme (Fig. 17)   - left in the model
+  python step4_apply_settings.py conventional   # conventional R2 (Fig. 14)
+
+R2 units in the model:  "R2 Fast" / "R2 Delayed"        forward setting group (CT 1000/5)
+                        "R2 Rev Fast" / "R2 Rev Delayed" reverse setting group (CT 500/5),
+                                                         out of service in the conventional scheme
+PowerFactory's library CDG34 is non-directional; the direction of each setting group is applied
+in the coordination analysis (faults upstream of R2 = reverse, downstream = forward).
+The check compares c:Ttrip of every unit and of the primary fuse with the Python curves.
+"""
+
+import csv
+import json
+import os
+import sys
+
+from pf_setup import activate, attr, out, obj, lib_type, RESULTS, clean_variation
+from protection_data import FUSES, NODES
+import step3_design_and_evaluate as S3
+
+scheme = sys.argv[1] if len(sys.argv) > 1 else "dsdr"
+settings = json.load(open(os.path.join(RESULTS, "settings.json")))[scheme]
+
+app = activate(build=True)                 # settings belong to the base network
+out("Applying the %s settings" % scheme)
+
+for name, tname in settings["fuses"].items():
+    f = obj(name, "RelFuse")
+    f.typ_id = lib_type(tname + ".TypFuse", "ProtFuse")
+
+
+def ct(cub, name, prim):
+    hit = cub.GetContents(name + ".StaCt")
+    c = hit[0] if hit else cub.CreateObject("StaCt", name)
+    equip = app.GetProjectFolder("equip")
+    tn = "CT %.0f-5A" % prim
+    t = equip.GetContents(tn + ".TypCt")
+    t = t[0] if t else equip.CreateObject("TypCt", tn)
+    t.SetAttribute("primtaps", [prim])
+    t.SetAttribute("sectaps", [5.0])
+    c.typ_id = t
+    c.SetAttribute("ptapset", prim)
+    c.SetAttribute("stapset", 5.0)
+    return c
+
+
+def set_unit(name, tap, dial, ct_obj=None, in_service=True):
+    r = obj(name, "ElmRelay")
+    r.SetAttribute("outserv", 0 if in_service else 1)
+    if ct_obj is not None:
+        sl = list(r.GetAttribute("pdiselm"))
+        sl[0] = ct_obj
+        r.SetAttribute("pdiselm", sl)
+    for toc in r.GetContents("*.RelToc"):
+        if "Earth" in toc.loc_name:
+            continue
+        toc.SetAttribute("Ipsetr", tap)
+        toc.SetAttribute("Tpset", dial)
+    return r
+
+
+r1 = settings["R1"]
+set_unit("R1 Fast", r1["tap"], r1["tds_f"])
+set_unit("R1 Delayed", r1["tap"], r1["tds_d"])
+cub2 = obj("R2 Fast", "ElmRelay").GetParent()
+fw = settings["R2fw"]
+ct_fw = ct(cub2, "CT R2", fw["ct"])
+set_unit("R2 Fast", fw["tap_f"], fw["tms_f"], ct_fw)
+set_unit("R2 Delayed", fw["tap_d"], fw["tms_d"], ct_fw)
+if "R2rv" in settings:
+    rv = settings["R2rv"]
+    ct_rv = ct(cub2, "CT R2 rev", rv["ct"])
+    set_unit("R2 Rev Fast", rv["tap_f"], rv["tms_f"], ct_rv)
+    set_unit("R2 Rev Delayed", rv["tap_d"], rv["tms_d"], ct_rv)
+else:
+    for u in ("R2 Rev Fast", "R2 Rev Delayed"):
+        set_unit(u, 1.0, 0.1, None, in_service=False)
+out("  R1 tap %.1f A (CT 900/5) TDS %.2f / %.2f" % (r1["tap"], r1["tds_f"], r1["tds_d"]))
+out("  R2 forward plug %.1f / %.1f A (CT %.0f/5) TMS %.3f / %.3f" % (fw["tap_f"], fw["tap_d"], fw["ct"], fw["tms_f"], fw["tms_d"]))
+if "R2rv" in settings:
+    out("  R2 reverse plug %.1f / %.1f A (CT %.0f/5) TMS %.3f / %.3f" % (rv["tap_f"], rv["tap_d"], rv["ct"], rv["tms_f"], rv["tms_d"]))
+out("  fuses: " + ", ".join("%s %s" % kv for kv in settings["fuses"].items()))
+
+# ---- check PowerFactory's operating times against the Python curves ---------------------------
+app = activate()                                   # study case with the substation transformer
+shc = app.GetFromStudyCase("ComShc")
+shc.SetAttribute("iopt_mde", 3)
+terms = {t.loc_name: t for t in app.GetCalcRelevantObjects("*.ElmTerm")}
+sym = app.GetCalcRelevantObjects("*.ElmSym")[0]
+PH = {"spgf": "i_pspgf", "2psc": "i_p2psc", "2pgf": "i_p2pgf"}
+UNITS = [("R1 Fast", "R1", "f"), ("R1 Delayed", "R1", "d"), ("R2 Fast", "R2fw", "f"), ("R2 Delayed", "R2fw", "d")]
+if "R2rv" in settings:
+    UNITS += [("R2 Rev Fast", "R2rv", "f"), ("R2 Rev Delayed", "R2rv", "d")]
+s3 = dict(settings)
+
+
+def pf_time(o):
+    v = attr(o, "c:Ttrip")
+    if v is None:
+        return float("inf")
+    v = v if isinstance(v, list) else [v]
+    v = [x for x in v if x is not None and 0 < x < 9999]
+    return min(v) if v else float("inf")
+
+
+rows, worst = [], 0.0
+for rec in [r for r in S3.FAULTS if r["case"] == "max" and r["dg"] in (0.0, 1.0) and r["where"] in NODES
+            and not NODES[r["where"]].get("lv")]:
+    sym.SetAttribute("outserv", 0 if rec["dg"] else 1)
+    code = S3.D["faults"] and {"LG": "spgf", "LL": "2psc", "LLG": "2pgf", "LLL": "3rst"}[rec["type"]]
+    shc.SetAttribute("shcobj", terms[rec["where"]])
+    shc.SetAttribute("iopt_shc", code)
+    if code in PH:
+        shc.SetAttribute(PH[code], rec["index"])
+    shc.SetAttribute("Rf", 0.0)
+    shc.SetAttribute("Xf", 0.0)
+    if shc.Execute() != 0:
+        continue
+    checks = []
+    for unit, key, mode in UNITS:
+        r = obj(unit, "ElmRelay")
+        t_pf = min(pf_time(t) for t in r.GetContents("*.RelToc") if not attr(t, "outserv"))
+        i = S3.imax(rec, "R1" if key == "R1" else "R2")
+        t_py = S3.t_r1(i, s3, mode) if key == "R1" else S3.t_r2(i, s3, key, mode)
+        checks.append((unit, t_pf, t_py))
+    path = NODES[rec["where"]]["path"]
+    if path:
+        f = obj(path[0], "RelFuse")
+        checks.append((path[0] + " MMT", pf_time(f), S3.FTYPE[settings["fuses"][path[0]]].mmt(S3.imax(rec, path[0]))))
+    for unit, t_pf, t_py in checks:
+        dev = 0.0 if t_pf == t_py else (abs(t_pf / t_py - 1) if t_py not in (0, float("inf")) else 1.0)
+        if t_py < 100:
+            worst = max(worst, dev)
+        rows.append([rec["where"], rec["type"], rec["phases"], rec["dg"], unit, S3.fmt(t_pf, 4), S3.fmt(t_py, 4),
+                     "%.2f" % (100 * dev) if dev < 1 else "-"])
+sym.SetAttribute("outserv", 0)
+clean_variation()
+with open(os.path.join(RESULTS, "PF_vs_Python_times_%s.csv" % scheme), "w", newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["node", "fault", "phases", "DG", "device", "PowerFactory t (s)", "Python t (s)", "deviation %"])
+    w.writerows(rows)
+devs = sorted(float(r[7]) for r in rows if r[7] != "-")
+out("Checked %d operating times: PowerFactory vs Python median deviation %.2f %%, max %.2f %%" % (
+    len(rows), devs[len(devs) // 2], max(devs)))
+bad = [r for r in rows if r[7] == "-" and r[5] != r[6]]
+for r in bad[:10]:
+    out("  trip / no-trip mismatch: %s" % r)
+\end{lstlisting}
+
+\subsection*{D.8\quad \texttt{step5\_fig10\_emt.py}}
+EMT simulation of the reclosing sequence.
+\begin{lstlisting}
+"""
+Step 5 - Fig. 10: time-domain fault current during the recloser's fast shots and the fuse operation.
+
+Fault (paper): line-line a-c at 684 through 0.2 ohm, conventional settings (R2 forward).
+Run twice in PowerFactory EMT: DG out (the paper's recloser-fuse sequence) and DG in.
+
+Every switching time comes from the step-3 curves applied to the simulated currents
+(one-cycle RMS of the EMT waveforms), in passes:
+  pass 1  fault only                 -> R2 current -> R2 fast trip time
+  pass 2  R2 fast, reclose, fast, reclose (dead time 0.3 s)
+          -> F671-2 heating from its simulated current, including the DG current that keeps
+             flowing while R2 is open: melts when sum(dt/MMT(I)) = 1, clears when sum(dt/TCT(I)) = 1
+          -> R2 delayed trip (timer from the last reclose)
+  pass 3  the whole sequence with the fuse opening (or R2 locking out if it is first)
+PowerFactory's own relay and fuse elements are out of service during the runs (restored after).
+"""
+
+import csv
+import json
+import math
+import os
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+from pf_setup import activate, out, obj, RESULTS, clean_variation
+import step3_design_and_evaluate as S3
+
+T0, T_END, DT = 0.30, 2.00, 1e-4  # fault at 0.30 s, as in the paper's figure
+T_BREAKER = 3 / 60.0              # recloser interrupting time
+T_DEAD = 0.20                     # reclosing dead time read from the paper's figure (0.46 -> 0.65 s, 0.80 -> 1.00 s)
+FAST_SHOTS = 2
+CYCLE = 1 / 60.0
+
+s = json.load(open(os.path.join(RESULTS, "settings.json")))["conventional"]
+FIG10 = [r for r in S3.FAULTS if r["case"] == "Fig10"][0]
+FUSE = S3.FTYPE[s["fuses"]["F671-2"]]
+
+app = activate()
+case = app.GetActiveStudyCase()
+evtfold = case.GetContents("*.IntEvt")[0]
+sym = app.GetCalcRelevantObjects("*.ElmSym")[0]
+brk = obj("LOHL632-671end", "ElmLne").GetAttribute("bus2").GetContents("*.StaSwitch")[0]
+fsw = obj("LOHL671-684", "ElmLne").GetAttribute("bus1").GetContents("*.StaSwitch")[0]
+res = case.GetContents("Fig10 EMT.ElmRes")
+res = res[0] if res else case.CreateObject("ElmRes", "Fig10 EMT")
+for c in res.GetContents():
+    c.Delete()
+MON = [("I632in", obj("LOHL650-632", "ElmLne"), "bus2"),          # feeder current arriving at node 632 (paper's plot)
+       ("I632", obj("LOHL632-671start", "ElmLne"), "bus1"),     # current leaving 632 towards 671
+       ("IR2", obj("LOHL632-671end", "ElmLne"), "bus2"),
+       ("IF", obj("LOHL671-684", "ElmLne"), "bus1")]              # through F671-2
+for _, el, side in MON:
+    for p in ("A", "C"):
+        res.AddVariable(el, "m:I:%s:%s" % (side, p))
+
+
+def simulate(events, tstop, csv_name):
+    app.ResetCalculation()               # events cannot be edited while a simulation is initialised
+    for e in evtfold.GetContents():
+        e.Delete()
+    sc = evtfold.CreateObject("EvtShc", "LL a-c at 684")
+    sc.SetAttribute("p_target", obj("684", "ElmTerm"))
+    sc.SetAttribute("time", T0)
+    sc.SetAttribute("i_shc", 1)          # 2-phase
+    sc.SetAttribute("i_p2psc", FIG10["index"])   # a-c (index found by the step-2 short circuit)
+    sc.SetAttribute("R_f", 0.2)
+    sc.SetAttribute("X_f", 0.0)
+    for k, (tt, kind, label) in enumerate(events):
+        ev = evtfold.CreateObject("EvtSwitch", "%02d %s" % (k, label))
+        ev.SetAttribute("p_target", fsw if kind == "fuse" else brk)
+        ev.SetAttribute("time", tt)
+        ev.SetAttribute("i_switch", 1 if kind == "close" else 0)
+        ev.SetAttribute("i_allph", 1)
+    inc = app.GetFromStudyCase("ComInc")
+    inc.SetAttribute("iopt_sim", "ins")
+    inc.SetAttribute("dtemt", DT)
+    inc.SetAttribute("p_resvar", res)
+    sim = app.GetFromStudyCase("ComSim")
+    sim.SetAttribute("tstop", tstop)
+    if inc.Execute() or sim.Execute():
+        raise RuntimeError("EMT simulation failed")
+    path = os.path.join(RESULTS, csv_name)
+    exp = case.CreateObject("ComRes", "export")
+    exp.SetAttribute("pResult", res)
+    exp.SetAttribute("iopt_exp", 6)
+    exp.SetAttribute("f_name", path)
+    exp.SetAttribute("iopt_sep", 0)
+    exp.SetAttribute("col_Sep", ",")
+    exp.SetAttribute("dec_Sep", ".")
+    exp.Execute()
+    exp.Delete()
+    app.ResetCalculation()
+    for e in evtfold.GetContents():
+        e.Delete()
+    with open(path) as f:
+        rows = list(csv.reader(f))
+    data = [[float(x) for x in r] for r in rows[2:] if r and r[0].strip()]
+    t = [r[0] for r in data]
+    wave = {}
+    for key, el, _ in MON:                        # PowerFactory sorts the columns: map by name
+        cols = [k for k in range(1, len(rows[0])) if rows[0][k] == el.loc_name]
+        ca = [k for k in cols if "Phase Current A" in rows[1][k]][0]
+        cc = [k for k in cols if "Phase Current C" in rows[1][k]][0]
+        wave[key] = ([r[ca] for r in data], [r[cc] for r in data])
+    return t, wave
+
+
+def rms(t, x):
+    """one-cycle moving RMS"""
+    n = max(1, int(round(CYCLE / (t[1] - t[0]))))
+    out_, acc = [], 0.0
+    for k, v in enumerate(x):
+        acc += v * v
+        if k >= n:
+            acc -= x[k - n] * x[k - n]
+        out_.append(math.sqrt(max(acc, 0.0) / min(k + 1, n)))
+    return out_
+
+
+def i_max_rms(t, wave, key):
+    a, c = rms(t, wave[key][0]), rms(t, wave[key][1])
+    return [max(p, q) for p, q in zip(a, c)]
+
+
+SUMMARY = {}
+
+
+def run(dg_on):
+    tag = "DG in" if dg_on else "DG out"
+    sym.SetAttribute("outserv", 0 if dg_on else 1)
+    # pass 1: R2 current -> fast trip time
+    t, w = simulate([], T0 + 0.15, "Fig10_pass.csv")
+    ir2 = i_max_rms(t, w, "IR2")
+    i_r2 = max(v for tt, v in zip(t, ir2) if T0 + 0.05 < tt < T0 + 0.15)
+    t_fast = S3.t_r2(i_r2, s, "R2fw", "f") + T_BREAKER
+    events, tt = [], T0
+    for shot in range(FAST_SHOTS):
+        tt += t_fast
+        events.append((tt, "open", "R2 fast trip %d" % (shot + 1)))
+        tt += T_DEAD
+        events.append((tt, "close", "R2 reclose %d" % (shot + 1)))
+    t_last = tt
+    # pass 2: fuse heating from the simulated fuse current
+    t, w = simulate(events, T_END, "Fig10_pass.csv")
+    iF = i_max_rms(t, w, "IF")
+    ir2 = i_max_rms(t, w, "IR2")
+    i_fault = max(v for tt_, v in zip(t, iF) if T0 < tt_ < T0 + t_fast)       # fuse current during the fault
+    melt = clear = 0.0
+    t_melt = t_clear = None
+    how = "clears"
+    t_delayed = None
+    acc_d = 0.0
+    for k in range(1, len(t)):
+        dt = t[k] - t[k - 1]
+        if t[k] < T0:
+            continue
+        i = iF[k]
+        if i > 0:
+            melt += dt / FUSE.mmt(i)
+            clear += dt / FUSE.tct(i)
+        if t_melt is None and melt >= 1:
+            t_melt = t[k]
+        if t_clear is None and clear >= 1:
+            t_clear = t[k]
+        # a fuse that has melted is finished as soon as a recloser interrupts its current
+        if t_clear is None and t_melt is not None and t[k] > t_melt + CYCLE and i < 0.05 * i_fault:
+            t_clear, how = t[k], "is blown (melted, current interrupted by R2)"
+        if t[k] > t_last + 2 * CYCLE and t_delayed is None:       # R2 delayed timer after last reclose
+            acc_d += dt / S3.t_r2(max(ir2[k], 1.0), s, "R2fw", "d")
+            if acc_d >= 1:
+                t_delayed = t[k] + T_BREAKER
+    heat_fast = None
+    for k in range(len(t)):
+        if t[k] >= t_last:
+            break
+    melt_at_last = sum((t[j] - t[j - 1]) / FUSE.mmt(iF[j]) for j in range(1, len(t))
+                       if T0 <= t[j] <= t_last and iF[j] > 0)
+    if t_clear is not None and (t_delayed is None or t_clear < t_delayed):
+        # the fault is gone after the fuse: no further recloser trips, only a pending reclose
+        kept = [e for e in events if e[0] < t_clear]
+        if kept and kept[-1][1] == "open":
+            kept.append(events[len(kept)])
+        events = sorted(kept + [(t_clear, "fuse", "F671-2 " + how.split(" (")[0])])
+        final = "F671-2 %s at %.3f s" % (how, t_clear)
+    elif t_delayed is not None:
+        events.append((t_delayed, "open", "R2 lockout"))
+        final = "R2 locks out at %.3f s" % t_delayed
+    else:
+        final = "no clearing within %.1f s" % T_END
+    t, w = simulate(events, T_END, "Fig10_EMT_%s.csv" % tag.replace(" ", "_"))
+    out("Fig. 10 %s: R2 %.0f A -> fast shot %.3f s incl. breaker; fuse heat at the end of the fast shots "
+        "%.0f %% of melting; melts %s, %s" % (tag, i_r2, t_fast, 100 * melt_at_last,
+                                              "at %.3f s" % t_melt if t_melt else "-", final))
+    for e in events:
+        out("   t = %.3f s  %s" % (e[0], e[2]))
+    ra, rc = rms(t, w["I632in"][0]), rms(t, w["I632in"][1])
+
+    def at(x, when):
+        return x[min(range(len(t)), key=lambda j: abs(t[j] - when))]
+
+    def peak(x, t1, t2):
+        return max(abs(v) for tt_, v in zip(t, x) if t1 <= tt_ <= t2)
+    node632 = dict(prefault_rms_a=at(ra, T0 - 0.002), prefault_rms_c=at(rc, T0 - 0.002),
+                   fault_rms_a=at(ra, T0 + t_fast - 0.005), fault_rms_c=at(rc, T0 + t_fast - 0.005),
+                   first_peak_a=peak(w["I632in"][0], T0, T0 + 0.03), first_peak_c=peak(w["I632in"][1], T0, T0 + 0.03),
+                   steady_peak_a=peak(w["I632in"][0], T0 + 0.06, T0 + t_fast - 0.01),
+                   steady_peak_c=peak(w["I632in"][1], T0 + 0.06, T0 + t_fast - 0.01),
+                   dead_time_rms_a=at(ra, events[0][0] + T_DEAD - 0.02), dead_time_rms_c=at(rc, events[0][0] + T_DEAD - 0.02))
+    out("   current into node 632 (A): prefault rms a/c %.0f / %.0f; fault rms a/c %.0f / %.0f, peak a/c %.0f / %.0f "
+        "(first peak %.0f / %.0f); R2 open rms a/c %.0f / %.0f" % (
+            node632["prefault_rms_a"], node632["prefault_rms_c"], node632["fault_rms_a"], node632["fault_rms_c"],
+            node632["steady_peak_a"], node632["steady_peak_c"], node632["first_peak_a"], node632["first_peak_c"],
+            node632["dead_time_rms_a"], node632["dead_time_rms_c"]))
+    SUMMARY[tag] = dict(node632=node632, t_fault=T0, t_dead=T_DEAD, i_r2=i_r2, i_fuse=i_fault, t_fast=t_fast, heat_after_fast_shots=melt_at_last, t_melt=t_melt,
+                        t_clear=t_clear, final=final, events=[(round(e[0], 3), e[2]) for e in events],
+                        fuse=s["fuses"]["F671-2"], fast_shots_before_melt=sum(
+                            1 for e in events if e[1] == "open" and (t_melt is None or e[0] <= t_melt)))
+    return tag, t, w, events, melt_at_last, t_melt
+
+
+# PowerFactory's own relay and fuse models would also act in the EMT run; the sequence is
+# scripted from the curves instead, so they are taken out of service for the simulation.
+PROT = [(o, o.GetAttribute("outserv")) for o in app.GetCalcRelevantObjects("*.ElmRelay") +
+        app.GetCalcRelevantObjects("*.RelFuse")]
+try:
+    for o, _ in PROT:
+        o.SetAttribute("outserv", 1)
+    cases = [run(False), run(True)]
+finally:
+    app.ResetCalculation()
+    for o, st in PROT:
+        o.SetAttribute("outserv", st)
+    sym.SetAttribute("outserv", 0)
+    clean_variation()                  # the switching above was recorded in the variation stage
+os.remove(os.path.join(RESULTS, "Fig10_pass.csv"))
+
+fig, axes = plt.subplots(2, 1, figsize=(7.4, 6.2), sharex=True)
+for ax, (tag, t, w, events, heat, t_melt) in zip(axes, cases):
+    ax.plot(t, w["I632in"][1], lw=0.7, color="#d03b3b", label="phase c, feeder current at node 632")
+    ax.plot(t, w["I632in"][0], lw=0.7, color="#2a78d6", label="phase a, feeder current at node 632")
+    ax.plot(t, w["IF"][0], lw=0.6, color="#8a8983", alpha=0.75, label="phase a through fuse F671-2")
+    top = max(max(map(abs, w["IF"][0])), max(map(abs, w["I632in"][0])), max(map(abs, w["I632in"][1])))
+    for tt, kind, label in events:
+        ax.axvline(tt, color="#52514e", lw=0.7, ls=":")
+        ax.text(tt, top * 1.02, label, rotation=90, va="top", ha="right", fontsize=6.8, color="#52514e")
+    ax.axvline(T0, color="#52514e", lw=0.8, ls="--")
+    ax.text(T0, top * 1.02, "fault initiated", rotation=90, va="top", ha="right", fontsize=6.8, color="#52514e")
+    if t_melt:
+        ax.axvline(t_melt, color="#eb6834", lw=1.0, ls="--")
+        ax.text(t_melt, -top * 1.02, "F671-2 melts", rotation=90, va="bottom", ha="right", fontsize=6.8,
+                color="#eb6834")
+    ax.set_ylim(-1.15 * top, 1.15 * top)
+    ax.set_ylabel("Current (A)")
+    ax.set_title("%s (fuse F671-2 %s)" % ("With DG" if tag == "DG in" else "Without DG", s["fuses"]["F671-2"].replace("A055C", "")), fontsize=9, loc="left")
+    ax.grid(True, color="#d9d8d4", lw=0.5)
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+axes[0].legend(frameon=False, fontsize=7.2, loc="lower left", ncol=3)
+axes[1].set_xlabel("Time (s)")
+fig.suptitle("Current at node 632, LL a-c fault at 684 through 0.2 ohm, PowerFactory EMT",
+             fontsize=9.5, x=0.01, ha="left")
+fig.tight_layout()
+try:
+    fig.savefig(os.path.join(RESULTS, "figures", "Fig10_EMT_LL_684.png"), dpi=160)
+except OSError:                        # open in a viewer
+    fig.savefig(os.path.join(RESULTS, "figures", "Fig10_EMT_LL_684_new.png"), dpi=160)
+    out("NOTE: Fig10_EMT_LL_684.png is open in another program; the new figure is Fig10_EMT_LL_684_new.png")
+json.dump(SUMMARY, open(os.path.join(RESULTS, "Fig10_summary.json"), "w"), indent=1)
+out("Saved figures/Fig10_EMT_LL_684.png, results/Fig10_EMT_DG_*.csv and Fig10_summary.json")
+\end{lstlisting}
 
 \end{document}

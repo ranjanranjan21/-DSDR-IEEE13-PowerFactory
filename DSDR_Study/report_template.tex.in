@@ -11,6 +11,7 @@
 % guideline: A4; margins left 3.5 cm, right 2 cm, top 3.5 cm, bottom 2 cm; page number at the top right
 \usepackage[a4paper,left=3.5cm,right=2cm,top=3.5cm,bottom=2cm,footskip=1cm]{geometry}
 \usepackage{fancyhdr}
+\usepackage{listings}
 \usepackage{indentfirst}               % every paragraph indented, also the first
 \usepackage{setspace}
 \usepackage{amsmath,amssymb}
@@ -44,6 +45,10 @@
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 \fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\lstset{language=Python,basicstyle=\ttfamily\scriptsize,breaklines=true,breakatwhitespace=false,
+  columns=fullflexible,keepspaces=true,showstringspaces=false,numbers=left,numberstyle=\tiny\color{gray},
+  numbersep=6pt,xleftmargin=1.6em,frame=single,rulecolor=\color{gray},aboveskip=6pt,belowskip=10pt,
+  commentstyle=\color{gray},keywordstyle=\bfseries,captionpos=t}
 \tolerance=1000
 \widowpenalty=10000
 \clubpenalty=10000
@@ -216,8 +221,7 @@ recloser, increasingly so as the DG penetration rises. With the DG connected, a 
 mid-line recloser keeps the coordination in 24 of the 39 studied fault cells. The dual-setting directional
 recloser alone raises this to 25 cells, and together with a revision of the fuse sizes to 38 of 39 cells under
 the zero-margin criterion; the remaining cell, an LG fault at node 692, is limited by the delayed dial range of
-the recloser. The relay and fuse models of \PF{} confirm the calculated operating
-times within <<PF_MAX>> per cent.
+the recloser.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
 coordination, IEEE 13-node feeder, DIgSILENT \PF.
@@ -1121,8 +1125,7 @@ without DG (top) and with DG (bottom).}
 \subsection{Verification With the Relay and Fuse Models of \PF}
 The operating times of Chapter Five are calculated from the time--current curves of the devices. As a check,
 the settings were entered into the relay and fuse elements of the model, and \PF{} itself calculated the tripping
-time of every device for every fault, for the conventional and for the DSDR settings. Over <<PF_N>> operating
-times the largest deviation is <<PF_MAX>> per cent.
+time of every device for every fault, for the conventional and for the DSDR settings.
 
 \subsection{Sensitivity of the Pickups With DG}
 \label{sec:pickdg}
@@ -1332,7 +1335,7 @@ the DG, achieving <<N17_HELD>> of <<N_CELLS>> coordinated fault cells under the 
 seven of the restored cells need the dual setting. The remaining LG fault at node 692 is limited by the
 maximum available R2 delayed dial.
 
-The faults downstream of R2 with the DG in service remain outside what the dual setting can correct. The relay and fuse models of \PF{} confirm the calculated operating times within <<PF_MAX>> per cent.
+The faults downstream of R2 with the DG in service remain outside what the dual setting can correct.
 
 \subsection{Major Findings}
 \begin{enumerate}
@@ -1350,7 +1353,6 @@ The faults downstream of R2 with the DG in service remain outside what the dual 
 \item With rising DG penetration and fixed settings the CTI falls at both studied nodes (633: from about
       $+4$ to $-51$\,ms; 671: from $+403$ to $+75$\,ms), the fault level rises by up to 64 per cent, and R2 stops
       detecting the weakest fault of its zone above about 50 per cent.
-\item \PF's own relay and fuse models confirm the operating times within <<PF_MAX>> per cent.
 \item In the EMT simulation the fuse survives the two fast shots without DG and melts at 1.25\,s; with DG it melts during the second fast shot.
 \end{enumerate}
 
@@ -1642,4 +1644,22 @@ not publish.
 \label{tab:e7}
 \end{table}
 
+% =====================================================================================================
+\appendixhead{D}{PYTHON SCRIPTS}
+The model, the studies and the evaluation of the coordination were run in DIgSILENT \PF{} through its Python
+interface. This appendix lists the scripts in the order in which they are run. Table~\ref{tab:scripts} gives
+the purpose of each script.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{|l|L|}
+\hline
+\textbf{Script} & \textbf{Purpose} \\ \hline
+<<SCRIPT_TABLE>>
+\end{tabularx}
+\caption{Python scripts of the study.}
+\label{tab:scripts}
+\end{table}
+
+<<SCRIPT_LISTINGS>>
 \end{document}

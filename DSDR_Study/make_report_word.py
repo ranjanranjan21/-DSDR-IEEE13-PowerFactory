@@ -584,12 +584,32 @@ def polish(path, tex):
         if mar is not None:
             pr.remove(mar)
         mar = OxmlElement("w:tblCellMar")
-        for side, v in (("top", 40), ("left", 100), ("bottom", 40), ("right", 100)):
+        for side, v in (("top", 40 if tsize > 8 else 8), ("left", 100 if tsize > 8 else 60), ("bottom", 40 if tsize > 8 else 8), ("right", 100 if tsize > 8 else 60)):
             e = OxmlElement("w:%s" % side)
             e.set(qn("w:w"), str(v))
             e.set(qn("w:type"), "dxa")
             mar.append(e)
         pr.append(mar)
+    # code listings of the appendix: small fixed-width type, no hyphenation, single spacing
+    for name in ("Source Code", "Verbatim Char"):
+        if name in [x.name for x in st]:
+            st[name].font.name, st[name].font.size = "Consolas", Pt(7)
+            rf = st[name].element.get_or_add_rPr().find(qn("w:rFonts"))
+            if rf is not None:
+                for a_ in ("w:ascii", "w:hAnsi", "w:cs", "w:eastAsia"):
+                    rf.set(qn(a_), "Consolas")
+    for p in doc.paragraphs:
+        if p.style.name == "Source Code":
+            pf = p.paragraph_format
+            pf.first_line_indent, pf.left_indent = Cm(0), Cm(0)
+            pf.space_before, pf.space_after = Pt(2), Pt(8)
+            pf.line_spacing, pf.line_spacing_rule = Pt(8.6), WD_LINE_SPACING.EXACTLY
+            pf.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            ppr = p._p.get_or_add_pPr()
+            if ppr.find(qn("w:suppressAutoHyphens")) is None:
+                ppr.append(OxmlElement("w:suppressAutoHyphens"))
+            for r in p.runs:
+                r.font.name, r.font.size = "Consolas", Pt(7)
     # references as in the PDF: label hanging in front, single spacing, a gap between entries
     for p in doc.paragraphs:
         if re.match(r"^\[\d+\] ", p.text):

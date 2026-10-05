@@ -52,6 +52,8 @@ def pdf_pages(pdf_path):
     for i in range(start + 1, len(doc)):
         if page_text(doc[i]).startswith("CHAPTER ONE"):           # starts a new section anyway
             continue
+        if page_text(doc[i]).startswith("APPENDIX D"):            # code listings: Word paginates them itself
+            break
         page = doc[i]
         h = page.rect.height
         blocks = [b for b in page.get_text("dict")["blocks"] if b["bbox"][1] < h - 60      # drop the page number

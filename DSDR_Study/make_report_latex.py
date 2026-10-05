@@ -216,10 +216,30 @@ T["EMT_PRE"] = "%.0f / %.0f" % (n["prefault_rms_a"], n["prefault_rms_c"])
 T["EMT_RMS"] = "%.0f / %.0f" % (n["fault_rms_a"], n["fault_rms_c"])
 T["EMT_PEAK"] = "%.0f / %.0f" % (n["steady_peak_a"], n["steady_peak_c"])
 
-# ---- PowerFactory against the calculation -----------------------------------------------------
-pf = read(os.path.join(RES, "PF_vs_Python_times_conventional.csv")) + read(os.path.join(RES, "PF_vs_Python_times_dsdr.csv"))
-d = [abs(float(r["deviation %"])) for r in pf if r["deviation %"] != "-"]
-T["PF_N"], T["PF_MAX"] = str(len(d)), "%.2f" % max(d)
+# ---- appendix D: the Python scripts of the study -----------------------------------------------
+SCRIPTS = [("pf_setup.py", "Connection to PowerFactory and helper functions"),
+           ("protection_data.py", "Feeder, device and fault data"),
+           ("curves.py", "Relay and fuse time--current curves"),
+           ("step1_build_model.py", "Builds the protection devices and the DG in the model"),
+           ("step2_studies.py", "Unbalanced load flow and short-circuit studies"),
+           ("step3_design_and_evaluate.py", "Settings, fuse coefficients and classification of the coordination"),
+           ("step4_apply_settings.py", "Writes the settings into the relay and fuse elements of the model"),
+           ("step5_fig10_emt.py", "EMT simulation of the reclosing sequence")]
+ASCII = {"\u2013": "-", "\u2212": "-", "\u2713": "held", "\u2717": "lost", "\u00d7": "x", "\u03a9": "ohm",
+         "\u2192": "->", "\u00b0": "deg", "\u2264": "<=", "\u2265": ">="}
+parts, tab = [], []
+for name, purpose in SCRIPTS:
+    code = open(os.path.join(HERE, name), encoding="utf-8").read().replace("\r\n", "\n").replace("\t", "    ")
+    for a, b in ASCII.items():
+        code = code.replace(a, b)
+    code = code.encode("ascii", "replace").decode()              # pdflatex listings: ASCII only
+    assert "\\end{lstlisting}" not in code and "<<" not in code, name
+    tex_name = name.replace("_", "\\_")
+    tab.append("\\texttt{%s} & %s \\\\ \\hline" % (tex_name, purpose))
+    parts.append("\\subsection*{D.%d\\quad \\texttt{%s}}\n%s.\n\\begin{lstlisting}\n%s\n\\end{lstlisting}\n" % (
+        len(parts) + 1, tex_name, purpose, code.rstrip()))
+T["SCRIPT_TABLE"] = "\n".join(tab)
+T["SCRIPT_LISTINGS"] = "\n".join(parts)
 
 # ---- the study's own tables (chapters 4 and 5); the *_vs_paper versions above are for Appendix C -------------
 t1o = read(os.path.join(DB, "Table_I_DG_parameters.csv"))
