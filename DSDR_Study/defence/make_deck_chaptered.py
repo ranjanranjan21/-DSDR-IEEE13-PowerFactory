@@ -642,6 +642,69 @@ textbox(s, 0, 3.95, 13.333, 0.6, "Questions and Discussion", size=22, color=MID,
 footer(s)
 s.notes_slide.notes_text_frame.text = "Thank you for your attention. I am happy to take your questions."
 
+# ---- speaker notes: short, one point per slide (keyed by the start of the slide title; "" = title page)
+SHORT = [
+    ("", "Good afternoon. I am Jhala Nath Kafle, roll number 081 MSPSE 009. My project is on dual-setting "
+         "directional recloser and fuse coordination in distribution networks with distributed generation."),
+    ("Abstract", "A DG can break recloser-fuse coordination. I implemented a dual-setting directional recloser on the "
+                 "IEEE 13-node feeder. With the DG, coordination holds in 24 of 39 cells; with the DSDR and revised "
+                 "fuses, in 38 of 39."),
+    ("Presentation Roadmap", "I will go through the introduction, literature, methodology, results and conclusion."),
+    ("Chapter I: Background", "The recloser trips fast to save the fuse on a temporary fault. That works only while both "
+                              "carry the same current. With a DG the fuse carries more current than the recloser, and "
+                              "it can melt first."),
+    ("Chapter I: Objectives", "The general objective is to build and validate the DSDR method on the IEEE 13-node feeder "
+                              "in PowerFactory. There are seven specific objectives, from building the model to the DG "
+                              "penetration study."),
+    ("Chapter II:", "The literature covers coordination with DG, the DSDR method, relay curves and the test feeder. The gap "
+                   "is an independent implementation with real relay curves, dial ranges and fuse sizes."),
+    ("Chapter III: Study System", "A 4.16 kV feeder with a 4.05 MVA synchronous DG at node 692. R1 is at the feeder head, "
+                                  "R2 is on line 632 to 671, and fuses protect the laterals."),
+    ("Chapter III: Overall Methodology", "Three stages: design without DG, the same settings with the DG, then R2 as a "
+                                         "DSDR. If coordination is lost, revise the dial, then the fuse."),
+    ("Chapter III: Mathematical Formulation", "These are the method's equations: the recloser curve, the pickup, the fuse "
+                                              "line and the coordination conditions."),
+    ("Chapter III: Formulation Used", "I kept the method's structure and used each manufacturer's curve: the GE IAC "
+                                      "equation for R1 and the CDG34 table for R2. R1 reproduces the paper's worked "
+                                      "example."),
+    ("Chapter III: Protection Settings", "R1 picks up at 720 amperes. R2 has a forward group of 300 and 600 amperes and "
+                                         "a new reverse group of 150 and 300. The dials were at their limits, so the "
+                                         "fuses were revised."),
+    ("Chapter IV: Base Case", "Without DG, 35 of 39 cells are coordinated, and all 39 after one fuse change."),
+    ("Chapter IV: Branch Currents", "Rated currents agree with the paper within 2 per cent. My fault levels match the IEEE "
+                                    "benchmark within 2 per cent; the paper's are higher."),
+    ("Chapter IV: Fuse Coefficients", "The fuse coefficients agree with the paper's Table three within 0.33."),
+    ("Chapter IV: DG Connected", "With the DG and the same settings, only 24 of 39 cells hold. The fuse melts before the "
+                                 "fast trip."),
+    ("Chapter IV: Coordination with DG", "Cell by cell, I hold 24 and the paper 30. We agree in 29 of 39 cells."),
+    ("Chapter IV: Effect of the DG Penetration", "As the DG grows from 0 to 100 per cent, the CTI falls: at 633 from plus "
+                                                 "4 to minus 51 milliseconds. The paper shows the same trend. This is "
+                                                 "why an adaptive setting is needed."),
+    ("Chapter IV: With the DSDR", "With the DSDR and revised fuses, 38 of 39 cells hold. The dual setting alone restores "
+                                  "seven cells. Only the LG fault at 692 stays lost, at R2's dial limit."),
+    ("Chapter IV: TCC with the DSDR", "For a line-to-line fault at 646, R2 trips in 0.086 seconds on its reverse group "
+                                      "and R1 in 0.189. The fuse would melt at 0.415, so it is saved."),
+    ("Chapter IV: Operating Times", "My operating times next to the paper's Table four. In both, the fuse melts after "
+                                    "the fast trip in every row."),
+    ("Chapter IV: Single versus Dual", "Same fault, same current. With the single setting R2 trips in 0.121 seconds: "
+                                       "lost. With the reverse group, 0.052 seconds: held."),
+    ("Chapter IV: Time-Domain", "The EMT run confirms it in time. Without DG the fuse survives the two fast shots at 45 "
+                                "per cent heat. With DG it melts during the second shot."),
+    ("Chapter IV: Summary", "In summary: 24 cells with a conventional recloser, 25 with the DSDR alone, 31 with the fuse "
+                            "revision alone, and 38 with both. The paper reports 30 and 39."),
+    ("Chapter V: Conclusion", "The DSDR with the fuse revision raises coordination from 24 to 38 of 39 cells. It is "
+                              "necessary but not sufficient: it needs the fuse revision."),
+    ("Chapter V: Recommendation", "Future work: the 34-node feeder, a true directional element and inverter-based DG."),
+    ("References", "These are the main references."),
+    ("Thank You", "Thank you. I am happy to take your questions."),
+]
+for sl in prs.slides:
+    title = next((sh.text_frame.text.strip() for sh in sl.shapes if sh.has_text_frame and sh.text_frame.text.strip()), "")
+    key = "" if title.startswith("TRIBHUVAN") else title
+    hit = [t for k, t in SHORT if (k == "" and key == "") or (k and key.startswith(k))]
+    assert len(hit) == 1, (title, len(hit))
+    sl.notes_slide.notes_text_frame.text = hit[0]
+
 out = None
 for suffix in ("", "_new", "_v2", "_v3", "_v4", "_v5", "_v6"):          # a file open in PowerPoint is locked
     try:
