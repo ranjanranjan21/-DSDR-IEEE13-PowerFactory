@@ -648,8 +648,7 @@ SHORT = [
                    "is an independent implementation with real relay curves, dial ranges and fuse sizes."),
     ("Chapter III: Study System", "A 4.16 kV feeder with a 4.05 MVA synchronous DG at node 692. R1 is at the feeder head, "
                                   "R2 is on line 632 to 671, and fuses protect the laterals."),
-    ("Chapter III: Overall Methodology", "Three stages: design without DG, the same settings with the DG, then R2 as a "
-                                         "DSDR. If coordination is lost, revise the dial, then the fuse."),
+    ("Chapter III: Overall Methodology", "This flowchart is the method. First, a load flow gives the rated current of every branch, and the pickup of each recloser is set to 1.25 times that current. For R2 this is done twice: once for the forward current from the grid, and once for the reverse current from the DG. Then the fuses are sized, and a fault at every location is checked. If the fuse melts before the recloser's fast trip, coordination is lost. In that case the time dial is revised first. If the dial is already at its limit, the fuse is made larger, and the check is repeated until coordination holds."),
     ("Chapter III: Mathematical Formulation", "These are the method's equations: the recloser curve, the pickup, the fuse "
                                               "line and the coordination conditions."),
     ("Chapter III: Formulation Used", "I kept the method's structure and used each manufacturer's curve: the GE IAC "
