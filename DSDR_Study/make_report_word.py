@@ -450,7 +450,7 @@ def approval_page(doc):
         r = run(q, t)
         if k < len(lines) - 1:
             r.add_break()
-    q = para(WD_ALIGN_PARAGRAPH.JUSTIFY, after=56)
+    q = para(WD_ALIGN_PARAGRAPH.JUSTIFY, after=40)
     run(q, "The undersigned certify that they have read, and recommended to the Institute of Engineering for "
            "acceptance, a project report entitled \u201c")
     run(q, "An Adaptive Overcurrent Protection Scheme for Dual-Setting Directional Recloser and Fuse Coordination "
@@ -459,57 +459,17 @@ def approval_page(doc):
     run(q, "Jhala Nath Kafle", italic=True)
     run(q, " in partial fulfilment of the requirements for the Master\u2019s degree in Power System Engineering.")
 
-    blocks = [[("Jeetendra Chaudhary", True), ("Head of Department &", True),
-               ("M.Sc. Program Coordinator (MSPDE)", True), ("Department of Electrical Engineering", True)],
-              [("Akhileshwar Mishra", True), ("M.Sc. Program Coordinator (MSPSE)", True),
-               ("Department of Electrical Engineering", True)]]
-    table = doc.add_table(rows=1, cols=2)
-    nxt._p.addprevious(table._tbl)
-    pr = table._tbl.tblPr
-    for tag in ("w:tblStyle", "w:tblBorders", "w:tblLayout", "w:tblW", "w:tblLook"):
-        old = pr.find(qn(tag))
-        if old is not None:
-            pr.remove(old)
-    b = OxmlElement("w:tblBorders")
-    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
-        e = OxmlElement("w:%s" % edge)
-        e.set(qn("w:val"), "nil")
-        b.append(e)
-    pr.append(b)
-    lay = OxmlElement("w:tblLayout")
-    lay.set(qn("w:type"), "fixed")
-    pr.append(lay)
-    look = OxmlElement("w:tblLook")                      # no header-row formatting of the default table style
-    for a_, v_ in (("w:val", "0000"), ("w:firstRow", "0"), ("w:lastRow", "0"), ("w:firstColumn", "0"),
-                   ("w:lastColumn", "0"), ("w:noHBand", "1"), ("w:noVBand", "1")):
-        look.set(qn(a_), v_)
-    pr.append(look)
-    for tc in table._tbl.iter(qn("w:tc")):               # and no borders on the cells themselves
-        tcpr = tc.get_or_add_tcPr()
-        tb = OxmlElement("w:tcBorders")
-        for edge in ("top", "left", "bottom", "right"):
-            e = OxmlElement("w:%s" % edge)
-            e.set(qn("w:val"), "nil")
-            tb.append(e)
-        tcpr.append(tb)
-    for k, items in enumerate(blocks):
-        cell = table.rows[k // 2].cells[k % 2]
-        cell.width = Cm(7.75)
-        q = cell.paragraphs[0]
-        for j, (text, ital) in enumerate([("\u2500" * 22, False)] + items):
-            if j:
-                q = cell.add_paragraph()
-            f = q.paragraph_format
-            f.alignment, f.first_line_indent = WD_ALIGN_PARAGRAPH.LEFT, Cm(0)
-            f.space_before = Pt(0)
-            f.space_after = Pt(0)
-            f.line_spacing, f.line_spacing_rule = Pt(17.9), WD_LINE_SPACING.AT_LEAST
-            r = run(q, text, italic=ital)
-            if j == 0:
-                r.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
-    q = para(WD_ALIGN_PARAGRAPH.CENTER, before=74)
-    run(q, "DATE OF APPROVAL: ", bold=True)
-    run(q, "6 October 2026", italic=True)
+    blocks = [["Er. Jeetendra Chaudhary", "Associate Professor & Head of Department"],
+              ["Er. Akhileshowr Kumar Mishra", "Assistant Professor & Coordinator (M.Sc.)"]]
+    common = ["Department of Electrical Engineering", "Pulchowk Campus, Lalitpur",
+              "Institute of Engineering, Tribhuvan University", "Kathmandu, Nepal"]
+    for k, items in enumerate(blocks):                  # one block below the other, as the department's form
+        lines = ["\u2500" * 34] + items + common
+        for j, text in enumerate(lines):
+            q = para(WD_ALIGN_PARAGRAPH.LEFT, before=(0 if k == 0 and j == 0 else 36 if j == 0 else 0))
+            run(q, text)
+    q = para(WD_ALIGN_PARAGRAPH.LEFT, before=38)
+    run(q, "Date: " + "_" * 26)
 
 
 def polish(path, tex):
