@@ -353,6 +353,40 @@ textbox(s, 0.7, 4.25, 5.6, 1.8, [
     "Without DG the conventional scheme works."], size=16, bullet=True, space=9)
 picture(s, "fig08.png", 6.7, 1.25, 6.1, 4.6, "LG fault at 611: R2 fast 0.128 s < F684 melts 0.271 s – coordination held")
 
+# ================================================================================================ 11b Table II
+import csv as _csv
+CMP = os.path.join(STUDY, "results", "comparison")
+rd = lambda f: list(_csv.DictReader(open(os.path.join(CMP, f), encoding="utf-8")))
+s = slide("Chapter IV: Branch Currents and Fault Levels – Side by Side",
+          "This compares the base case with Table two of the reference paper. The rated branch currents agree "
+          "within 2 per cent. My fault levels are lower: 4.73 kiloamperes at the feeder head against 5.41, because "
+          "the model is validated against the IEEE short-circuit benchmark.")
+T2 = rd("Table_II_vs_paper.csv")
+br = lambda r: ("%s %s" % (r["From"], r["To"])) if r["From"].startswith("XFM") else "%s–%s" % (r["From"], r["To"])
+H2 = ["Branch", "I nom (A)", "If,min (kA)", "If,max (kA)"]
+mine = [H2] + [[br(r), r["Inom (A)"], r["If,min (kA)"], r["If,max (kA)"]] for r in T2]
+paper = [H2] + [[br(r), r["paper Inom (A)"], r["paper If,min (kA)"], r["paper If,max (kA)"]] for r in T2]
+textbox(s, 0.5, 1.2, 6.0, 0.35, "**This study**", size=15, color=NAVY, align=PP_ALIGN.CENTER, space=0)
+textbox(s, 6.85, 1.2, 6.0, 0.35, "**Reference paper [1], Table II**", size=15, color=NAVY, align=PP_ALIGN.CENTER, space=0)
+table(s, mine, 0.5, 1.58, 6.0, [2.0, 1.3, 1.35, 1.35], size=11, row_h=0.31)
+table(s, paper, 6.85, 1.58, 6.0, [2.0, 1.3, 1.35, 1.35], size=11, row_h=0.31)
+box(s, 0.5, 6.05, 12.35, 0.72, "**Rated currents agree within 2 %.** Fault levels here are lower (feeder head 4.73 kA against 5.41 kA): the model follows the IEEE short-circuit benchmark within about 2 %.",
+    size=13, fill=WARM, line=ORANGE)
+
+# ================================================================================================ 11c Table III
+s = slide("Chapter IV: Fuse Coefficients – Side by Side",
+          "These are the fuse coefficients b against Table three of the reference paper. They agree within about "
+          "0.3 for every fuse; the small differences follow the lower fault currents.")
+T3 = rd("Table_III_vs_paper.csv")
+rows = [["Fuse", "If (A)", "t fast (s)", "t delayed (s)", "b (this study)", "b (paper, Table III)", "Difference"]]
+for r in T3:
+    a_, b_ = float(r["b_i (i counted from source)"]), float(r["paper b_i"])
+    rows.append([r["Fuse"], r["If (A)"], r["t_fast (s)"], r["t_delayed (s)"], "%.2f" % a_, "%.2f" % b_, "%+.2f" % (a_ - b_)])
+table(s, rows, 1.2, 1.3, 10.9, [1.2, 1.3, 1.4, 1.5, 1.8, 2.0, 1.5], size=11, row_h=0.29)
+dmax = max(abs(float(r[6])) for r in rows[1:])
+box(s, 1.2, 6.1, 10.9, 0.65, "Fuse line: log t = a log I + b, with a = −1.8. The coefficients agree within **%.2f** for all %d fuses." % (dmax, len(rows) - 1),
+    size=13, fill=WARM, line=ORANGE)
+
 # ================================================================================================ 12 DG conventional
 s = slide("Chapter IV: DG Connected, Conventional R2",
           "With the DG and unchanged settings, coordination holds in only 24 of 39 cells. The fuse melts before the "
@@ -367,6 +401,41 @@ textbox(s, 0.6, 4.45, 5.9, 1.9, [
     "The fuse carries grid + DG current and melts before the fast trip.",
     "For some LG faults the single-setting R2 does not pick up the reverse DG current."], size=16, bullet=True, space=9)
 picture(s, "fig14.png", 6.8, 1.3, 6.0, 4.4, "Coordination status with DG, conventional R2", "Green: held. Red: lost.")
+
+# ================================================================================================ 12b Fig 14 grid
+s = slide("Chapter IV: Coordination with DG – Side by Side",
+          "This is the coordination status with the DG and a conventional R2, cell by cell: my study above and the "
+          "reference paper below. I obtained 24 held cells and the paper 30. The two agree in 29 of the 39 cells, "
+          "and both lose cells at 633, 645, 646 and 675.")
+G = rd("Fig14_Fig17_vs_paper.csv")
+nodes = []
+for r in G:
+    if r["node"] not in nodes:
+        nodes.append(r["node"])
+FT = ["LG", "LL", "LLG", "LLL"]
+SYM = {"held": "✓", "lost": "×", "n/a": "–"}
+
+
+def grid(col, y, label):
+    look = {(r["node"], r["fault"]): r[col] for r in G}
+    rows_ = [["Fault"] + nodes] + [[ft] + [SYM.get(look.get((n, ft), "n/a"), "–") for n in nodes] for ft in FT]
+    cols = {}
+    for i, ft in enumerate(FT, 1):
+        for j, n in enumerate(nodes, 1):
+            v = look.get((n, ft), "n/a")
+            if v in ("held", "lost"):
+                cols[(i, j)] = GREEN if v == "held" else RED
+    held = sum(v == "held" for v in look.values())
+    tot = sum(v in ("held", "lost") for v in look.values())
+    textbox(s, 0.7, y - 0.4, 11.9, 0.35, "**%s** – coordination held in %d of %d cells" % (label, held, tot), size=15, color=NAVY, space=0)
+    table(s, rows_, 0.7, y, 11.9, [1.1] + [0.9] * len(nodes), size=13, row_h=0.36, colors=cols)
+
+
+grid("Fig14 model", 1.65, "This study")
+grid("Fig14 paper", 4.05, "Reference paper [1], Fig. 14")
+agree = sum(1 for r in G if r["Fig14 model"] in ("held", "lost") and r["Fig14 model"] == r["Fig14 paper"])
+box(s, 0.7, 6.0, 11.9, 0.72, "The two agree in **%d of 39** cells. Both lose cells at 633, 645, 646 and 675; this study also at DL. With the DSDR: 38 of 39 here, 39 of 39 in the paper." % agree,
+    size=13, fill=WARM, line=ORANGE)
 
 # ================================================================================================ 13 DSDR
 s = slide("Chapter IV: With the DSDR",
@@ -518,14 +587,16 @@ textbox(s, 0, 3.95, 13.333, 0.6, "Questions and Discussion", size=22, color=MID,
 footer(s)
 s.notes_slide.notes_text_frame.text = "Thank you for your attention. I am happy to take your questions."
 
-out = OUT
-for suffix in ("", "_new", "_v2"):
+out = None
+for suffix in ("", "_new", "_v2", "_v3", "_v4", "_v5", "_v6"):          # a file open in PowerPoint is locked
     try:
-        out = OUT.replace(".pptx", suffix + ".pptx")
-        prs.save(out)
+        cand = OUT.replace(".pptx", suffix + ".pptx")
+        prs.save(cand)
+        out = cand
         break
     except PermissionError:
         continue
+assert out, "every file name is locked: close the presentation in PowerPoint"
 import re
 words = sum(len(re.findall(r"[\w.']+", sl.notes_slide.notes_text_frame.text)) for sl in prs.slides)
 print("saved", out, "-", len(prs.slides), "slides; notes %d words, about %.1f minutes" % (words, words / 125.0))
