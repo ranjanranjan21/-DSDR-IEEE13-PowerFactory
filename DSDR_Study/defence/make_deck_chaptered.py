@@ -422,8 +422,9 @@ picture(s, "fig14.png", 6.8, 1.3, 6.0, 4.4, "Coordination status with DG, conven
 # ================================================================================================ 12b Fig 14 grid
 s = slide("Chapter IV: Coordination with DG – Side by Side",
           "This is the coordination status with the DG and a conventional R2, cell by cell: my study above and the "
-          "reference paper below. I obtained 24 held cells and the paper 30. The two agree in 29 of the 39 cells, "
-          "and both lose cells at 633, 645, 646 and 675.")
+          "reference paper below. I obtained 24 held cells and the paper 30. We agree in 29 of the 39 cells: 22 held "
+          "in both and 7 lost in both. Of the 10 that differ, 8 are lost only in my study, four of them at the "
+          "distributed load, and 2 are lost only in the paper.")
 G = rd("Fig14_Fig17_vs_paper.csv")
 nodes = []
 for r in G:
@@ -450,9 +451,14 @@ def grid(col, y, label):
 
 grid("Fig14 model", 1.65, "This study")
 grid("Fig14 paper", 4.05, "Reference paper [1], Fig. 14")
-agree = sum(1 for r in G if r["Fig14 model"] in ("held", "lost") and r["Fig14 model"] == r["Fig14 paper"])
-box(s, 0.7, 6.0, 11.9, 0.72, "The two agree in **%d of 39** cells. Both lose cells at 633, 645, 646 and 675; this study also at DL. With the DSDR: 38 of 39 here, 39 of 39 in the paper." % agree,
-    size=13, fill=WARM, line=ORANGE)
+cells = [r for r in G if r["Fig14 model"] in ("held", "lost")]
+n_hh = sum(r["Fig14 model"] == "held" and r["Fig14 paper"] == "held" for r in cells)
+n_ll = sum(r["Fig14 model"] == "lost" and r["Fig14 paper"] == "lost" for r in cells)
+here = [r for r in cells if r["Fig14 model"] == "lost" and r["Fig14 paper"] == "held"]
+there = [r for r in cells if r["Fig14 model"] == "held" and r["Fig14 paper"] == "lost"]
+box(s, 0.7, 6.0, 11.9, 0.78, "**Agree in %d of %d cells** (%d held in both, %d lost in both). Differ in %d: %d lost only here (%d of them at DL), %d lost only in the paper (%s). With the DSDR: 38 of 39 here, 39 of 39 in the paper." % (
+    n_hh + n_ll, len(cells), n_hh, n_ll, len(here) + len(there), len(here), sum(r["node"] == "DL" for r in here),
+    len(there), ", ".join(sorted(set(r["node"] for r in there)))), size=13, fill=WARM, line=ORANGE)
 
 # ================================================================================================ 13 DSDR
 s = slide("Chapter IV: With the DSDR",
