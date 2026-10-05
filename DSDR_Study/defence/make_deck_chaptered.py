@@ -248,20 +248,22 @@ box(s, 1.05, 5.95, 11.2, 0.75, "**Problem focus:** can independent forward and r
 
 # ================================================================================================ 5 objectives
 s = slide("Chapter I: Objectives and Study Scope",
-          "The main objective is to build and validate a PowerFactory implementation of the DSDR method on the IEEE "
+          "The general objective is to build and validate a PowerFactory implementation of the DSDR method on the IEEE "
           "13-node feeder, with and without DG. The specific objectives cover the model, the studies, the settings, "
           "the coordination without and with the DG, the dual setting, the time-domain check and the DG penetration.")
-box(s, 0.82, 1.24, 11.7, 0.85, "**Main objective:** To build and validate a DIgSILENT PowerFactory implementation of the dual-setting directional recloser (DSDR) coordination method on the IEEE 13-node feeder, with and without distributed generation.", size=15)
-textbox(s, 0.91, 2.25, 11.7, 3.7, [
-    "To build and verify the IEEE 13-node feeder with its recloser and fuse protection.",
-    "To perform unbalanced load-flow and short-circuit studies for LG, LL, LLG and LLL faults.",
-    "To calculate the recloser pickups, time dials and fuse coefficients.",
-    "To establish the coordination without DG, and with a 4.05 MVA synchronous DG at node 692.",
-    "To design the DSDR settings of R2 and classify the resulting coordination.",
-    "To verify the reclosing sequence in the time domain (EMT simulation).",
-    "To study the effect of the DG penetration level from 0 to 100 %."], size=16, bullet=True, space=7)
-box(s, 1.0, 6.1, 11.5, 0.65, "**Scope:** IEEE 13-node feeder; 12 fault locations × 4 fault types = 39 cells; one DG location (692); zero-margin criterion CTI > 0.",
-    size=15, fill=WARM, line=ORANGE)
+textbox(s, 0.82, 1.22, 11.7, 0.35, "**General Objective**", size=19, color=NAVY, space=0)
+box(s, 0.82, 1.62, 11.7, 0.85, "To build and validate a DIgSILENT PowerFactory implementation of the dual-setting directional recloser (DSDR) coordination method on the IEEE 13-node feeder, with and without distributed generation.", size=15)
+textbox(s, 0.82, 2.62, 11.7, 0.35, "**Specific Objectives**", size=19, color=NAVY, space=0)
+textbox(s, 0.95, 3.02, 11.6, 3.1, [
+    "1.  To build and verify the IEEE 13-node feeder with its recloser and fuse protection.",
+    "2.  To perform unbalanced load-flow and short-circuit studies for LG, LL, LLG and LLL faults.",
+    "3.  To calculate the recloser pickups, time dials and fuse coefficients.",
+    "4.  To establish the coordination without DG, and with a 4.05 MVA synchronous DG at node 692.",
+    "5.  To design the DSDR settings of R2 and classify the resulting coordination.",
+    "6.  To verify the reclosing sequence in the time domain (EMT simulation).",
+    "7.  To study the effect of the DG penetration level from 0 to 100 %."], size=15, space=4)
+box(s, 1.0, 6.2, 11.5, 0.6, "**Scope:** IEEE 13-node feeder; 12 fault locations × 4 fault types = 39 cells; one DG location (692); zero-margin criterion CTI > 0.",
+    size=14, fill=WARM, line=ORANGE)
 
 # ================================================================================================ 6 literature
 s = slide("Chapter II: Literature Positioning and Gap",
