@@ -548,23 +548,15 @@ box(s, 0.35, 6.05, 12.63, 0.72, "**Same behaviour in both:** the fuse melts afte
     size=13, fill=WARM, line=ORANGE)
 
 # ================================================================================================ 14 single vs dual
-s = slide("Chapter IV: Single versus Dual Setting \u2013 Side by Side", "")
-picture(s, "case05.png", 0.4, 1.18, 7.0, 2.75)
-textbox(s, 7.55, 1.45, 5.35, 2.4, [
-    "Three-phase fault at 10 % of line 632\u2013633, DG connected.",
-    "R2 carries only the DG current, in **reverse**.",
-    "Single setting: R2 uses its forward group and is too slow.",
-    "Dual setting: R2 uses its reverse group and trips before the fuse melts."], size=14, bullet=True, space=6)
-table(s, [["Quantity", "This study, single setting", "Paper [1], Fig. 13, single setting", "This study, dual setting (DSDR)", "Paper [1], Table IV, DSDR (node 633)"],
-          ["Current through R2", "1777 A, reverse", "3361 A, reverse", "1777 A, reverse", "\u2013"],
-          ["R2 setting used", "Forward: plug 300 / 600 A", "Conventional", "Reverse: plug 150 / 300 A", "Reverse"],
-          ["R2 fast trip", "0.121 s", "0.079 s", "0.052 s", "0.052 s"],
-          ["Fuse F633 starts to melt", "0.100 s (400E)", "0.022 s (250E)", "0.100 s (400E)", "0.163 s"],
-          ["Fuse saving", "LOST", "LOST", "HELD", "HELD"]],
-      0.4, 3.98, 12.5, [2.4, 2.45, 2.6, 2.5, 2.55], size=11.5, row_h=0.32,
-      colors={(5, 1): RED, (5, 2): RED, (5, 3): GREEN, (5, 4): GREEN})
-box(s, 0.4, 6.22, 12.5, 0.62, "**Same result in both studies:** with a single setting the fuse melts before R2's fast trip; with the dual setting R2 trips first (0.052 s in both). Currents are lower here because the fault levels follow the IEEE benchmark.",
-    size=12.5, fill=WARM, line=ORANGE)
+s = slide("Chapter IV: Single versus Dual Setting", "")
+picture(s, "case05.png", 0.5, 1.2, 12.3, 3.3)
+table(s, [["Quantity", "Single setting", "Dual setting (DSDR)"],
+          ["Current through R2", "1777 A, reverse", "1777 A, reverse"],
+          ["R2 setting used", "Forward: plug 300 / 600 A", "Reverse: plug 150 / 300 A"],
+          ["R2 fast trip", "0.121 s", "0.052 s"],
+          ["F633 (400E) starts to melt", "0.100 s", "0.100 s"],
+          ["Fuse saving", "LOST", "HELD"]],
+      1.9, 4.6, 9.5, [3.2, 3.2, 3.1], size=13, row_h=0.34, colors={(5, 1): RED, (5, 2): GREEN})
 
 # ================================================================================================ 15 EMT
 s = slide("Chapter IV: Time-Domain (EMT) Verification",
@@ -682,9 +674,8 @@ SHORT = [
                                       "and R1 in 0.189. The fuse would melt at 0.415, so it is saved."),
     ("Chapter IV: Operating Times", "My operating times next to the paper's Table four. In both, the fuse melts after "
                                     "the fast trip in every row."),
-    ("Chapter IV: Single versus Dual", "Same fault near 632. With the single setting R2 trips in 0.121 seconds, after the "
-                                       "fuse starts to melt: lost, as in the paper's figure thirteen. With the reverse "
-                                       "group R2 trips in 0.052 seconds, the same as the paper: held."),
+    ("Chapter IV: Single versus Dual", "Same fault, same current. With the single setting R2 trips in 0.121 seconds: "
+                                       "lost. With the reverse group, 0.052 seconds: held."),
     ("Chapter IV: Time-Domain", "The EMT run confirms it in time. Without DG the fuse survives the two fast shots at 45 "
                                 "per cent heat. With DG it melts during the second shot."),
     ("Chapter IV: Summary", "In summary: 24 cells with a conventional recloser, 25 with the DSDR alone, 31 with the fuse "
