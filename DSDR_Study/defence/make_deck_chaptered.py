@@ -477,6 +477,20 @@ textbox(s, 0.6, 4.2, 5.9, 2.3, [
     "Still lost: LG fault at 692 – R2's delayed dial is already at its maximum."], size=16, bullet=True, space=9)
 picture(s, "fig17.png", 6.8, 1.3, 6.0, 4.4, "Coordination status with the DSDR and revised fuses", "Only one cell remains lost.")
 
+# ================================================================================================ 13a TCC with the DSDR
+s = slide("Chapter IV: TCC with the DSDR \u2013 Bolted LL Fault at 646",
+          "This is the time-current plot of one fault with the DSDR: a bolted line-to-line fault at 646. The fuses "
+          "carry 3.67 kiloamperes, the grid plus the DG current. R2 sees the DG share, 1114 amperes in reverse, and "
+          "its reverse group trips in 0.086 seconds. R1 sees the grid share and trips in 0.189 seconds. Both are "
+          "before the fuse starts to melt at 0.415 seconds, so the fuse is saved.")
+picture(s, "fig15.png", 0.35, 1.2, 6.25, 3.75, "R2 reverse group (DG share, 1114 A): fast trip 0.086 s")
+picture(s, "fig16.png", 6.75, 1.2, 6.25, 3.75, "R1 (grid share, 2785 A): fast trip 0.189 s")
+table(s, [["Device", "Current", "Operates at", "Result"],
+          ["R2, reverse group", "1114 A (DG share)", "0.086 s", "trips first"],
+          ["R1", "2785 A (grid share)", "0.189 s", "trips second"],
+          ["Fuse F646 (400E)", "3672 A (grid + DG)", "starts to melt at 0.415 s", "**saved**, CTI = +226 ms"]],
+      0.9, 5.42, 11.5, [2.6, 2.8, 3.2, 2.9], size=12.5, row_h=0.33, colors={(3, 3): GREEN})
+
 # ================================================================================================ 13b Table IV
 s = slide("Chapter IV: Operating Times with the DSDR – Side by Side",
           "This is the table of operating times with the DSDR, my study on the left and Table four of the "
