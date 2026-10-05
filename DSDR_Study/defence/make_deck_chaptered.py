@@ -21,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 STUDY = os.path.dirname(HERE)
 FIGS = os.path.join(STUDY, "report", "figures")
 EQ = os.path.join(STUDY, "results", "figures", "DSDR_equations_method.png")
+IMPL = os.path.join(STUDY, "results", "figures", "DSDR_equations_impl.png")
 OUT = os.path.join(os.path.dirname(STUDY), "Presentation and report", "DSDR_Presentation_Chaptered.pptx")
 
 NAVY, ORANGE, BLUE = RGBColor(0x0B, 0x25, 0x45), RGBColor(0xF4, 0xA1, 0x1A), RGBColor(0x00, 0x67, 0xB1)
@@ -305,10 +306,22 @@ textbox(s, 0.81, 1.45, 5.6, 4.2, [
 box(s, 0.9, 5.55, 5.4, 0.9, "**Check:** the fuse must not start to melt before the fast trip, and must clear before the delayed trip.", size=15)
 
 # ================================================================================================ 9 formulation
-s = slide("Chapter III: Mathematical Formulation",
+s = slide("Chapter III: Mathematical Formulation of the Method",
           "These are the equations of the method: the recloser curve with a fast and a delayed time dial, the pickup "
           "from the load current, the fuse line on log-log axes, and the coordination conditions.")
 picture(s, EQ, 0.4, 1.2, 12.5, 5.6)
+
+# ================================================================================================ 9b curves used
+s = slide("Chapter III: Formulation Used for the Operating Times",
+          "The method writes the operating time as the time dial times a function of the current. I kept this "
+          "structure and used the manufacturer's curve of each relay: the GE IAC equation for R1 and the "
+          "manufacturer's table for the CDG34. As a check, R1 reproduces the worked example of the reference paper.")
+picture(s, IMPL, 0.6, 1.2, 12.1, 4.0)
+textbox(s, 0.85, 5.25, 11.7, 1.5, [
+    "The method fixes the structure **t = TDS × g(M)**, with M = I_f / I_p; the constants A, B and n describe only a generic curve.",
+    "So g(M) is taken from the manufacturer of each relay: the IAC extremely inverse equation for R1, the CDG34 table for R2.",
+    "Check: R1 gives **0.096 / 1.926 s** at 4219 A, against 0.097 / 1.932 s in the reference paper."],
+    size=15, bullet=True, space=6)
 
 # ================================================================================================ 10 settings
 s = slide("Chapter III: Protection Settings",
