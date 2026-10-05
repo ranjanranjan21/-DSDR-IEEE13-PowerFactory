@@ -561,6 +561,22 @@ table(s, [["Quantity", "Single setting", "Dual setting (DSDR)"],
           ["Fuse saving", "LOST", "HELD"]],
       1.9, 4.6, 9.5, [3.2, 3.2, 3.1], size=13, row_h=0.34, colors={(5, 1): RED, (5, 2): GREEN})
 
+# ================================================================================================ 14b Fig. 13 against the paper
+s = slide("Chapter IV: Fault near 632, Conventional R2 \u2013 Side by Side",
+          "")
+picture(s, "fig13.png", 0.4, 1.2, 5.9, 4.3, "This study: three-phase fault at 10 % of line 632\u2013633, conventional R2")
+table(s, [["Quantity", "This study", "Reference paper [1], Fig. 13"],
+          ["Current through R2 (reverse)", "1777 A", "3361 A"],
+          ["Current through fuse F633", "6398 A", "8517 A"],
+          ["R2 fast trip", "0.121 s", "0.079 s"],
+          ["R2 delayed trip", "6.426 s", "1.556 s"],
+          ["Fuse F633 (250E) melts", "0.039 s", "0.022 s"],
+          ["Fuse melts before the fast trip by", "83 ms", "57 ms"],
+          ["Fuse saving", "LOST", "LOST"]],
+      6.55, 1.35, 6.35, [2.9, 1.5, 1.95], size=13, row_h=0.44, colors={(7, 1): RED, (7, 2): RED})
+box(s, 0.5, 5.95, 12.4, 0.85, "**Same outcome in both:** with a single setting the fuse melts before R2's fast trip, so fuse saving is lost. Currents are lower here because the fault levels follow the IEEE benchmark. The paper shows this fault only with the conventional setting; the dual-setting result is this study's.",
+    size=13, fill=WARM, line=ORANGE)
+
 # ================================================================================================ 15 EMT
 s = slide("Chapter IV: Time-Domain (EMT) Verification",
           "This EMT simulation is a line-to-line fault at 684. Without DG, the two fast shots use only 45 per cent of "
@@ -679,6 +695,9 @@ SHORT = [
                                     "the fast trip in every row."),
     ("Chapter IV: Single versus Dual", "Same fault, same current. With the single setting R2 trips in 0.121 seconds: "
                                        "lost. With the reverse group, 0.052 seconds: held."),
+    ("Chapter IV: Fault near 632", "The same fault in the paper's figure thirteen, with the conventional setting. In "
+                                   "both studies the fuse melts before the fast trip: 0.039 against 0.121 seconds here, "
+                                   "0.022 against 0.079 in the paper."),
     ("Chapter IV: Time-Domain", "The EMT run confirms it in time. Without DG the fuse survives the two fast shots at 45 "
                                 "per cent heat. With DG it melts during the second shot."),
     ("Chapter IV: Summary", "In summary: 24 cells with a conventional recloser, 25 with the DSDR alone, 31 with the fuse "
