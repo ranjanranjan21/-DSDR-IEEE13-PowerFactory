@@ -367,26 +367,28 @@ s = slide("Chapter IV: Branch Currents and Fault Levels – Side by Side",
 T2 = rd("Table_II_vs_paper.csv")
 FB = {r["Node"]: r for r in _csv.DictReader(open(os.path.join(STUDY, "results", "Fault_level_benchmark.csv"), encoding="utf-8"))}
 br = lambda r: ("%s %s" % (r["From"], r["To"])) if r["From"].startswith("XFM") else "%s–%s" % (r["From"], r["To"])
-rows = [["Branch", "I nom (A), study", "I nom (A), paper", "If,max (kA), IEEE benchmark", "If,max (kA), this study",
-         "If,max (kA), paper", "Study vs benchmark", "Paper vs benchmark"]]
+rows = [["Branch", "I nom (A) study", "I nom (A) paper", "If,min (kA) study", "If,min (kA) paper",
+         "If,max (kA) IEEE [7]", "If,max (kA) study", "If,max (kA) paper", "Study vs IEEE", "Paper vs IEEE"]]
 cols = {}
 for k, r in enumerate(T2, 1):
     f = FB.get(r["To"])
+    base = [br(r), r["Inom (A)"], r["paper Inom (A)"], "%.2f" % float(r["If,min (kA)"]), "%.2f" % float(r["paper If,min (kA)"])]
     if f:
         ds, dp = float(f["Study vs benchmark (%)"]), float(f["Paper vs benchmark (%)"])
-        rows.append([br(r), r["Inom (A)"], r["paper Inom (A)"], "%.2f" % float(f["IEEE benchmark (kA)"]),
-                     "%.2f" % float(f["This study (kA)"]), "%.2f" % float(r["paper If,max (kA)"]), "%+.1f %%" % ds, "%+.1f %%" % dp])
-        cols[(k, 6)] = GREEN
+        rows.append(base + ["%.2f" % float(f["IEEE benchmark (kA)"]), "%.2f" % float(f["This study (kA)"]),
+                            "%.2f" % float(r["paper If,max (kA)"]), "%+.1f %%" % ds, "%+.1f %%" % dp])
+        cols[(k, 8)] = GREEN
         if abs(dp) > 10:
-            cols[(k, 7)] = RED
+            cols[(k, 9)] = RED
     else:
-        rows.append([br(r), r["Inom (A)"], r["paper Inom (A)"], "–", "%.2f" % float(r["If,max (kA)"]),
-                     "%.2f" % float(r["paper If,max (kA)"]), "–", "–"])
-table(s, rows, 0.5, 1.28, 12.35, [1.7, 1.2, 1.2, 1.6, 1.5, 1.4, 1.4, 1.4], size=11, row_h=0.305, colors=cols)
+        rows.append(base + ["\u2013", "%.2f" % float(r["If,max (kA)"]), "%.2f" % float(r["paper If,max (kA)"]), "\u2013", "\u2013"])
+table(s, rows, 0.4, 1.25, 12.55, [1.55, 1.05, 1.05, 1.1, 1.1, 1.2, 1.15, 1.15, 1.1, 1.1], size=10.5, row_h=0.30, colors=cols)
+textbox(s, 0.4, 5.52, 12.55, 0.3, "IEEE benchmark: [7] W. H. Kersting and G. Shirek, \u201cShort circuit analysis of IEEE test feeders,\u201d IEEE PES T&D, 2012 (maximum fault current, DG out). "
+        "If,min: LG fault through 3 \u03a9 at the farthest node. Paper: reference [1], Table II.", size=10.5, color=MID, space=0)
 ds_all = [abs(float(f["Study vs benchmark (%)"])) for f in FB.values()]
 dp_all = [float(f["Paper vs benchmark (%)"]) for f in FB.values()]
-box(s, 0.5, 5.95, 12.35, 0.85, "**Rated currents agree with the paper within 2 %%.** Fault levels: this study is within 2 %% of the IEEE benchmark at %d of %d nodes (largest %.1f %%); the paper is %.0f %% to %.0f %% higher. The model was validated against the benchmark, not tuned to the paper." % (
-    sum(d <= 2.0 for d in ds_all), len(FB), max(ds_all), min(dp_all), max(dp_all)), size=13, fill=WARM, line=ORANGE)
+box(s, 0.4, 6.05, 12.55, 0.78, "**Rated currents agree with the paper within 2 %%.** If,max: this study is within 2 %% of the IEEE benchmark at %d of %d nodes (largest %.1f %%); the paper is %.0f %% to %.0f %% higher. If,min on the 4.16 kV lines: 0.64 to 1.07 kA here, 0.59 to 1.24 kA in the paper." % (
+    sum(d <= 2.0 for d in ds_all), len(FB), max(ds_all), min(dp_all), max(dp_all)), size=12.5, fill=WARM, line=ORANGE)
 
 # ================================================================================================ 11c Table III
 s = slide("Chapter IV: Fuse Coefficients – Side by Side",
