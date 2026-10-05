@@ -156,7 +156,8 @@ SLIDES = [
         (P, "the table, top to bottom"),
         (S, "In summary: without DG, 35 cells and 39 after the fuse revision; 24 with the DG and a "
             "conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both."),
-        (S, "These counts use a zero margin."),
+        (S, "The reference paper reports 30 of 39 with a conventional R2 and 39 of 39 with the DSDR; I obtained "
+            "24 and 38. The trend is the same, and my fault levels follow the IEEE benchmark."),
     ]),
     (26, "6. Conclusions and Future Work", [
         (S, "To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and "
@@ -217,16 +218,28 @@ def block(n, title, items):
     return "\\slide{%d}{%s}\n" % (n, tex(text)), words(items)
 
 
-main_blocks, main_words = [], 0
-for n, title, items in SLIDES:
-    b, w = block(n, title, items)
-    main_blocks.append(b)
-    main_words += w
-app_blocks = [block(n, t, it)[0] for n, t, it in APPENDIX]
+# ---- the 8-minute version of the deck: six detail slides are moved behind the appendix as backup slides.
+#      Numbers below are the slide numbers of the ORIGINAL deck; the script prints the NEW numbers.
+BACKUP = [11, 13, 14, 19, 20, 22]
+TEXT = {n: (title, items) for n, title, items in SLIDES + APPENDIX}
+MAIN_ORDER = [n for n, _, _ in SLIDES if n not in BACKUP and n != 32] + [32]
+APP_ORDER = [n for n, _, _ in APPENDIX]
+ORDER = MAIN_ORDER + APP_ORDER + BACKUP                 # new position k+1 holds original slide ORDER[k]
+NEWNO = {old: k + 1 for k, old in enumerate(ORDER)}
+
+
+def said(n):
+    return " ".join(t for k, t in TEXT[n][1] if k in (S, O))
+
+
+main_blocks = ["\\slide{%d}{%s}\n" % (NEWNO[n], tex(said(n))) for n in MAIN_ORDER]
+main_words = sum(words(TEXT[n][1]) for n in MAIN_ORDER)
+app_blocks = ["\\slide{%d}{%s}\n" % (NEWNO[n], tex(said(n))) for n in APP_ORDER]
+bak_blocks = ["\\slide{%d}{%s}\n" % (NEWNO[n], tex(said(n))) for n in BACKUP]
 minutes = main_words / WPM
 
 DOC = r"""\documentclass[11pt,a4paper]{article}
-\usepackage[left=1.5cm,right=1.5cm,top=1.3cm,bottom=1.3cm]{geometry}
+\usepackage[left=1.5cm,right=1.5cm,top=1.1cm,bottom=1.0cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{mathptmx}
 \usepackage{xcolor}
@@ -234,9 +247,10 @@ DOC = r"""\documentclass[11pt,a4paper]{article}
 \setlength{\parindent}{0pt}
 \pagestyle{empty}
 % slide number in the margin column, the text to read beside it
-\newcommand{\slide}[2]{\par\vspace{6pt}\noindent
+\newcommand{\slide}[2]{\par\vspace{4.5pt}\noindent
   \makebox[0.95cm][r]{\fontsize{13}{15}\selectfont\bfseries\color{navy}#1}\hspace{0.3cm}%
-  \parbox[t]{\dimexpr\linewidth-1.25cm}{\fontsize{11.5}{15}\selectfont\raggedright #2}\par}
+  \parbox[t]{\dimexpr\linewidth-1.25cm}{\fontsize{11.3}{14.3}\selectfont\raggedright #2}\par}
+\newcommand{\partbar}[1]{\vspace{8pt}{\color{navy}\hrule height 0.8pt}\vspace{3pt}{\small\bfseries\color{navy} #1}\par}
 
 \begin{document}
 {\large\bfseries\color{navy} Presentation script}\hfill{\small Jhala Nath Kafle (081MSPSE009) \quad
@@ -244,14 +258,20 @@ number = slide \quad about MINUTES minutes}\par\vspace{2pt}
 {\color{navy}\hrule height 0.8pt}
 
 MAIN
-\vspace{8pt}
-{\color{navy}\hrule height 0.8pt}\vspace{3pt}
-{\small\bfseries\color{navy} Appendix slides --- only if asked}
+\partbar{Appendix slides --- only if asked}
 
 APPENDIX
+\partbar{Backup slides --- only if asked}
+
+BACKUP
 \end{document}
 """
 doc = DOC.replace("MINUTES", "%.0f" % round(minutes)).replace("MAIN", "\n".join(main_blocks)) \
-         .replace("APPENDIX", "\n".join(app_blocks))
+         .replace("APPENDIX", "\n".join(app_blocks)).replace("BACKUP", "\n".join(bak_blocks))
 open(os.path.join(HERE, "DSDR_Presentation_Script.tex"), "w", encoding="utf-8").write(doc)
-print("main talk: %d words, about %.1f minutes at %d words per minute" % (main_words, minutes, WPM))
+# for the deck: the new order and the speaker note of every slide
+import json
+json.dump(dict(order=ORDER, backup=BACKUP, notes={str(n): said(n) for n in ORDER}),
+          open(os.path.join(HERE, "deck_8min.json"), "w", encoding="utf-8"), indent=1)
+print("main talk: %d slides, %d words, about %.1f minutes at %d words per minute" % (
+    len(MAIN_ORDER), main_words, minutes, WPM))

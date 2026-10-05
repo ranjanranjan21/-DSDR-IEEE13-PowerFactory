@@ -1,5 +1,5 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage[left=1.5cm,right=1.5cm,top=1.3cm,bottom=1.3cm]{geometry}
+\usepackage[left=1.5cm,right=1.5cm,top=1.1cm,bottom=1.0cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{mathptmx}
 \usepackage{xcolor}
@@ -7,13 +7,14 @@
 \setlength{\parindent}{0pt}
 \pagestyle{empty}
 % slide number in the margin column, the text to read beside it
-\newcommand{\slide}[2]{\par\vspace{6pt}\noindent
+\newcommand{\slide}[2]{\par\vspace{4.5pt}\noindent
   \makebox[0.95cm][r]{\fontsize{13}{15}\selectfont\bfseries\color{navy}#1}\hspace{0.3cm}%
-  \parbox[t]{\dimexpr\linewidth-1.25cm}{\fontsize{11.5}{15}\selectfont\raggedright #2}\par}
+  \parbox[t]{\dimexpr\linewidth-1.25cm}{\fontsize{11.3}{14.3}\selectfont\raggedright #2}\par}
+\newcommand{\partbar}[1]{\vspace{8pt}{\color{navy}\hrule height 0.8pt}\vspace{3pt}{\small\bfseries\color{navy} #1}\par}
 
 \begin{document}
 {\large\bfseries\color{navy} Presentation script}\hfill{\small Jhala Nath Kafle (081MSPSE009) \quad
-number = slide \quad about 9 minutes}\par\vspace{2pt}
+number = slide \quad about 8 minutes}\par\vspace{2pt}
 {\color{navy}\hrule height 0.8pt}
 
 \slide{1}{Good afternoon. I am Jhala Nath Kafle, roll number 081 MSPSE 009. My project is an adaptive overcurrent protection scheme for dual-setting directional recloser and fuse coordination in distribution networks with distributed generation, on the IEEE 13-node feeder in PowerFactory.}
@@ -36,52 +37,52 @@ number = slide \quad about 9 minutes}\par\vspace{2pt}
 
 \slide{10}{This is the PowerFactory model: a 4.16 kV feeder, a 4.05 MVA synchronous generator at node 692, R1 at the feeder head, R2 on line 632 to 671, and fuses on the laterals.}
 
-\slide{11}{These are the parameters of the synchronous DG, 4.05 MVA, connected at node 692.}
+\slide{11}{R1 has a pickup of 720 amperes. R2 forward uses plugs of 300 and 600 amperes, and the new reverse group 150 and 300 amperes. The dials were already at their limits, so the fuse sizes were revised as shown.}
 
-\slide{12}{R1 has a pickup of 720 amperes. R2 forward uses plugs of 300 and 600 amperes, and the new reverse group 150 and 300 amperes. The dials were already at their limits, so the fuse sizes were revised as shown.}
+\slide{12}{Without DG, 35 of 39 cells were coordinated, and all 39 after one fuse change. In both examples, R2's fast curve is below the fuses and its delayed curve is above them.}
 
-\slide{13}{The first result is the base case without DG: the rated current and the minimum and maximum fault current of each branch. The feeder head sees 4.73 kiloamperes.}
+\slide{13}{With the DG and unchanged settings, coordination holds in only 24 of 39 cells. The fuse melts before the fast trip, and for some line-to-ground faults R2 does not even pick up the reverse current.}
 
-\slide{14}{These are the fuse coefficients from the method's fuse equation, with the installed fuse and its melting time in the last columns.}
+\slide{14}{Three faults with the conventional settings. In the first two the recloser still trips first. For the three-phase fault close to 632, R2 trips in 0.121 seconds, but the fuse melts in 0.039 seconds: coordination is lost.}
 
-\slide{15}{Without DG, 35 of 39 cells were coordinated, and all 39 after one fuse change. In both examples, R2's fast curve is below the fuses and its delayed curve is above them.}
+\slide{15}{With R2 as a DSDR and revised fuses, 38 of 39 cells are held under the zero-margin criterion. With the same revised fuses but a single-setting R2, only 31, so the dual setting itself restores seven cells. The DSDR with the old fuses gives only 25, so it needs the fuse revision. Only the line-to-ground fault at 692 stays lost, limited by the maximum delayed dial of R2.}
 
-\slide{16}{With the DG and unchanged settings, coordination holds in only 24 of 39 cells. The fuse melts before the fast trip, and for some line-to-ground faults R2 does not even pick up the reverse current.}
+\slide{16}{One case in detail: the three-phase fault near 632. With the single setting, R2 trips in 0.121 seconds, after the fuse starts melting: lost. With the reverse group, R2 trips in 0.052 seconds: held. Only the setting group changed.}
 
-\slide{17}{Three faults with the conventional settings. In the first two the recloser still trips first. For the three-phase fault close to 632, R2 trips in 0.121 seconds, but the fuse melts in 0.039 seconds: coordination is lost.}
+\slide{17}{This EMT simulation is a line-to-line fault at 684. Without DG, the two fast shots use only 45 per cent of the fuse's melting heat, and the fuse then clears the permanent fault. With the DG, current keeps flowing while R2 is open, and the fuse melts at 0.75 seconds, during the second fast shot.}
 
-\slide{18}{With R2 as a DSDR and revised fuses, 38 of 39 cells are held under the zero-margin criterion. With the same revised fuses but a single-setting R2, only 31, so the dual setting itself restores seven cells. The DSDR with the old fuses gives only 25, so it needs the fuse revision. Only the line-to-ground fault at 692 stays lost, limited by the maximum delayed dial of R2.}
+\slide{18}{Seven models with the DG from 0 to 100 per cent show the CTI falling: at 633 from plus 4 to minus 51 milliseconds, at 671 from 403 to 75 milliseconds.}
 
-\slide{19}{A bolted line-to-line fault at 646 with the DSDR. R2 trips in 0.086 seconds on its reverse group and R1 in 0.189 seconds. Both are before the fuse starts to melt at 0.415 seconds, so the fuse is saved.}
+\slide{19}{In summary: without DG, 35 cells and 39 after the fuse revision; 24 with the DG and a conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both. The reference paper reports 30 of 39 with a conventional R2 and 39 of 39 with the DSDR; I obtained 24 and 38. The trend is the same, and my fault levels follow the IEEE benchmark.}
 
-\slide{20}{This table gives the operating times with the DSDR. In every row the fuse starts to melt after the last fast trip.}
+\slide{20}{To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse revision raises this to 38 of 39, and the last cell is limited by R2's maximum delayed dial. The DSDR alone gives only 25, so it is necessary but not sufficient, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional element and inverter-based DG.}
 
-\slide{21}{One case in detail: the three-phase fault near 632. With the single setting, R2 trips in 0.121 seconds, after the fuse starts melting: lost. With the reverse group, R2 trips in 0.052 seconds: held. Only the setting group changed.}
+\slide{21}{These are the main references.}
 
-\slide{22}{As a second check I followed every fault in time. Above R2 the single setting holds 15 of 18 cells and the DSDR all 18. Below R2 the DG feeds the fault directly, so R2's setting makes no difference.}
+\slide{22}{Thank you for your attention. I am happy to take your questions.}
 
-\slide{23}{This EMT simulation is a line-to-line fault at 684. Without DG, the two fast shots use only 45 per cent of the fuse's melting heat, and the fuse then clears the permanent fault. With the DG, current keeps flowing while R2 is open, and the fuse melts at 0.75 seconds, during the second fast shot.}
+\partbar{Appendix slides --- only if asked}
 
-\slide{24}{Seven models with the DG from 0 to 100 per cent show the CTI falling: at 633 from plus 4 to minus 51 milliseconds, at 671 from 403 to 75 milliseconds.}
+\slide{23}{Compared with the reference paper, load currents agree within 2 per cent and the R1 worked example almost exactly. My fault levels are lower because I validated against the IEEE benchmark. The paper reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced: the DSDR with the fuse revision restores the coordination between the grid and the DG.}
 
-\slide{25}{In summary: without DG, 35 cells and 39 after the fuse revision; 24 with the DG and a conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both. These counts use a zero margin.}
+\slide{24}{My fault levels are lower than the paper's, so I checked them against the IEEE short-circuit benchmark. My model agrees within 2 per cent at ten of eleven nodes. The paper's values are up to 151 per cent higher, and two of them exceed its own feeder-head value of 5.41 kiloamperes, which is not possible in a radial feeder without DG.}
 
-\slide{26}{To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse revision raises this to 38 of 39, and the last cell is limited by R2's maximum delayed dial. The DSDR alone gives only 25, so it is necessary but not sufficient, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional element and inverter-based DG.}
+\slide{25}{The operating times with the DSDR show the same behaviour as the paper: in every row the fuse melts after the fast trip of the recloser that protects it. R1's delayed time is twenty times the fast time in both, which confirms the dials. R2's settings are not published, so its times are compared in trend only.}
 
-\slide{27}{These are the main references.}
+\slide{26}{Both studies show the margin decreasing with DG penetration; where it turns negative depends on settings the paper does not publish.}
 
-\slide{32}{Thank you for your attention. I am happy to take your questions.}
+\partbar{Backup slides --- only if asked}
 
-\vspace{8pt}
-{\color{navy}\hrule height 0.8pt}\vspace{3pt}
-{\small\bfseries\color{navy} Appendix slides --- only if asked}
+\slide{27}{These are the parameters of the synchronous DG, 4.05 MVA, connected at node 692.}
 
-\slide{28}{Compared with the reference paper, load currents agree within 2 per cent and the R1 worked example almost exactly. My fault levels are lower because I validated against the IEEE benchmark. The paper reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced: the DSDR with the fuse revision restores the coordination between the grid and the DG.}
+\slide{28}{The first result is the base case without DG: the rated current and the minimum and maximum fault current of each branch. The feeder head sees 4.73 kiloamperes.}
 
-\slide{29}{My fault levels are lower than the paper's, so I checked them against the IEEE short-circuit benchmark. My model agrees within 2 per cent at ten of eleven nodes. The paper's values are up to 151 per cent higher, and two of them exceed its own feeder-head value of 5.41 kiloamperes, which is not possible in a radial feeder without DG.}
+\slide{29}{These are the fuse coefficients from the method's fuse equation, with the installed fuse and its melting time in the last columns.}
 
-\slide{30}{The operating times with the DSDR show the same behaviour as the paper: in every row the fuse melts after the fast trip of the recloser that protects it. R1's delayed time is twenty times the fast time in both, which confirms the dials. R2's settings are not published, so its times are compared in trend only.}
+\slide{30}{A bolted line-to-line fault at 646 with the DSDR. R2 trips in 0.086 seconds on its reverse group and R1 in 0.189 seconds. Both are before the fuse starts to melt at 0.415 seconds, so the fuse is saved.}
 
-\slide{31}{Both studies show the margin decreasing with DG penetration; where it turns negative depends on settings the paper does not publish.}
+\slide{31}{This table gives the operating times with the DSDR. In every row the fuse starts to melt after the last fast trip.}
+
+\slide{32}{As a second check I followed every fault in time. Above R2 the single setting holds 15 of 18 cells and the DSDR all 18. Below R2 the DG feeds the fault directly, so R2's setting makes no difference.}
 
 \end{document}
