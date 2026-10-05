@@ -156,16 +156,15 @@ SLIDES = [
         (P, "the table, top to bottom"),
         (S, "In summary: without DG, 35 cells and 39 after the fuse revision; 24 with the DG and a "
             "conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both."),
-        (S, "These counts use a zero margin; with a three-cycle breaker time they become 31, and 26 with a "
-            "fuse safety margin as well."),
+        (S, "These counts use a zero margin."),
     ]),
     (26, "6. Conclusions and Future Work", [
         (S, "To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and "
             "fuse revision raises this to 38 of 39, and the last cell is limited by R2's maximum delayed "
             "dial."),
         (S, "The DSDR alone gives only 25, so it is necessary but not sufficient, and faults below R2 remain "
-            "a limit. Future work includes the 34-node feeder, a true directional element, practical margins "
-            "and inverter-based DG."),
+            "a limit. Future work includes the 34-node feeder, a true directional element and "
+            "inverter-based DG."),
     ]),
     (27, "7. References", [
         (S, "These are the main references."),

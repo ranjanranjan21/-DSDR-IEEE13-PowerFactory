@@ -235,8 +235,7 @@ NOTES = [
     """The study covers four fault types at twelve locations, which gives 39 node and fault-type cells,
     plus one EMT simulation and a penetration study. The limitations: the method does not uniquely specify some
     settings, so they were defined in this study and documented; the CDG34 relay model is not directional, so two
-    relay units are used; the coordination is classified with a zero margin, and practical margins are evaluated
-    separately; and only one DG location is studied.""",
+    relay units are used; the coordination is classified with a zero margin; and only one DG location is studied.""",
     # 7 method
     """The method has three stages: A, the conventional design without DG, with pickup equal to 1.25 times
     the rated current; B, the same settings with the DG; and C, R2 as a DSDR. If coordination is lost, the
@@ -320,15 +319,14 @@ NOTES = [
     # 17 summary
     """In summary: without DG 35 of 39 cells with the starting fuses and 39 after the fuse revision; 24 with
     the DG and a conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both.
-    These counts use a zero margin; with a three-cycle breaker time they become 31, and 26 with a fuse safety
-    margin as well. PowerFactory's own relay and fuse models reproduced all 1896 operating times within 1.22
+    These counts use a zero margin. PowerFactory's own relay and fuse models reproduced all 1896 operating times within 1.22
     percent.""",
     # 18 conclusions
     """To conclude: with the DG a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse
     revision raises this to 38 of 39 under the zero-margin criterion, and the last cell, the LG fault at 692,
     is limited by R2's maximum delayed dial. The DSDR alone gives only 25, so it is necessary but not
-    sufficient; with practical margins the result is 31 and 26 cells, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional
-    element, practical margins and inverter-based DG.""",
+    sufficient, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional
+    element and inverter-based DG.""",
     # 19 references
     """These are the main references; the method is from Yousaf and co-authors, 2022.""",
     # 20 appendix
@@ -489,7 +487,7 @@ def build():
         "The method does not uniquely specify the R2 settings, fuse sizes or fault type of each operating-time "
         "case; they were defined in this study and documented.",
         "The CDG34 library relay is not directional: two relay units, direction from the fault location.",
-        "Zero-margin criterion: CTI = t_MMT − t_F > 0; practical margins evaluated separately.",
+        "Zero-margin criterion: CTI = t_MMT − t_F > 0.",
         "One DG location (692); IEEE 34-node feeder not modelled."], size=16, space=6)
 
     # ---- methodology -----------------------------------------------------------------------
@@ -706,8 +704,7 @@ def build():
     text(s, 8.05, 1.3, 4.2, 4.9, [
         "PowerFactory's own relay and fuse models reproduce the calculated operating times within **1.22 %** "
         "(1896 operating times).",
-        "These counts use the zero-margin criterion, CTI = t_MMT − t_F > 0.",
-        "With a three-cycle breaker interrupting time: **31** cells held; with a fuse safety margin as well: **26**."],
+        "These counts use the zero-margin criterion, CTI = t_MMT − t_F > 0."],
         size=15, space=10)
 
     # ---- conclusions -----------------------------------------------------------------------
@@ -719,12 +716,11 @@ def build():
         "With the DG and a conventional R2: **24**. DSDR alone: 25; fuse revision alone: 31; combined DSDR and "
         "fuse revision: **38 of 39** (zero margin). The remaining LG fault at 692 is limited by R2's maximum "
         "delayed dial.",
-        "With a three-cycle breaker time the 38 cells become 31, and 26 with a fuse safety margin as well.",
         "The DSDR is necessary but not sufficient: it needs the fuse revision, and faults below R2 remain a limit. "
         "PowerFactory's relay and fuse models confirm the times within 1.22 %."], size=15, space=5)
     text(s, 0.75, 4.75, 11.4, 0.45, ["Future work"], bullet=False, size=18, color=NAVY)
     text(s, 0.75, 5.2, 11.4, 1.2, [
-        "IEEE 34-node feeder; explicit directional element for R2; practical margins; setting-group change "
+        "IEEE 34-node feeder; explicit directional element for R2; setting-group change "
         "triggered by the DG state; inverter-based DG; hardware-in-the-loop tests."], size=15)
 
     # ---- references ------------------------------------------------------------------------
