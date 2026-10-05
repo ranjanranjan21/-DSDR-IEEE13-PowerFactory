@@ -383,10 +383,8 @@ for k, r in enumerate(T2, 1):
     else:
         rows.append(base + ["\u2013", "%.2f" % float(r["If,max (kA)"]), "%.2f" % float(r["paper If,max (kA)"]), "\u2013", "\u2013"])
 table(s, rows, 0.4, 1.25, 12.55, [1.55, 1.05, 1.05, 1.1, 1.1, 1.2, 1.15, 1.15, 1.1, 1.1], size=10.5, row_h=0.30, colors=cols)
-textbox(s, 0.4, 5.50, 12.55, 0.55, [
-    "IEEE benchmark: [7] W. H. Kersting and G. Shirek, \u201cShort circuit analysis of IEEE test feeders,\u201d IEEE PES T&D, 2012 \u2013 bolted (maximum) fault currents, DG out. Paper: reference [1], Table II.",
-    "**The IEEE benchmark gives no minimum fault current.** If,min is defined by the method (LG fault through 3 \u03a9 at the farthest node), so it is compared with the paper only."],
-    size=10.5, color=MID, space=1)
+textbox(s, 0.4, 5.52, 12.55, 0.3, "IEEE benchmark: [7] W. H. Kersting and G. Shirek, \u201cShort circuit analysis of IEEE test feeders,\u201d IEEE PES T&D, 2012 (maximum fault current, DG out). Paper: reference [1], Table II.",
+        size=10.5, color=MID, space=0)
 ds_all = [abs(float(f["Study vs benchmark (%)"])) for f in FB.values()]
 dp_all = [float(f["Paper vs benchmark (%)"]) for f in FB.values()]
 box(s, 0.4, 6.05, 12.55, 0.78, "**Rated currents agree with the paper within 2 %%.** If,max: this study is within 2 %% of the IEEE benchmark at %d of %d nodes (largest %.1f %%); the paper is %.0f %% to %.0f %% higher. If,min on the 4.16 kV lines: 0.64 to 1.07 kA here, 0.59 to 1.24 kA in the paper." % (
