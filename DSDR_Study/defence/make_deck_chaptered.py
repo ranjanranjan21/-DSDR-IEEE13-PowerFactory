@@ -593,31 +593,22 @@ table(s, [["Stage", "This study (of 39)", "Reference paper [1]"],
 box(s, 0.9, 5.25, 11.5, 0.85, "Same trend as the reference paper. The counts differ because the model is validated against the IEEE short-circuit benchmark (feeder head 4.73 kA) and uses real dial ranges.",
     size=15, fill=WARM, line=ORANGE)
 
-# ================================================================================================ 18 conclusion
-s = slide("Chapter V: Conclusion",
-          "To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse revision "
-          "raises this to 38 of 39, and the last cell is limited by R2's maximum delayed dial. The DSDR alone gives "
-          "only 25, so it is necessary but not sufficient, and faults below R2 remain a limit.")
-textbox(s, 0.85, 1.40, 11.7, 5.2, [
-    "The DSDR method was implemented on the IEEE 13-node feeder in DIgSILENT PowerFactory with manufacturer-based relay and fuse characteristics; the model meets the IEEE benchmark within about 2 %.",
+# ================================================================================================ 18 conclusion and future scope
+s = slide("Chapter V: Conclusion and Future Scope", "")
+textbox(s, 0.82, 1.22, 11.7, 0.35, "**Conclusion**", size=19, color=NAVY, space=0)
+textbox(s, 0.85, 1.62, 11.8, 3.0, [
+    "The DSDR method was implemented on the IEEE 13-node feeder in DIgSILENT PowerFactory; the model meets the IEEE benchmark within about 2 %.",
     "Without DG: **35 of 39** cells with the starting fuses, **39 of 39** after the fuse revision.",
     "With the DG, a conventional R2 keeps only **24 of 39** cells: the fuse carries grid + DG current and melts before the fast trip.",
-    "DSDR alone: 25; fuse revision alone: 31; combined DSDR and fuse revision: **38 of 39** (zero-margin criterion).",
-    "The remaining LG fault at node 692 is limited by R2's maximum delayed dial.",
-    "The DSDR is **necessary but not sufficient**: it needs the fuse revision, and faults downstream of R2 remain a limit."],
-    size=17, bullet=True, space=12)
-
-# ================================================================================================ 19 recommendation
-s = slide("Chapter V: Recommendation and Future Scope",
-          "Future work includes the 34-node feeder, a true directional element and inverter-based DG.")
-textbox(s, 0.85, 1.40, 11.7, 5.2, [
-    "Extend the study to the IEEE 34-node test feeder.",
-    "Model an explicit directional element for R2 instead of two relay units.",
-    "Use a recloser with a wider dial range or user-defined curves to recover the remaining cell.",
-    "Change the setting group automatically with the state of the DG.",
-    "Include the disconnection of the DG during the reclosing dead time.",
-    "Study inverter-based generation and the sensitivity to fault impedance.",
-    "Validate with hardware-in-the-loop tests."], size=17, bullet=True, space=12)
+    "DSDR alone: 25; fuse revision alone: 31; DSDR with the fuse revision: **38 of 39** (zero-margin criterion).",
+    "The DSDR is **necessary but not sufficient**: it needs the fuse revision; the LG fault at 692 is limited by R2's delayed dial."],
+    size=15, bullet=True, space=5)
+textbox(s, 0.82, 4.72, 11.7, 0.35, "**Recommendation and Future Scope**", size=19, color=NAVY, space=0)
+textbox(s, 0.85, 5.12, 11.8, 1.7, [
+    "Extend the study to the IEEE 34-node feeder and to inverter-based DG.",
+    "Model an explicit directional element for R2, and change the setting group with the state of the DG.",
+    "Use a recloser with a wider dial range to recover the remaining cell; validate with hardware-in-the-loop tests."],
+    size=15, bullet=True, space=5)
 
 # ================================================================================================ 20 references
 s = slide("References", "These are the main references.")
@@ -692,9 +683,9 @@ SHORT = [
                                 "per cent heat. With DG it melts during the second shot."),
     ("Chapter IV: Summary", "In summary: 24 cells with a conventional recloser, 25 with the DSDR alone, 31 with the fuse "
                             "revision alone, and 38 with both. The paper reports 30 and 39."),
-    ("Chapter V: Conclusion", "The DSDR with the fuse revision raises coordination from 24 to 38 of 39 cells. It is "
-                              "necessary but not sufficient: it needs the fuse revision."),
-    ("Chapter V: Recommendation", "Future work: the 34-node feeder, a true directional element and inverter-based DG."),
+    ("Chapter V: Conclusion", "To conclude: the DSDR with the fuse revision raises coordination from 24 to 38 of 39 cells. "
+                              "It is necessary but not sufficient: it needs the fuse revision. Future work includes the "
+                              "34-node feeder, a true directional element and inverter-based DG."),
     ("References", "These are the main references."),
     ("Thank You", "Thank you. I am happy to take your questions."),
 ]
