@@ -373,6 +373,33 @@ table(s, paper, 6.85, 1.58, 6.0, [2.0, 1.3, 1.35, 1.35], size=11, row_h=0.31)
 box(s, 0.5, 6.05, 12.35, 0.72, "**Rated currents agree within 2 %.** Fault levels here are lower (feeder head 4.73 kA against 5.41 kA): the model follows the IEEE short-circuit benchmark within about 2 %.",
     size=13, fill=WARM, line=ORANGE)
 
+# ================================================================================================ 11b2 IEEE benchmark
+s = slide("Chapter IV: Fault Levels Against the IEEE Benchmark",
+          "Because my fault levels are lower than the paper's, I checked both against the IEEE short-circuit "
+          "benchmark. My model agrees within 2 per cent at ten of eleven nodes. The paper's values are 4 to 151 per "
+          "cent higher, and two of them exceed its own feeder-head value, which is not possible in a radial feeder "
+          "without DG.")
+FB = list(_csv.DictReader(open(os.path.join(STUDY, "results", "Fault_level_benchmark.csv"), encoding="utf-8")))
+rows = [["Node", "IEEE benchmark (kA)", "This study (kA)", "Study vs benchmark", "Paper, Table II (kA)", "Paper vs benchmark"]]
+cols = {}
+for k, r in enumerate(FB, 1):
+    ds, dp = float(r["Study vs benchmark (%)"]), float(r["Paper vs benchmark (%)"])
+    rows.append([r["Node"], "%.2f" % float(r["IEEE benchmark (kA)"]), "%.2f" % float(r["This study (kA)"]), "%+.1f %%" % ds,
+                 "%.2f" % float(r["Paper Table II If,max of the branch (kA)"]), "%+.1f %%" % dp])
+    cols[(k, 3)] = GREEN
+    if abs(dp) > 10:
+        cols[(k, 5)] = RED
+table(s, rows, 0.6, 1.35, 7.9, [0.9, 1.5, 1.4, 1.4, 1.4, 1.4], size=12, row_h=0.36, colors=cols, center_from=0)
+ds_all = [abs(float(r["Study vs benchmark (%)"])) for r in FB]
+dp_all = [float(r["Paper vs benchmark (%)"]) for r in FB]
+textbox(s, 8.8, 1.4, 4.0, 4.2, [
+    "**This study:** within 2 %% at %d of %d nodes; largest difference %.1f %%." % (sum(d <= 2.0 for d in ds_all), len(FB), max(ds_all)),
+    "**Reference paper:** %.0f %% to %.0f %% higher than the benchmark." % (min(dp_all), max(dp_all)),
+    "The paper's 6.73 kA and 7.83 kA exceed its own 5.41 kA at the feeder head.",
+    "Benchmark: Kersting and Shirek [7], maximum fault current, DG out."], size=15, bullet=True, space=10)
+box(s, 0.6, 6.0, 12.2, 0.72, "**The model was validated against the IEEE benchmark, not tuned to the paper's table.** This is why the operating times and cell counts differ from the paper.",
+    size=14, fill=WARM, line=ORANGE)
+
 # ================================================================================================ 11c Table III
 s = slide("Chapter IV: Fuse Coefficients – Side by Side",
           "These are the fuse coefficients b against Table three of the reference paper. They agree within about "
