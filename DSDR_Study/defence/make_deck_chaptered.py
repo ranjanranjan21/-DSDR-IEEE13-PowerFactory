@@ -385,6 +385,28 @@ textbox(s, 0.6, 4.2, 5.9, 2.3, [
     "Still lost: LG fault at 692 – R2's delayed dial is already at its maximum."], size=16, bullet=True, space=9)
 picture(s, "fig17.png", 6.8, 1.3, 6.0, 4.4, "Coordination status with the DSDR and revised fuses", "Only one cell remains lost.")
 
+# ================================================================================================ 13b Table IV
+s = slide("Chapter IV: Operating Times with the DSDR – Side by Side",
+          "This is the table of operating times with the DSDR, my study on the left and Table four of the "
+          "reference paper on the right. In every row of both, the fuse melts after the fast trip of the recloser "
+          "that protects it. R1's delayed time is twenty times its fast time in both, which confirms the dials. My "
+          "R1 times are mostly slower because my fault levels follow the IEEE benchmark and are lower.")
+import csv
+T4 = list(csv.DictReader(open(os.path.join(STUDY, "results", "comparison", "Table_IV_vs_paper.csv"))))
+dash = lambda v: "–" if v in ("---", "") else v
+HD = ["Node", "Fault", "R1 fast", "R1 delayed", "R2 fast", "R2 delayed", "Fuse melts"]
+mine = [HD] + [[r["node"], r["fault"], dash(r["R1 fast (s)"]), dash(r["R1 delayed (s)"]), dash(r["R2 fast (s)"]),
+                dash(r["R2 delayed (s)"]), dash(r["fuse MMT (s)"])] for r in T4]
+paper = [HD] + [[r["node"], r["fault"], dash(r["paper R1 fast"]), dash(r["paper R1 delayed"]), dash(r["paper R2 fast"]),
+                 dash(r["paper R2 delayed"]), dash(r["paper fuse MMT"])] for r in T4]
+W = [0.7, 0.7, 0.95, 1.15, 0.95, 1.15, 1.15]
+textbox(s, 0.35, 1.22, 6.2, 0.35, "**This study** (times in s)", size=15, color=NAVY, align=PP_ALIGN.CENTER, space=0)
+textbox(s, 6.78, 1.22, 6.2, 0.35, "**Reference paper [1], Table IV** (times in s)", size=15, color=NAVY, align=PP_ALIGN.CENTER, space=0)
+table(s, mine, 0.35, 1.62, 6.2, W, size=11, row_h=0.33)
+table(s, paper, 6.78, 1.62, 6.2, W, size=11, row_h=0.33)
+box(s, 0.35, 6.05, 12.63, 0.72, "**Same behaviour in both:** the fuse melts after the fast trip; R1 delayed = 20 × R1 fast (dials 0.5 / 10). R1 is slower here in most rows because the fault levels follow the IEEE benchmark; R2's settings are not published in the paper.",
+    size=13, fill=WARM, line=ORANGE)
+
 # ================================================================================================ 14 single vs dual
 s = slide("Chapter IV: Single versus Dual Setting",
           "One case in detail: the three-phase fault near 632. With the single setting, R2 trips in 0.121 seconds, "
