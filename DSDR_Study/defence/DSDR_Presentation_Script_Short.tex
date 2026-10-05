@@ -1,0 +1,60 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[left=1.5cm,right=1.5cm,top=1.1cm,bottom=1.0cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{xcolor}
+\definecolor{navy}{HTML}{1B3755}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+% slide number in the margin column, the text to read beside it
+\newcommand{\slide}[2]{\par\vspace{4.5pt}\noindent
+  \makebox[0.95cm][r]{\fontsize{13}{15}\selectfont\bfseries\color{navy}#1}\hspace{0.3cm}%
+  \parbox[t]{\dimexpr\linewidth-1.25cm}{\fontsize{11.3}{14.3}\selectfont\raggedright #2}\par}
+\newcommand{\partbar}[1]{\vspace{8pt}{\color{navy}\hrule height 0.8pt}\vspace{3pt}{\small\bfseries\color{navy} #1}\par}
+
+\begin{document}
+{\large\bfseries\color{navy} Presentation script}\hfill{\small Jhala Nath Kafle (081MSPSE009) \quad
+number = slide \quad about 7 minutes}\par\vspace{2pt}
+{\color{navy}\hrule height 0.8pt}
+
+\slide{1}{Good afternoon. I am Jhala Nath Kafle, roll number 081 MSPSE 009. My project is an adaptive overcurrent protection scheme for dual-setting directional recloser and fuse coordination in distribution networks with distributed generation, on the IEEE 13-node feeder in PowerFactory.}
+
+\slide{2}{In a fuse-saving scheme the recloser trips first on its fast curve, so a temporary fault clears and the fuse is saved. For a permanent fault, the delayed curve lets the fuse clear its lateral. This works only while the recloser and the fuse carry the same current, and a DG changes both the size and the direction of the fault current.}
+
+\slide{3}{With a DG, the fuse carries grid plus DG current, while the recloser sees only the grid part, and a mid-line recloser can even see reverse current. The fuse may then melt before the fast trip. The solution studied is the dual-setting directional recloser, or DSDR: the mid-line recloser R2 gets separate forward and reverse settings, chosen by the direction of the current.}
+
+\slide{4}{The general objective was to build and validate a PowerFactory implementation of the DSDR method on the IEEE 13-node feeder, with and without DG. The seven specific objectives are: the model, load flow and short circuit, the settings, coordination without and with the DG, the dual setting of R2, a time-domain check, and the effect of DG penetration.}
+
+\slide{5}{The study covers four fault types at twelve locations, which gives 39 node and fault-type cells, plus one EMT simulation and a penetration study. The limitations: some settings are not specified by the method and were defined here; the CDG34 relay model is not directional, so two relay units are used; a zero margin is used; and only one DG location is studied.}
+
+\slide{6}{The method has three stages: A, the conventional design without DG; B, the same settings with the DG; and C, R2 as a DSDR. If coordination is lost, the time dial is revised first, and at the dial limit the fuse is made larger.}
+
+\slide{7}{These are the equations of the method: the recloser curve with a fast and a delayed time dial, the pickup from the load current, the fuse line on log-log axes, and the coordination conditions.}
+
+\slide{8}{This is the PowerFactory model: a 4.16 kV feeder, a 4.05 MVA synchronous generator at node 692, R1 at the feeder head, R2 on line 632 to 671, and fuses on the laterals.}
+
+\slide{9}{R1 has a pickup of 720 amperes. R2 forward uses plugs of 300 and 600 amperes, and the new reverse group 150 and 300 amperes. The dials were already at their limits, so the fuse sizes were revised as shown.}
+
+\slide{10}{With the DG and unchanged settings, coordination holds in only 24 of 39 cells. The fuse melts before the fast trip, and for some line-to-ground faults R2 does not even pick up the reverse current.}
+
+\slide{11}{With R2 as a DSDR and revised fuses, 38 of 39 cells are held under the zero-margin criterion. With the same revised fuses but a single-setting R2, only 31, so the dual setting itself restores seven cells. The DSDR with the old fuses gives only 25, so it needs the fuse revision. Only the line-to-ground fault at 692 stays lost, limited by the maximum delayed dial of R2.}
+
+\slide{12}{One case in detail: the three-phase fault near 632. With the single setting, R2 trips in 0.121 seconds, after the fuse starts melting: lost. With the reverse group, R2 trips in 0.052 seconds: held. Only the setting group changed.}
+
+\slide{13}{This EMT simulation is a line-to-line fault at 684. Without DG, the two fast shots use only 45 per cent of the fuse's melting heat, and the fuse then clears the permanent fault. With the DG, current keeps flowing while R2 is open, and the fuse melts at 0.75 seconds, during the second fast shot.}
+
+\slide{14}{Seven models with the DG from 0 to 100 per cent show the CTI falling: at 633 from plus 4 to minus 51 milliseconds, at 671 from 403 to 75 milliseconds.}
+
+\slide{15}{In summary: without DG, 35 cells and 39 after the fuse revision; 24 with the DG and a conventional R2; 25 with the DSDR alone, 31 with the fuse revision alone, and 38 with both. The reference paper reports 30 of 39 with a conventional R2 and 39 of 39 with the DSDR; I obtained 24 and 38. The trend is the same, and my fault levels follow the IEEE benchmark.}
+
+\slide{16}{To conclude: with the DG, a conventional R2 keeps only 24 of 39 cells. The combined DSDR and fuse revision raises this to 38 of 39, and the last cell is limited by R2's maximum delayed dial. The DSDR alone gives only 25, so it is necessary but not sufficient, and faults below R2 remain a limit. Future work includes the 34-node feeder, a true directional element and inverter-based DG.}
+
+\slide{17}{These are the main references.}
+
+\slide{18}{Thank you for your attention. I am happy to take your questions.}
+
+\partbar{Appendix slide --- only if asked}
+
+\slide{19}{Compared with the reference paper, load currents agree within 2 per cent and the R1 worked example almost exactly. My fault levels are lower because I validated against the IEEE benchmark. The paper reports 30 and 39 coordinated cells, I obtained 24 and 38. The main finding is reproduced: the DSDR with the fuse revision restores the coordination between the grid and the DG.}
+
+\end{document}
