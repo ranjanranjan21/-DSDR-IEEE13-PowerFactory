@@ -360,47 +360,33 @@ import csv as _csv
 CMP = os.path.join(STUDY, "results", "comparison")
 rd = lambda f: list(_csv.DictReader(open(os.path.join(CMP, f), encoding="utf-8")))
 s = slide("Chapter IV: Branch Currents and Fault Levels – Side by Side",
-          "This compares the base case with Table two of the reference paper. The rated branch currents agree "
-          "within 2 per cent. My fault levels are lower: 4.73 kiloamperes at the feeder head against 5.41, because "
-          "the model is validated against the IEEE short-circuit benchmark.")
+          "This compares the base case with Table two of the reference paper and with the IEEE short-circuit "
+          "benchmark. The rated currents agree with the paper within 2 per cent. My fault levels are lower than the "
+          "paper's, so I checked both against the benchmark: my model agrees within 2 per cent at ten of eleven "
+          "nodes, while the paper's values are 4 to 151 per cent higher.")
 T2 = rd("Table_II_vs_paper.csv")
+FB = {r["Node"]: r for r in _csv.DictReader(open(os.path.join(STUDY, "results", "Fault_level_benchmark.csv"), encoding="utf-8"))}
 br = lambda r: ("%s %s" % (r["From"], r["To"])) if r["From"].startswith("XFM") else "%s–%s" % (r["From"], r["To"])
-H2 = ["Branch", "I nom (A)", "If,min (kA)", "If,max (kA)"]
-mine = [H2] + [[br(r), r["Inom (A)"], r["If,min (kA)"], r["If,max (kA)"]] for r in T2]
-paper = [H2] + [[br(r), r["paper Inom (A)"], r["paper If,min (kA)"], r["paper If,max (kA)"]] for r in T2]
-textbox(s, 0.5, 1.2, 6.0, 0.35, "**This study**", size=15, color=NAVY, align=PP_ALIGN.CENTER, space=0)
-textbox(s, 6.85, 1.2, 6.0, 0.35, "**Reference paper [1], Table II**", size=15, color=NAVY, align=PP_ALIGN.CENTER, space=0)
-table(s, mine, 0.5, 1.58, 6.0, [2.0, 1.3, 1.35, 1.35], size=11, row_h=0.31)
-table(s, paper, 6.85, 1.58, 6.0, [2.0, 1.3, 1.35, 1.35], size=11, row_h=0.31)
-box(s, 0.5, 6.05, 12.35, 0.72, "**Rated currents agree within 2 %.** Fault levels here are lower (feeder head 4.73 kA against 5.41 kA): the model follows the IEEE short-circuit benchmark within about 2 %.",
-    size=13, fill=WARM, line=ORANGE)
-
-# ================================================================================================ 11b2 IEEE benchmark
-s = slide("Chapter IV: Fault Levels Against the IEEE Benchmark",
-          "Because my fault levels are lower than the paper's, I checked both against the IEEE short-circuit "
-          "benchmark. My model agrees within 2 per cent at ten of eleven nodes. The paper's values are 4 to 151 per "
-          "cent higher, and two of them exceed its own feeder-head value, which is not possible in a radial feeder "
-          "without DG.")
-FB = list(_csv.DictReader(open(os.path.join(STUDY, "results", "Fault_level_benchmark.csv"), encoding="utf-8")))
-rows = [["Node", "IEEE benchmark (kA)", "This study (kA)", "Study vs benchmark", "Paper, Table II (kA)", "Paper vs benchmark"]]
+rows = [["Branch", "I nom (A), study", "I nom (A), paper", "If,max (kA), IEEE benchmark", "If,max (kA), this study",
+         "If,max (kA), paper", "Study vs benchmark", "Paper vs benchmark"]]
 cols = {}
-for k, r in enumerate(FB, 1):
-    ds, dp = float(r["Study vs benchmark (%)"]), float(r["Paper vs benchmark (%)"])
-    rows.append([r["Node"], "%.2f" % float(r["IEEE benchmark (kA)"]), "%.2f" % float(r["This study (kA)"]), "%+.1f %%" % ds,
-                 "%.2f" % float(r["Paper Table II If,max of the branch (kA)"]), "%+.1f %%" % dp])
-    cols[(k, 3)] = GREEN
-    if abs(dp) > 10:
-        cols[(k, 5)] = RED
-table(s, rows, 0.6, 1.35, 7.9, [0.9, 1.5, 1.4, 1.4, 1.4, 1.4], size=12, row_h=0.36, colors=cols, center_from=0)
-ds_all = [abs(float(r["Study vs benchmark (%)"])) for r in FB]
-dp_all = [float(r["Paper vs benchmark (%)"]) for r in FB]
-textbox(s, 8.8, 1.4, 4.0, 4.2, [
-    "**This study:** within 2 %% at %d of %d nodes; largest difference %.1f %%." % (sum(d <= 2.0 for d in ds_all), len(FB), max(ds_all)),
-    "**Reference paper:** %.0f %% to %.0f %% higher than the benchmark." % (min(dp_all), max(dp_all)),
-    "The paper's 6.73 kA and 7.83 kA exceed its own 5.41 kA at the feeder head.",
-    "Benchmark: Kersting and Shirek [7], maximum fault current, DG out."], size=15, bullet=True, space=10)
-box(s, 0.6, 6.0, 12.2, 0.72, "**The model was validated against the IEEE benchmark, not tuned to the paper's table.** This is why the operating times and cell counts differ from the paper.",
-    size=14, fill=WARM, line=ORANGE)
+for k, r in enumerate(T2, 1):
+    f = FB.get(r["To"])
+    if f:
+        ds, dp = float(f["Study vs benchmark (%)"]), float(f["Paper vs benchmark (%)"])
+        rows.append([br(r), r["Inom (A)"], r["paper Inom (A)"], "%.2f" % float(f["IEEE benchmark (kA)"]),
+                     "%.2f" % float(f["This study (kA)"]), "%.2f" % float(r["paper If,max (kA)"]), "%+.1f %%" % ds, "%+.1f %%" % dp])
+        cols[(k, 6)] = GREEN
+        if abs(dp) > 10:
+            cols[(k, 7)] = RED
+    else:
+        rows.append([br(r), r["Inom (A)"], r["paper Inom (A)"], "–", "%.2f" % float(r["If,max (kA)"]),
+                     "%.2f" % float(r["paper If,max (kA)"]), "–", "–"])
+table(s, rows, 0.5, 1.28, 12.35, [1.7, 1.2, 1.2, 1.6, 1.5, 1.4, 1.4, 1.4], size=11, row_h=0.305, colors=cols)
+ds_all = [abs(float(f["Study vs benchmark (%)"])) for f in FB.values()]
+dp_all = [float(f["Paper vs benchmark (%)"]) for f in FB.values()]
+box(s, 0.5, 5.95, 12.35, 0.85, "**Rated currents agree with the paper within 2 %%.** Fault levels: this study is within 2 %% of the IEEE benchmark at %d of %d nodes (largest %.1f %%); the paper is %.0f %% to %.0f %% higher. The model was validated against the benchmark, not tuned to the paper." % (
+    sum(d <= 2.0 for d in ds_all), len(FB), max(ds_all), min(dp_all), max(dp_all)), size=13, fill=WARM, line=ORANGE)
 
 # ================================================================================================ 11c Table III
 s = slide("Chapter IV: Fuse Coefficients – Side by Side",
