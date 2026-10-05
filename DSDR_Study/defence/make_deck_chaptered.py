@@ -214,7 +214,7 @@ for k, (ch, txt) in enumerate([
         ("Chapter I", "Introduction, problem statement, objectives and scope"),
         ("Chapter II", "Literature review, research gap and positioning of the project"),
         ("Chapter III", "Methodology: test system, flowchart, formulation and protection settings"),
-        ("Chapter IV", "Results and discussion: coordination without DG, with DG, with the DSDR; EMT; DG penetration"),
+        ("Chapter IV", "Results and discussion: coordination without DG and with DG; DG penetration; the DSDR; EMT check"),
         ("Chapter V", "Conclusion, recommendation and future scope"),
         ("References", "Method, test feeder and device sources")]):
     y = 1.30 + 0.82 * k
@@ -460,6 +460,32 @@ box(s, 0.7, 6.0, 11.9, 0.78, "**Agree in %d of %d cells** (%d held in both, %d l
     n_hh + n_ll, len(cells), n_hh, n_ll, len(here) + len(there), len(here), sum(r["node"] == "DL" for r in here),
     len(there), ", ".join(sorted(set(r["node"] for r in there)))), size=13, fill=WARM, line=ORANGE)
 
+# ================================================================================================ 16 penetration
+s = slide("Chapter IV: Effect of the DG Penetration Level \u2013 Side by Side",
+          "Seven models with the DG from 0 to 100 per cent and the conventional settings show the CTI falling: at 633 from plus 4 to minus 51 "
+          "milliseconds, at 671 from 403 to 75 milliseconds. The table gives the share of the CTI at each level "
+          "next to the values read from the paper's figure. Both fall steadily as the DG grows. In my study node "
+          "633 is negative from 10 per cent, in the paper from 50 per cent, because my starting margin there is "
+          "only 4 milliseconds. This is why a setting that adapts to the DG is needed.")
+# share of the CTI at each penetration level (ring %): this study and the values read from the paper's Fig. 7
+PEN = [("0", "+2.1", "+30", "+26.0", "+36"), ("10", "\u22123.1", "+23", "+21.5", "+22"), ("25", "\u22129.6", "+14", "+16.4", "+12"),
+       ("37", "\u221213.9", "+6", "+13.4", "+6"), ("50", "\u221217.9", "\u22124", "+10.7", "0"),
+       ("75", "\u221224.2", "\u22129", "+7.1", "\u22128"), ("100", "\u221229.2", "\u221216", "+4.9", "\u221214")]
+rows = [["DG (%)", "Node 633 study", "Node 633 paper", "Node 671 study", "Node 671 paper"]] + [list(r) for r in PEN]
+cols = {}
+for i, r in enumerate(PEN, 1):
+    for j in (1, 2, 3, 4):
+        if r[j].startswith("\u2212"):
+            cols[(i, j)] = RED
+table(s, rows, 0.5, 1.35, 6.2, [0.9, 1.35, 1.35, 1.35, 1.35], size=12.5, row_h=0.37, colors=cols, center_from=0)
+textbox(s, 0.5, 4.40, 6.2, 0.3, "Share of the CTI at each penetration level (%). Paper: values read from Fig. 7 of [1].", size=10.5, color=MID, space=0)
+textbox(s, 0.5, 4.78, 6.2, 1.2, [
+    "This study, in time: CTI at 633 from **+4 ms to \u221251 ms**; at 671 from **+403 ms to +75 ms**.",
+    "The fuse carries grid + DG current, the recloser only the grid share."], size=14, bullet=True, space=5)
+picture(s, "pen_ring_vs_paper.png", 6.95, 1.3, 6.0, 4.2, "This study (left) and the reference paper (right)", "Outer ring: node 671. Inner ring: node 633.")
+box(s, 0.5, 6.05, 12.4, 0.75, "**Same trend in both:** the CTI falls steadily as the DG penetration rises. Node 633 turns negative from 10 % here and from 50 % in the paper, because the starting margin here is only +4 ms.",
+    size=13, fill=WARM, line=ORANGE)
+
 # ================================================================================================ 13 DSDR
 s = slide("Chapter IV: With the DSDR",
           "With R2 as a DSDR and revised fuses, 38 of 39 cells are held. With the same revised fuses but a "
@@ -542,32 +568,6 @@ textbox(s, 0.6, 4.2, 5.9, 2.4, [
     "LL fault (a–c) at 684 through 0.2 Ω, conventional settings.",
     "With the DG the fuse carries more current, and the DG keeps feeding the fault while R2 is open."], size=16, bullet=True, space=9)
 picture(s, "fig10.png", 6.8, 1.2, 6.0, 5.0, "Current at node 632: without DG (top), with DG (bottom)")
-
-# ================================================================================================ 16 penetration
-s = slide("Chapter IV: Effect of the DG Penetration Level \u2013 Side by Side",
-          "Seven models with the DG from 0 to 100 per cent show the CTI falling: at 633 from plus 4 to minus 51 "
-          "milliseconds, at 671 from 403 to 75 milliseconds. The table gives the share of the CTI at each level "
-          "next to the values read from the paper's figure. Both fall steadily as the DG grows. In my study node "
-          "633 is negative from 10 per cent, in the paper from 50 per cent, because my starting margin there is "
-          "only 4 milliseconds.")
-# share of the CTI at each penetration level (ring %): this study and the values read from the paper's Fig. 7
-PEN = [("0", "+2.1", "+30", "+26.0", "+36"), ("10", "\u22123.1", "+23", "+21.5", "+22"), ("25", "\u22129.6", "+14", "+16.4", "+12"),
-       ("37", "\u221213.9", "+6", "+13.4", "+6"), ("50", "\u221217.9", "\u22124", "+10.7", "0"),
-       ("75", "\u221224.2", "\u22129", "+7.1", "\u22128"), ("100", "\u221229.2", "\u221216", "+4.9", "\u221214")]
-rows = [["DG (%)", "Node 633 study", "Node 633 paper", "Node 671 study", "Node 671 paper"]] + [list(r) for r in PEN]
-cols = {}
-for i, r in enumerate(PEN, 1):
-    for j in (1, 2, 3, 4):
-        if r[j].startswith("\u2212"):
-            cols[(i, j)] = RED
-table(s, rows, 0.5, 1.35, 6.2, [0.9, 1.35, 1.35, 1.35, 1.35], size=12.5, row_h=0.37, colors=cols, center_from=0)
-textbox(s, 0.5, 4.40, 6.2, 0.3, "Share of the CTI at each penetration level (%). Paper: values read from Fig. 7 of [1].", size=10.5, color=MID, space=0)
-textbox(s, 0.5, 4.78, 6.2, 1.2, [
-    "This study, in time: CTI at 633 from **+4 ms to \u221251 ms**; at 671 from **+403 ms to +75 ms**.",
-    "The fuse carries grid + DG current, the recloser only the grid share."], size=14, bullet=True, space=5)
-picture(s, "pen_ring_vs_paper.png", 6.95, 1.3, 6.0, 4.2, "This study (left) and the reference paper (right)", "Outer ring: node 671. Inner ring: node 633.")
-box(s, 0.5, 6.05, 12.4, 0.75, "**Same trend in both:** the CTI falls steadily as the DG penetration rises. Node 633 turns negative from 10 % here and from 50 % in the paper, because the starting margin here is only +4 ms.",
-    size=13, fill=WARM, line=ORANGE)
 
 # ================================================================================================ 17 summary
 s = slide("Chapter IV: Summary and Comparison",
