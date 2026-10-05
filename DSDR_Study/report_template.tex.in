@@ -216,8 +216,7 @@ recloser, increasingly so as the DG penetration rises. With the DG connected, a 
 mid-line recloser keeps the coordination in 24 of the 39 studied fault cells. The dual-setting directional
 recloser alone raises this to 25 cells, and together with a revision of the fuse sizes to 38 of 39 cells under
 the zero-margin criterion; the remaining cell, an LG fault at node 692, is limited by the delayed dial range of
-the recloser. When a three-cycle breaker interrupting time and a fuse safety margin are included, the number
-of coordinated cells falls to 31 and 26. The relay and fuse models of \PF{} confirm the calculated operating
+the recloser. The relay and fuse models of \PF{} confirm the calculated operating
 times within <<PF_MAX>> per cent.
 
 \textbf{Keywords:} distributed generation, dual-setting directional recloser, fuse saving, recloser--fuse
@@ -349,12 +348,10 @@ respected, and it separates the contribution of the dual setting from the contri
 \item The method does not uniquely specify the R2 settings, the fuse sizes, the source impedance or the fault
       type of each operating-time case; these choices were therefore defined in this study, and every choice
       and its basis is listed in Section~\ref{sec:assumptions}.
-\item The coordination is classified with a zero margin; the effect of a breaker interrupting time and a
-      fuse safety margin is evaluated separately in Section~\ref{sec:margin}.
 \item The library model of the CDG34 relay is not directional. The two setting groups are modelled as
       separate relay units and the direction is assigned from the fault location.
-\item Coordination is judged with a zero-margin criterion (the fuse must not start to melt before the fast
-      trip). Section~\ref{sec:margin} shows how the result changes with a breaker time and a fuse margin.
+\item Coordination is judged with a zero-margin criterion: the fuse must not start to melt before the fast
+      trip.
 \item The DG penetration study (Section~\ref{sec:pen}) uses one DG location (692) and keeps the protection
       of the design without DG at every level.
 \item The IEEE 34-node feeder has not been modelled.
@@ -575,8 +572,7 @@ t_{TCT}(I_{fuse}) < t_D \quad\text{for the same reclosers,}
 together with the series-fuse condition of eq.~\eqref{eq:75} and a margin of at least 10~cycles
 between the delayed curves of R2 and R1. The coordination time interval is $CTI = t_{MMT} - t_F$, the time by
 which the fuse starts to melt after the latest fast trip; a cell is held when $CTI > 0$ (the zero-margin
-criterion). An additional engineering margin, for the breaker interrupting time and for uncertainty, is not
-part of the classification and is examined separately in Section~\ref{sec:margin}. A cell (node and fault type) is held only if every phase
+criterion). A cell (node and fault type) is held only if every phase
 combination of that fault type is held. The fuse and each recloser are evaluated at their own currents,
 because with DG they differ.
 
@@ -1128,13 +1124,11 @@ the settings were entered into the relay and fuse elements of the model, and \PF
 time of every device for every fault, for the conventional and for the DSDR settings. Over <<PF_N>> operating
 times the largest deviation is <<PF_MAX>> per cent.
 
-\subsection{Sensitivity of the Result to the Margin}
-\label{sec:margin}
-The <<N17_HELD>> held cells are obtained with a zero margin. If the breaker interrupting time of three cycles
-is added to the fast trip, 31 cells are held; if in addition a safety margin is kept on
-the fuse melting time, 26 cells are held. The pickups are a second limit: with the DG, the lowest LG fault current
-through 3\ohm{} is 577\,A at R1 and 368\,A at R2, below the pickups of 734.6\,A and 587.5\,A, because the DG
-supplies part of the fault.
+\subsection{Sensitivity of the Pickups With DG}
+\label{sec:pickdg}
+The pickups are a further limit of the settings. With the DG, the lowest LG fault current through 3\ohm{} is
+577\,A at R1 and 368\,A at R2, below the pickups of 734.6\,A and 587.5\,A, because the DG supplies part of
+the fault.
 
 \subsection{Effect of the DG Penetration Level}
 \label{sec:pen}
@@ -1338,10 +1332,7 @@ the DG, achieving <<N17_HELD>> of <<N_CELLS>> coordinated fault cells under the 
 seven of the restored cells need the dual setting. The remaining LG fault at node 692 is limited by the
 maximum available R2 delayed dial.
 
-The result depends on the margin. When a three-cycle breaker interrupting time is added to the fast trip,
-the number of coordinated cells decreases from <<N17_HELD>> to 31, and with an additional fuse safety margin
-to 26. The faults downstream of R2 with the DG in service also remain outside what the dual setting can
-correct. The relay and fuse models of \PF{} confirm the calculated operating times within <<PF_MAX>> per cent.
+The faults downstream of R2 with the DG in service remain outside what the dual setting can correct. The relay and fuse models of \PF{} confirm the calculated operating times within <<PF_MAX>> per cent.
 
 \subsection{Major Findings}
 \begin{enumerate}
@@ -1354,8 +1345,6 @@ correct. The relay and fuse models of \PF{} confirm the calculated operating tim
 \item Coordination (of 39 cells): 35 without DG with the starting fuses and 39 after the fuse revision;
       <<N14_HELD>> with DG and a conventional R2; 25 with the DSDR alone; <<N17_SINGLE>> with the fuse revision
       alone; <<N17_HELD>> with the DSDR and the fuse revision, under the zero-margin criterion.
-\item The <<N17_HELD>> cells become 31 when a three-cycle breaker interrupting time is added to the fast trip,
-      and 26 when a safety margin is also kept on the fuse melting time.
 \item The dual setting restores seven cells with the revised fuses and one cell without the revision.
 \item The LG fault at 692 cannot be coordinated within the delayed dial range of R2.
 \item With rising DG penetration and fixed settings the CTI falls at both studied nodes (633: from about
@@ -1376,7 +1365,7 @@ correct. The relay and fuse models of \PF{} confirm the calculated operating tim
 
 \subsection{Future Work}
 Future work may include the extension of the study to the IEEE 34-node test feeder, an explicit directional
-element for R2, a classification with a practical margin (breaker time and a fuse margin), a recloser with a
+element for R2, a recloser with a
 wider dial range or with user-defined curves, a setting-group
 change triggered by the DG state, the disconnection logic of the DG during the reclosing dead time, the
 sensitivity to fault impedance, inverter-based generation, and hardware-in-the-loop tests.
