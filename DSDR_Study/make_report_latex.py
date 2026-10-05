@@ -217,7 +217,9 @@ T["EMT_RMS"] = "%.0f / %.0f" % (n["fault_rms_a"], n["fault_rms_c"])
 T["EMT_PEAK"] = "%.0f / %.0f" % (n["steady_peak_a"], n["steady_peak_c"])
 
 # ---- appendix D: the Python scripts of the study -----------------------------------------------
-SCRIPTS = [("pf_setup.py", "Connection to PowerFactory and helper functions"),
+SCRIPTS = [("show_progress.py", "Script of the PowerFactory script object Final(1): runs the load flows, the "
+                                "short-circuit database and the coordination study, and prints the report in the Output Window"),
+           ("pf_setup.py", "Connection to PowerFactory and helper functions"),
            ("protection_data.py", "Feeder, device and fault data"),
            ("curves.py", "Relay and fuse time--current curves"),
            ("step1_build_model.py", "Builds the protection devices and the DG in the model"),
@@ -236,7 +238,7 @@ for name, purpose in SCRIPTS:
     assert "\\end{lstlisting}" not in code and "<<" not in code, name
     tex_name = name.replace("_", "\\_")
     tab.append("\\texttt{%s} & %s \\\\ \\hline" % (tex_name, purpose))
-    parts.append("\\subsection*{D.%d\\quad \\texttt{%s}}\n%s.\n\\begin{lstlisting}\n%s\n\\end{lstlisting}\n" % (
+    parts.append("\\subsection*{C.%d\\quad \\texttt{%s}}\n%s.\n\\begin{lstlisting}\n%s\n\\end{lstlisting}\n" % (
         len(parts) + 1, tex_name, purpose, code.rstrip()))
 T["SCRIPT_TABLE"] = "\n".join(tab)
 T["SCRIPT_LISTINGS"] = "\n".join(parts)

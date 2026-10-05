@@ -366,7 +366,7 @@ Chapter One introduces the problem and the objectives. Chapter Two reviews the l
 method followed. Chapter Three gives the method and its equations. Chapter Four describes the \PF{} model,
 the DG, the protection devices and the simulation cases. Chapter Five presents the results. Chapter Six
 discusses the findings and their limits. Chapter Seven gives the conclusions and the future work. The
-comparison with the reference paper is in Appendix~C.
+comparison with the reference paper is in Appendix~B.
 
 % =====================================================================================================
 \chapterhead{TWO}{LITERATURE REVIEW}
@@ -1402,11 +1402,7 @@ General Meeting}, 2020, doi: 10.1109/PESGM41954.2020.9281529.
 \end{spacing}
 
 % =====================================================================================================
-\appendixhead{A}{COMPLETE COPY OF THE REFERENCE PAPER}
-The complete reference paper~\cite{yousaf2022} is attached as a separate, unchanged
-PDF copy in accordance with the requirement of the department. It is not reproduced inside this document.
-
-\appendixhead{B}{IMPLEMENTATION FORMULAS}
+\appendixhead{A}{IMPLEMENTATION FORMULAS}
 The operating times are evaluated with the following expressions, where $M = I_f/I_p$ for R1 and
 $M = I_f/I_s$ for R2.
 \begin{align}
@@ -1426,7 +1422,7 @@ carries 5426\,A, the sum of both contributions: its curve points are 4800\,A at 
 $f = \ln(5426/4800)/\ln(6392/4800) = 0.428$, $t_{MMT} = 0.2\times0.5^{0.428} = 0.149$\,s. The fuse outlasts the
 last fast trip (0.106\,s) by 0.043\,s.
 
-\appendixhead{C}{COMPARISON WITH THE REFERENCE PAPER}
+\appendixhead{B}{COMPARISON WITH THE REFERENCE PAPER}
 This appendix compares the results of Chapter Five with the values printed in the reference
 paper~\cite{yousaf2022} or read from its figures.
 
@@ -1645,7 +1641,7 @@ not publish.
 \end{table}
 
 % =====================================================================================================
-\appendixhead{D}{PYTHON SCRIPTS}
+\appendixhead{C}{PYTHON SCRIPTS}
 The model, the studies and the evaluation of the coordination were run in DIgSILENT \PF{} through its Python
 interface. This appendix lists the scripts in the order in which they are run. Table~\ref{tab:scripts} gives
 the purpose of each script.
@@ -1662,4 +1658,10 @@ the purpose of each script.
 \end{table}
 
 <<SCRIPT_LISTINGS>>
+
+% =====================================================================================================
+\appendixhead{D}{COMPLETE COPY OF THE REFERENCE PAPER}
+The complete reference paper~\cite{yousaf2022} is attached as a separate, unchanged
+PDF copy in accordance with the requirement of the department. It is not reproduced inside this document.
+
 \end{document}

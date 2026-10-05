@@ -52,7 +52,7 @@ def pdf_pages(pdf_path):
     for i in range(start + 1, len(doc)):
         if page_text(doc[i]).startswith("CHAPTER ONE"):           # starts a new section anyway
             continue
-        if page_text(doc[i]).startswith("APPENDIX D"):            # code listings: Word paginates them itself
+        if "PYTHON SCRIPTS" in page_text(doc[i])[:60]:            # code listings: Word paginates them itself
             break
         page = doc[i]
         h = page.rect.height

@@ -389,7 +389,7 @@ Chapter One introduces the problem and the objectives. Chapter Two reviews the l
 method followed. Chapter Three gives the method and its equations. Chapter Four describes the \PF{} model,
 the DG, the protection devices and the simulation cases. Chapter Five presents the results. Chapter Six
 discusses the findings and their limits. Chapter Seven gives the conclusions and the future work. The
-comparison with the reference paper is in Appendix~C.
+comparison with the reference paper is in Appendix~B.
 
 % =====================================================================================================
 \chapterhead{TWO}{LITERATURE REVIEW}
@@ -1554,11 +1554,7 @@ General Meeting}, 2020, doi: 10.1109/PESGM41954.2020.9281529.
 \end{spacing}
 
 % =====================================================================================================
-\appendixhead{A}{COMPLETE COPY OF THE REFERENCE PAPER}
-The complete reference paper~\cite{yousaf2022} is attached as a separate, unchanged
-PDF copy in accordance with the requirement of the department. It is not reproduced inside this document.
-
-\appendixhead{B}{IMPLEMENTATION FORMULAS}
+\appendixhead{A}{IMPLEMENTATION FORMULAS}
 The operating times are evaluated with the following expressions, where $M = I_f/I_p$ for R1 and
 $M = I_f/I_s$ for R2.
 \begin{align}
@@ -1578,7 +1574,7 @@ carries 5426\,A, the sum of both contributions: its curve points are 4800\,A at 
 $f = \ln(5426/4800)/\ln(6392/4800) = 0.428$, $t_{MMT} = 0.2\times0.5^{0.428} = 0.149$\,s. The fuse outlasts the
 last fast trip (0.106\,s) by 0.043\,s.
 
-\appendixhead{C}{COMPARISON WITH THE REFERENCE PAPER}
+\appendixhead{B}{COMPARISON WITH THE REFERENCE PAPER}
 This appendix compares the results of Chapter Five with the values printed in the reference
 paper~\cite{yousaf2022} or read from its figures.
 
@@ -1869,7 +1865,7 @@ not publish.
 \end{table}
 
 % =====================================================================================================
-\appendixhead{D}{PYTHON SCRIPTS}
+\appendixhead{C}{PYTHON SCRIPTS}
 The model, the studies and the evaluation of the coordination were run in DIgSILENT \PF{} through its Python
 interface. This appendix lists the scripts in the order in which they are run. Table~\ref{tab:scripts} gives
 the purpose of each script.
@@ -1879,6 +1875,7 @@ the purpose of each script.
 \begin{tabularx}{\textwidth}{|l|L|}
 \hline
 \textbf{Script} & \textbf{Purpose} \\ \hline
+\texttt{show\_progress.py} & Script of the PowerFactory script object Final(1): runs the load flows, the short-circuit database and the coordination study, and prints the report in the Output Window \\ \hline
 \texttt{pf\_setup.py} & Connection to PowerFactory and helper functions \\ \hline
 \texttt{protection\_data.py} & Feeder, device and fault data \\ \hline
 \texttt{curves.py} & Relay and fuse time--current curves \\ \hline
@@ -1892,7 +1889,181 @@ the purpose of each script.
 \label{tab:scripts}
 \end{table}
 
-\subsection*{D.1\quad \texttt{pf\_setup.py}}
+\subsection*{C.1\quad \texttt{show\_progress.py}}
+Script of the PowerFactory script object Final(1): runs the load flows, the short-circuit database and the coordination study, and prints the report in the Output Window.
+\begin{lstlisting}
+"""
+Script behind the PowerFactory script object "Final(1)".  The report appears in the Output Window.
+
+First (always)     load flow on all buses and branches, "From node -> To node", DG disconnected
+                   and connected                                          loadflow_all_buses.py
+
+Stage 1 (RUN_DATABASE)  load-flow and short-circuit database, DG disconnected and connected, with the
+                   current through R1 and R2 and its direction, If,max, If,min and a validation
+                   checklist                                                  database_study.py
+                   -> results/database/  (no relay or fuse setting is touched)
+
+Stage 2 (only when RUN_COORDINATION = True, i.e. after the database has been checked)
+                   design by the paper's method: Tables II, III, IV, Figs. 14, 17;
+                   settings written into the model and PowerFactory's trip times checked;
+                   Tables I-IV (Table IV with the fuse t_MMT) -> results/database/   make_tables.py
+                                                    step2_studies.py, step3_..., step4_...
+
+While it runs, PowerFactory fills the Output Window with its own messages (a fault on a phase a
+bus does not have is reported as "Short-circuit calculation not possible"; that is normal).  At the
+end the window is cleared and only the report is printed.  The report is also saved as
+results/Show_Progress_output.txt.
+
+Replaces the old Show_Progress.py, which needs relays named "R1" and "R2"; in this model they are
+"R1 Fast", "R1 Delayed", "R2 Fast", "R2 Delayed", "R2 Rev Fast", "R2 Rev Delayed".
+
+Run: Python Script (ComPython) -> Execute.  The model is left in the study case
+"Study with Substation Transformer".
+"""
+
+import contextlib
+import csv
+import gc
+import io
+import os
+import runpy
+import subprocess
+import sys
+import traceback
+
+DIR = r"C:\Users\Rabin\Desktop\Digsilent_project - TWIST AND TURN\DSDR_Study"
+if not os.path.isdir(DIR):
+    DIR = os.path.dirname(os.path.abspath(__file__))
+RES = os.path.join(DIR, "results")
+OUT_TXT = os.path.join(RES, "Show_Progress_output.txt")
+RUN_DATABASE = True           # False: only the load flow on all buses and branches
+RUN_COORDINATION = True       # stage 2 after the database; switched on 2026-10-01 (database accepted)
+OWN = ("pf_setup", "protection_data", "curves", "step3_design_and_evaluate")
+
+
+def forget():
+    """PowerFactory keeps its Python session between runs: drop this project's modules (and with
+    them the Application object of an earlier run) so every run starts clean."""
+    for m in OWN:
+        sys.modules.pop(m, None)
+    gc.collect()
+
+
+forget()
+if DIR not in sys.path:
+    sys.path.insert(0, DIR)
+import pf_setup
+
+app = pf_setup.get_app()
+report = []
+pf_setup.out = lambda msg="": report.append(str(msg))      # the steps' messages go into the report
+
+
+def banner(text):
+    report.extend(["", "#" * 100, "#  " + text, "#" * 100])
+
+
+def step(script, *args):
+    """Run one step of the pipeline; what it prints goes into the report."""
+    argv = getattr(sys, "argv", None)
+    sys.argv = [script] + list(args)
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            runpy.run_path(os.path.join(DIR, script), run_name="__main__")
+    finally:
+        report.extend(buf.getvalue().splitlines())
+        if argv is None:
+            del sys.argv
+        else:
+            sys.argv = argv
+        sys.modules.pop("step3_design_and_evaluate", None)   # step 4 must read the new results
+
+
+def external(script):
+    """Run a step that needs no PowerFactory with the normal python.exe: PowerFactory's built-in
+    interpreter is some 50 times slower on pure calculation (step 3: 13 minutes instead of 15 s)."""
+    exe = os.path.join(os.path.dirname(os.path.dirname(os.__file__)), "python.exe")
+    if not os.path.isfile(exe):
+        return step(script)
+    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    p = subprocess.run([exe, os.path.join(DIR, script)], cwd=DIR, env=env, stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    report.extend(p.stdout.decode("utf-8", "replace").splitlines())
+    if p.returncode:
+        raise RuntimeError("%s failed (exit code %d)" % (script, p.returncode))
+
+
+def grid(title, column):
+    """Fig. 14 / 17 as text: one symbol per faulted node and fault type."""
+    rows = list(csv.DictReader(open(os.path.join(RES, "Fig14_Fig17_classification.csv"))))
+    nodes = []
+    for r in rows:
+        if r["node"] not in nodes:
+            nodes.append(r["node"])
+    sym = {"held": "v", "lost": "x", "n/a": "-"}
+    report.extend(["", "   " + title, "   (v) exists   (x) doesn't exist   (-) not applicable"])
+    for ft in ("LG", "LL", "LLG", "LLL"):
+        cells = {r["node"]: sym[r[column]] for r in rows if r["fault"] == ft}
+        report.append("   %-4s |" % ft + "".join("  (%s) " % cells[n] for n in nodes))
+    report.append("        +" + "-" * (6 * len(nodes)) + "> faulted node")
+    report.append("         " + "".join(" %-5s" % n for n in nodes))
+
+
+def run():
+    app.PrintPlain("Running. PowerFactory's messages below are replaced by the report at the end.")
+    app.EchoOff()
+    banner("LOAD FLOW ON ALL BUSES AND BRANCHES  (From node -> To node; no setting is changed)")
+    step("loadflow_all_buses.py")
+    if not RUN_DATABASE:
+        report.extend(["", "Short-circuit database and relay coordination not run: RUN_DATABASE = False in show_progress.py."])
+        return
+    banner("STAGE 1 - LOAD-FLOW AND SHORT-CIRCUIT DATABASE  (no relay or fuse setting is changed)")
+    step("database_study.py")
+    if not RUN_COORDINATION:
+        report.extend(["", "Relay coordination (pickup, fast / delayed operation, TDS, TCC, CTI) has NOT been run:",
+                       "RUN_COORDINATION = False in show_progress.py. Set it to True once the database is accepted."])
+        return
+    banner("STAGE 2 - RELAY COORDINATION")
+    banner("1. LOAD FLOWS AND SHORT CIRCUITS  (PowerFactory, complete method, unbalanced)")
+    step("step2_studies.py")
+    banner("2. DESIGN BY THE PAPER'S METHOD  -  Tables II, III, IV; Figs. 14, 17")
+    external("step3_design_and_evaluate.py")
+    banner("FIG. 14 AND FIG. 17  -  recloser-fuse coordination, DG 4.05 MVA at 692")
+    grid("Fig. 14: without the DSDR", "without DSDR (Fig14)")
+    grid("Fig. 17: with the DSDR", "with DSDR (Fig17)")
+    banner("3. DSDR SETTINGS IN THE MODEL  -  PowerFactory's trip times against the calculation")
+    step("step4_apply_settings.py", "dsdr")
+    banner("4. TABLES I-IV OF THE PAPER  (Table IV with the fuse t_MMT and t_TCT)  -> results/database/")
+    external("make_tables.py")
+    external("make_figures_1_to_6.py")
+    report.extend(["", "Figures: " + os.path.join(RES, "figures") + "  (Fig01 ... Fig17)",
+                   "Tables:  " + os.path.join(RES, "database") + "  (Table_I ... Table_IV csv, Tables_I_to_IV.txt)"])
+
+
+try:
+    try:
+        run()
+    except Exception:
+        report.extend(["", "SCRIPT STOPPED WITH AN ERROR:"] + ["  " + s for s in traceback.format_exc().splitlines()])
+        raise
+    finally:
+        try:
+            app.EchoOn()
+            app.GetOutputWindow().Clear()
+        except Exception:
+            pass
+        for line in report:
+            app.PrintPlain(line)
+        with open(OUT_TXT, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(report) + "\n")
+        app.PrintPlain("Report saved: " + OUT_TXT)
+finally:
+    del app
+    forget()
+\end{lstlisting}
+
+\subsection*{C.2\quad \texttt{pf\_setup.py}}
 Connection to PowerFactory and helper functions.
 \begin{lstlisting}
 """
@@ -2048,7 +2219,7 @@ def set_dg(in_service):
         g.SetAttribute("outserv", 0 if in_service else 1)
 \end{lstlisting}
 
-\subsection*{D.2\quad \texttt{protection\_data.py}}
+\subsection*{C.3\quad \texttt{protection\_data.py}}
 Feeder, device and fault data.
 \begin{lstlisting}
 """
@@ -2186,7 +2357,7 @@ A_FUSE = -1.8         # fuse slope a_i, eq. (6)
 T_RECL_MIN = 10 / 60  # minimum time delay between the reclosers' delayed curves (10 cycles)
 \end{lstlisting}
 
-\subsection*{D.3\quad \texttt{curves.py}}
+\subsection*{C.4\quad \texttt{curves.py}}
 Relay and fuse time--current curves.
 \begin{lstlisting}
 """
@@ -2279,7 +2450,7 @@ class Fuse:
         return _loglog(t, pts)
 \end{lstlisting}
 
-\subsection*{D.4\quad \texttt{step1\_build\_model.py}}
+\subsection*{C.5\quad \texttt{step1\_build\_model.py}}
 Builds the protection devices and the DG in the model.
 \begin{lstlisting}
 """
@@ -2403,7 +2574,7 @@ ldf = app.GetFromStudyCase("ComLdf")
 out("Load flow after build: %s" % ("OK" if ldf.Execute() == 0 else "FAILED"))
 \end{lstlisting}
 
-\subsection*{D.5\quad \texttt{step2\_studies.py}}
+\subsection*{C.6\quad \texttt{step2\_studies.py}}
 Unbalanced load flow and short-circuit studies.
 \begin{lstlisting}
 """
@@ -2617,7 +2788,7 @@ clean_variation()                       # DG switching above was recorded in the
 out("Saved %d fault cases to results/studies.json" % len(faults))
 \end{lstlisting}
 
-\subsection*{D.6\quad \texttt{step3\_design\_and\_evaluate.py}}
+\subsection*{C.7\quad \texttt{step3\_design\_and\_evaluate.py}}
 Settings, fuse coefficients and classification of the coordination.
 \begin{lstlisting}
 """
@@ -3338,7 +3509,7 @@ if __name__ == "__main__":
     main()
 \end{lstlisting}
 
-\subsection*{D.7\quad \texttt{step4\_apply\_settings.py}}
+\subsection*{C.8\quad \texttt{step4\_apply\_settings.py}}
 Writes the settings into the relay and fuse elements of the model.
 \begin{lstlisting}
 """
@@ -3494,7 +3665,7 @@ for r in bad[:10]:
     out("  trip / no-trip mismatch: %s" % r)
 \end{lstlisting}
 
-\subsection*{D.8\quad \texttt{step5\_fig10\_emt.py}}
+\subsection*{C.9\quad \texttt{step5\_fig10\_emt.py}}
 EMT simulation of the reclosing sequence.
 \begin{lstlisting}
 """
@@ -3769,5 +3940,11 @@ except OSError:                        # open in a viewer
 json.dump(SUMMARY, open(os.path.join(RESULTS, "Fig10_summary.json"), "w"), indent=1)
 out("Saved figures/Fig10_EMT_LL_684.png, results/Fig10_EMT_DG_*.csv and Fig10_summary.json")
 \end{lstlisting}
+
+
+% =====================================================================================================
+\appendixhead{D}{COMPLETE COPY OF THE REFERENCE PAPER}
+The complete reference paper~\cite{yousaf2022} is attached as a separate, unchanged
+PDF copy in accordance with the requirement of the department. It is not reproduced inside this document.
 
 \end{document}
