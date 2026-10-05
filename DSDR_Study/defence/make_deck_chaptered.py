@@ -288,10 +288,18 @@ table(s, [["Item", "Methodological definition"],
           ["Source", "115 kV grid, 5 MVA substation transformer"],
           ["DG", "4.05 MVA synchronous machine at node 692"],
           ["R1 (feeder head)", "GE IAC77B801A, extremely inverse"],
-          ["R2 (line 632–671)", "GE/Alstom CDG34 – becomes the DSDR"],
+          ["R2 (line 632\u2013671)", "GE/Alstom CDG34 \u2013 becomes the DSDR"],
           ["Fuses", "A055C, E-rated, on the laterals"],
           ["Studies", "Unbalanced load flow, short circuit, EMT"]],
-      0.5, 1.40, 6.3, [2.3, 4.0], size=14, row_h=0.50, center_from=9)
+      0.5, 1.30, 6.3, [2.3, 4.0], size=13, row_h=0.37, center_from=9)
+textbox(s, 0.5, 4.36, 6.3, 0.3, "**Parameters of the synchronous DG**", size=14, color=NAVY, space=0)
+table(s, [["Parameter", "Value", "Parameter", "Value"],
+          ["Rating Sn", "4.05 MVA", "Xd", "1.4 pu"],
+          ["Voltage Un", "0.69 kV", "X'd", "0.231 pu"],
+          ["Step-up transformer", "0.69 / 4.16 kV", "X''d", "0.118 pu"],
+          ["Transformer reactance xT", "0.15 pu", "Starting time M = 2H", "1.5 s"],
+          ["Operating point", "3.24 MW", "Stator resistance Ra", "0.0014 pu"]],
+      0.5, 4.70, 6.3, [2.1, 1.15, 1.9, 1.15], size=11.5, row_h=0.32, center_from=9)
 picture(s, "sld.png", 7.0, 1.25, 5.9, 4.5, "IEEE 13-node feeder with reclosers R1, R2, fuses and the DG")
 
 # ================================================================================================ 8 flowchart
