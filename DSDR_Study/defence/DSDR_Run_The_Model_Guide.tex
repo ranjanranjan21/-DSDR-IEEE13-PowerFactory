@@ -1,0 +1,224 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{needspace}
+\usepackage[hidelinks]{hyperref}
+\definecolor{navy}{HTML}{1B3755}
+\definecolor{headc}{HTML}{E6ECF5}
+\definecolor{okc}{HTML}{DFF3DF}
+\definecolor{noc}{HTML}{FBE0E0}
+\definecolor{warnc}{HTML}{FFF8E8}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.25}
+\newcommand{\sect}[1]{\needspace{8\baselineskip}\bigskip{\Large\color{navy}\bfseries #1}\par\smallskip{\color{navy}\hrule height 0.8pt}\smallskip}
+\newcommand{\sub}[1]{\needspace{5\baselineskip}\medskip{\large\color{navy}\bfseries #1}\par}
+\newcommand{\hd}{\rowcolor{headc}}
+\newcommand{\cmd}[1]{\par\smallskip\noindent\colorbox{headc}{\parbox{\dimexpr\linewidth-2\fboxsep}{\ttfamily\small #1}}\par\smallskip}
+\newcommand{\note}[1]{\par\smallskip\noindent\fcolorbox{orange}{warnc}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{#1}}\par\smallskip}
+\newcommand{\say}[1]{\par\noindent\textit{Say: ``#1''}\par}
+
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{navy} Running the Model in Front of the Examiner}\\[4pt]
+{\large A step-by-step guide for the defence}\\[2pt]
+IEEE 13-node feeder, DIgSILENT PowerFactory 2021 --- Jhala Nath Kafle (081MSPSE009)
+\end{center}
+
+\note{\textbf{The short version.} Open PowerFactory, activate the project \textbf{IEEE13 DSDR Fuse Coordination} and
+the study case \textbf{Study with Substation Transformer}. Then show three things by hand: (1) the load flow
+with the DG out and in --- the current through R2 reverses; (2) a short circuit at node 633 --- the fuse
+carries more current than the recloser; (3) the tripping times of the relays and the fuse. That takes about
+five minutes and proves the model is real. The scripts are the backup, not the main show.}
+
+\sect{1. Before the defence (do this the day before)}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{Use the same laptop} you built the model on. The project is stored in PowerFactory's own database
+on this machine, not in the project folder.
+\item \textbf{Check the licence.} Open PowerFactory once where you will present. If the licence needs a
+network or a dongle, make sure it works there.
+\item \textbf{Rehearse every step of Section 2 once}, and write down the numbers you see next to the numbers in
+Section 5. The menu names below are those of PowerFactory 2021; if a button is somewhere else on your
+screen, note where.
+\item \textbf{Leave the model in the DSDR state.} It is left that way after the last run of the study.
+\item \textbf{Keep a backup:} in PowerFactory, right-click the project \,$\rightarrow$\, \emph{Export}, and save
+the \texttt{.pfd} file on a USB stick.
+\item \textbf{Have these open and minimised:} PowerFactory with the project active; the report PDF; and
+the figures folder, \texttt{results\textbackslash figures}, inside \texttt{DSDR\_Study}.
+\end{enumerate}
+
+\sect{2. Showing the model by hand in PowerFactory (recommended)}
+
+\sub{Step 1 --- Open and activate (30 seconds)}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Start \textbf{PowerFactory 2021}.
+\item Open the Data Manager, find the project \textbf{IEEE13 DSDR Fuse Coordination} under your user,
+right-click \,$\rightarrow$\, \textbf{Activate}.
+\item In the study-case list at the top, choose \textbf{Study with Substation Transformer}.
+\item The single-line diagram of the IEEE 13-node feeder appears.
+\end{enumerate}
+\say{This is the IEEE 13-node feeder at 4.16 kV, fed from a 115 kV grid through a 5 MVA transformer. R1 is
+here at the feeder head, R2 is on line 632 to 671, the fuses are on the laterals, and the DG is at node 692.}
+
+\sub{Step 2 --- Load flow without the DG (1 minute)}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Right-click the \textbf{Synchronous Machine} at node 692 \,$\rightarrow$\, set it \textbf{Out of Service}.
+\item Click \textbf{Calculate Load Flow}. Select \emph{AC Load Flow, unbalanced, 3-phase (ABC)} and
+\textbf{Execute}.
+\item Point at the result boxes of line 650--632 and of line 632--671.
+\end{enumerate}
+\say{Without DG the feeder head carries about 588 amperes and the branch of R2 about 470 amperes, flowing
+from the grid towards the loads.}
+
+\sub{Step 3 --- Load flow with the DG (1 minute)}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Put the Synchronous Machine back \textbf{In Service}.
+\item \textbf{Calculate Load Flow} again.
+\item Point at line 632--671: the current is now about 252 amperes and the power flows \emph{towards 632}.
+\end{enumerate}
+\say{With the DG the current through R2 falls to about 252 amperes and its direction reverses. This is why
+R2 needs a second, reverse setting: 1.25 times 252 gives the reverse pickup of 315 amperes.}
+
+\sub{Step 4 --- Short circuit (1 to 2 minutes)}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Right-click the busbar \textbf{633} \,$\rightarrow$\, \textbf{Calculate} \,$\rightarrow$\,
+\textbf{Short-Circuit}.
+\item Method: \textbf{complete}. Fault type: \textbf{3-phase short-circuit}. Fault impedance 0.
+\textbf{Execute}.
+\item Point at the currents in the fuse F633, in R1 (line 650--632) and in R2 (line 632--671).
+\end{enumerate}
+\say{For a three-phase fault at 633 with the DG, the fuse carries about 5.4 kiloamperes, but R1 carries
+only about 4.0 and R2 about 1.5 in reverse. The fuse sees the grid and the DG current together; each
+recloser sees only its share. That is the whole problem.}
+
+\sub{Step 5 --- Tripping times (1 minute)}
+With the short circuit of Step 4 still calculated:
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Open the relay \textbf{R1 Fast} (double-click it in the cubicle, or find it in the Data Manager) and
+look at its \textbf{tripping time}. Do the same for \textbf{R2 Rev Fast} and for the fuse \textbf{F633}.
+\item Or open a \textbf{time-overcurrent plot} that contains these devices: the vertical line is the fault
+current, and the plot shows where it meets each curve.
+\end{enumerate}
+\say{R2 trips on its reverse group in about 0.06 seconds and R1 in about 0.11 seconds. The fuse would start
+to melt at about 0.15 seconds. So both reclosers trip first and the fuse is saved.}
+
+\sub{Step 6 --- If asked for the EMT simulation}
+The EMT run needs the scripted reclosing events, so it is quicker to show the saved result: Figure 5.14 of
+the report, or the picture file
+\cmd{DSDR\_Study\textbackslash results\textbackslash figures\textbackslash Fig10\_EMT\_LL\_684.png}
+If the examiner insists on a live run, use Section 3, command (d); it runs the simulation six times and
+takes a few minutes.
+
+\sect{3. Running the scripts (backup, or if asked ``show me the code running'')}
+\note{\textbf{Close PowerFactory first.} The scripts start their own PowerFactory in the background, and that
+cannot start while the PowerFactory window is open.}
+
+Open a Command Prompt and go to the study folder:
+\cmd{cd /d "C:\textbackslash Users\textbackslash Rabin\textbackslash Desktop\textbackslash Digsilent\_project - TWIST AND TURN\textbackslash DSDR\_Study"}
+\cmd{set PY="C:\textbackslash Users\textbackslash Rabin\textbackslash AppData\textbackslash Local\textbackslash Programs\textbackslash Python\textbackslash Python39\textbackslash python.exe"}
+
+\begin{table}[H]\centering\small
+\begin{tabular}{|c|p{6.2cm}|p{8cm}|}\hline
+\hd & \textbf{Command} & \textbf{What it does and what appears} \\ \hline
+(a) & \texttt{\%PY\% step2\_studies.py} & Load flows and all short circuits in PowerFactory. Prints the
+currents through R1 and R2 for each fault. \\ \hline
+(b) & \texttt{\%PY\% step3\_design\_and\_evaluate.py} & No PowerFactory needed; a few seconds. Prints Table II,
+the settings, and the cell counts: 35 and 39 without DG, 24 with DG, 38 with the DSDR. \\ \hline
+(c) & \texttt{\%PY\% step4\_apply\_settings.py dsdr} & Writes the DSDR settings into the relays and fuses and
+compares PowerFactory's tripping times with the calculated ones. \\ \hline
+(d) & \texttt{\%PY\% step5\_fig10\_emt.py} & The EMT simulation, DG out and DG in. Prints the event times and
+saves the figure. \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{The safest script to run live is (b).} It needs no PowerFactory, finishes in seconds and prints the
+headline results. The full output is also saved in \texttt{results\textbackslash summary.txt}, which you can
+simply open.
+
+\note{\textbf{Do not run \texttt{run\_all.py} or \texttt{step1\_build\_model.py} at the defence.} They rebuild
+the model and all outputs from scratch, which takes several minutes and is not needed to show a result.}
+
+\sect{4. A third way: the script inside PowerFactory}
+The project contains a Python script object named \textbf{Final(1)}. With the project active, find it in the
+Data Manager (under the study case or the project's \emph{Scripts}), right-click \,$\rightarrow$\,
+\textbf{Execute}. It runs the load flows and the short-circuit database and prints a report in the
+\textbf{Output Window}, with the current through R1 and R2 and its direction, DG out and DG in. Rehearse
+it once; it takes a few minutes.
+
+\sect{5. Numbers you should see}
+\begin{table}[H]\centering\small
+\begin{tabular}{|p{6.6cm}|c|c|}\hline
+\hd \textbf{Load flow} & \textbf{DG out} & \textbf{DG in} \\ \hline
+Feeder head, line 650--632 (R1) & 587.7 A & 284.9 A \\ \hline
+Line 632--671 (R2) & 470.0 A, forward & 252.2 A, \textbf{reverse} \\ \hline
+\end{tabular}
+\end{table}
+\begin{table}[H]\centering\small
+\begin{tabular}{|p{6.6cm}|c|c|}\hline
+\hd \textbf{Bolted three-phase fault} & \textbf{DG out} & \textbf{DG in} \\ \hline
+Fault current at 632 & 4.74 kA & 6.53 kA \\ \hline
+Fault current at 633 & 4.10 kA & 5.43 kA \\ \hline
+\end{tabular}
+\end{table}
+\begin{table}[H]\centering\small
+\begin{tabular}{|p{4.2cm}|c|c|c|}\hline
+\hd \textbf{Fault at 633, DG in, DSDR} & \textbf{Current} & \textbf{Device} & \textbf{Time} \\ \hline
+R2, reverse group & 1500 A & R2 Rev Fast & 0.060 s \\ \hline
+R1 & 3970 A & R1 Fast & 0.106 s \\ \hline
+Fuse F633 (400E) & 5426 A & F633 & melts at 0.149 s \\ \hline
+\end{tabular}
+\end{table}
+Small differences in the last digit are normal. If a number is very different, check the two things in
+Section 6 first.
+
+\sect{6. If something goes wrong}
+\begin{table}[H]\centering\small
+\begin{tabular}{|p{5.4cm}|p{9.9cm}|}\hline
+\hd \textbf{What you see} & \textbf{What to do} \\ \hline
+The numbers are much too high (for example 6 to 8 kA at 632 without DG) & The wrong study case is active.
+Choose \textbf{Study with Substation Transformer}. \\ \hline
+R2 current is 470 A although you expect 252 A & The DG is out of service. Put the Synchronous Machine in
+service and run the load flow again. \\ \hline
+Load flow does not converge & Press \emph{Reset Calculation}, check that nothing was switched off by mistake,
+run again. \\ \hline
+``Short-circuit calculation not possible'' & You chose a phase the node does not have (645 and 646 have b--c
+only, 684 has a--c, 611 has c, 652 has a). Choose node 633, 632 or 671. \\ \hline
+A script says PowerFactory could not start & PowerFactory's window is still open. Close it and run the
+command again. \\ \hline
+A script stops with an error & Do not debug in front of the panel. Open \texttt{results\textbackslash summary.txt}
+and the saved figures, and say the results were produced by the same script. \\ \hline
+PowerFactory will not open at all & Show the report figures and \texttt{results\textbackslash summary.txt}; offer
+to run it afterwards. \\ \hline
+\end{tabular}
+\end{table}
+
+\sect{7. What the examiner may ask while it runs}
+\textbf{Which calculation method is this?} Unbalanced, three-phase load flow; short circuit by the
+\emph{complete} method, which starts from the load-flow state.
+
+\textbf{Why this study case and not the other one?} This one includes the 115/4.16 kV, 5 MVA substation
+transformer. With it the fault levels match the IEEE short-circuit benchmark within about 2 per cent. The
+stiff-grid case gives fault levels that are too high.
+
+\textbf{Where are the two settings of R2?} The CDG34 relay of the library is not directional. So R2 has
+separate relay units: \emph{R2 Fast} and \emph{R2 Delayed} for the forward group, \emph{R2 Rev Fast} and
+\emph{R2 Rev Delayed} for the reverse group. The direction is assigned from the fault location. I state
+this as a limitation.
+
+\textbf{What do the Python scripts do that PowerFactory does not?} PowerFactory does the load flow, the short
+circuits and the EMT simulation. The scripts run those studies for all nodes and fault types, apply the
+method's equations to get the settings, and classify the 39 cells. Doing 273 short circuits by hand would
+not be practical.
+
+\textbf{Can you change the DG size and show the effect?} Open the Synchronous Machine, change its active
+power, run the load flow: the current through R2 changes. The full study at seven penetration levels is in
+Section 5.16 of the report.
+
+\end{document}
